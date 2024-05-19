@@ -4,6 +4,7 @@ import sys
 
 
 class Options:
+    # Function to initialise default values to the options
     def __init__(self):
         self.ref = ''
         self.program = 'bwa'
@@ -47,9 +48,9 @@ class Options:
         self.mem = 5
         self.nodes = 20
         self.dirty = False
-        self.mapfiles = ''
+        self.mapfiles = []
 
-
+# Function for UI of CLI and input validity
 def menu_system(option):
     run = False
     while not run:
@@ -58,7 +59,7 @@ def menu_system(option):
         if option.ref == '':
             print("r: Reference dna sequence:\t\tNone selected (required)")
         else:
-            print("File: Directory containing the files to be mapped:\t\t" + option.mapfiles)
+            print("File: Directory containing the files to be mapped:\t\t" + str(option.mapfiles))
             print("r: Reference dna sequence:\t\t" + option.ref)
             print("p: Program:\t\t\t\t" + option.program)
             print("1: Do not remap data:\t\t\t" + str(not option.domapping))
@@ -117,93 +118,396 @@ def menu_system(option):
             os.system('clear')
             run = True
         elif ui == 'File':
-            option.mapfiles = input('Enter the directory containing the files to be mapped: ')
+            file_path = input('Enter the path of the files to be mapped: ')
+            if os.path.isfile(file_path):
+                option.mapfiles.append(file_path)
+            else:
+                print("File does not exist")
         elif ui == 'r':
-            option.ref = input('Enter reference file name including path or Q to go back to the menu: ')
+            while True:
+                ref_file_path = input('Enter reference file name including path or Q to go back to the menu: ')
+                print(ref_file_path)
+                if os.path.isfile(ref_file_path):
+                    option.ref = ref_file_path
+                    break
+                else:
+                    print("Reference file does not exist")
+
         elif ui == 'p':
-            option.program = input('Enter program (bwa, ssaha, smalt) or Q to go back to the menu: ')
+            while True:
+                inp = input('Enter program (bwa, ssaha, smalt) or Q to go back to the menu: ').lower()
+                if inp == 'q':
+                    break
+                elif inp in ['bwa', 'ssaha', 'smalt']:
+                    option.program = inp
+                    break
+                else :
+                    print("Invalid program")
+
         elif ui == '1':
-            option.domapping = input('Enter true or false or Q to go back to the menu: ').lower() == 'true'
+            while True:
+                inp = input('Enter true or false or Q to go back to the menu: ').lower()
+                if inp == 'q':
+                    break
+                elif inp in ['true', 'false']:
+                    option.domapping = inp == 'true'
+                    break
+                else :
+                    print("Invalid input")
         elif ui == 'H':
-            option.human = input('Enter true or false or Q to go back to the menu: ').lower() == 'true'
+            while True:
+                inp = input('Enter true or false or Q to go back to the menu: ').lower()
+                print(inp)
+                if inp == 'q':
+                    break
+                elif inp in ['true', 'false']:
+                    option.human = inp == 'true'
+                    break
+                else :
+                    print("Invalid input")
         elif ui == 's':
-            option.pairedend = input('Enter true or false or Q to go back to the menu: ').lower() == 'true'
+            while True:
+                inp = input('Enter true or false or Q to go back to the menu: ').lower()
+                print(inp)
+                if inp == 'q':
+                    break
+                elif inp in ['true', 'false']:
+                    option.pairedend = inp == 'true'
+                    break
+                else :
+                    print("Invalid input")
         elif ui == 'i':
-            option.maxinsertsize = int(input('Enter maximum insert size (10-10,000). Must be more than min: '))
+            while True:
+                inp = input('Enter maximum insert size (10-10,000) or Q to go back to the menu. Must be more than min: ').lower()
+                if inp == 'q':
+                    break
+                elif int(inp) >= 10 and int(inp) <= 10000 and int(inp) > int(option.mininsertsize):
+                    option.maxinsertsize = inp
+                    break
+                else :
+                    print("Invalid input")
+            
         elif ui == 'j':
-            option.mininsertsize = int(input('Enter minimum insert size (10-10,000). Must be less than max: '))
+            while True:
+                inp = input('Enter minimum insert size (10-10,000) or Q to go back to the menu. Must be less than max: ').lower()
+                if inp == 'q':
+                    break
+                elif int(inp) >= 10 and int(inp) <= 10000 and int(inp) < int(option.maxinsertsize):
+                    option.mininsertsize = inp
+                    break
+                else :
+                    print("Invalid input")
         elif ui == 'S':
-            option.ssahaquality = int(input('Enter minimum ssaha quality score while mapping (ssaha only): '))
+            if option.program != 'ssaha':
+                print("ssaha quality score is only applicable for ssaha program. Press any key to continue.")
+                inp = input()
+            while True:
+                inp = input('Enter minimum ssaha quality score while mapping (ssaha only) or Q to go back to the menu: ').lower()
+                if inp == 'q':
+                    break
+                elif int(inp) >= 0:
+                    option.ssahaquality = inp
+                    break
+                else :
+                    print("Invalid input")
         elif ui == 'E':
-            option.maprepeats = input('Enter true or false or Q to go back to the menu: ').lower() == 'true'
+            while True:
+                inp = input('Enter true or false or Q to go back to the menu: ').lower()
+                print(inp)
+                if inp == 'q':
+                    break
+                elif inp in ['true', 'false']:
+                    option.maprepeats = inp == 'true'
+                    break
+                else :
+                    print("Invalid input")
         elif ui == 'z':
             option.nomapid = float(input('Enter minimum identity threshold to report a mapping: '))
         elif ui == 'G':
-            option.GATK = input('Enter true or false or Q to go back to the menu: ').lower() == 'true'
+            while True:
+                inp = input('Enter true or false or Q to go back to the menu: ').lower()
+                print(inp)
+                if inp == 'q':
+                    break
+                elif inp in ['true', 'false']:
+                    option.GATK = inp == 'true'
+                    break
+                else :
+                    print("Invalid input")
         elif ui == 'u':
-            option.markdup = input('Enter true or false or Q to go back to the menu: ').lower() == 'true'
+            while True:
+                inp = input('Enter true or false or Q to go back to the menu: ').lower()
+                print(inp)
+                if inp == 'q':
+                    break
+                elif inp in ['true', 'false']:
+                    option.markdup = inp == 'true'
+                    break
+                else :
+                    print("Invalid input")
         elif ui == '2':
-            option.detectOverlaps = input('Enter true or false or Q to go back to the menu: ').lower() == 'true'
+            while True:
+                inp = input('Enter true or false or Q to go back to the menu: ').lower()
+                print(inp)
+                if inp == 'q':
+                    break
+                elif inp in ['true', 'false']:
+                    option.detectOverlaps = inp == 'true'
+                    break
+                else :
+                    print("Invalid input")
         elif ui == 'X':
-            option.pseudosequence = input('Enter true or false or Q to go back to the menu: ').lower() == 'true'
+            while True:
+                inp = input('Enter true or false or Q to go back to the menu: ').lower()
+                print(inp)
+                if inp == 'q':
+                    break
+                elif inp in ['true', 'false']:
+                    option.pseudosequence = inp == 'true'
+                    break
+                else :
+                    print("Invalid input")
         elif ui == 'x':
-            option.incref = input('Enter true or false or Q to go back to the menu: ').lower() == 'true'
+            while True:
+                inp = input('Enter true or false or Q to go back to the menu: ').lower()
+                print(inp)
+                if inp == 'q':
+                    break
+                elif inp in ['true', 'false']:
+                    option.incref = inp == 'true'
+                    break
+                else :
+                    print("Invalid input")
         elif ui == 'I':
-            option.indels = input('Enter true or false or Q to go back to the menu: ').lower() == 'true'
+            while True:
+                inp = input('Enter true or false or Q to go back to the menu: ').lower()
+                print(inp)
+                if inp == 'q':
+                    break
+                elif inp in ['true', 'false']:
+                    option.indels = inp == 'true'
+                    break
+                else :
+                    print("Invalid input")
         elif ui == 'q':
-            option.quality = int(input('Enter minimum base call quality: '))
+            while True:
+                inp = input('Enter minimum base call quality: ').lower()
+                if inp == 'q':
+                    break
+                elif int(inp) >= 0:
+                    option.quality = inp
+                    break
+                else :
+                    print("Invalid input")
         elif ui == 'Q':
-            option.mapq = int(input('Enter minimum mapping quality: '))
+            while True:
+                inp = input('Enter minimum mapping quality: ').lower()
+                if inp == 'q':
+                    break
+                elif int(inp) >= 0:
+                    option.mapq = inp
+                    break
+                else :
+                    print("Invalid input")
         elif ui == 'd':
-            option.depth = int(input('Enter minimum number of reads matching SNP: '))
+            while True:
+                inp = input('Enter minimum number of reads matching SNP: ').lower()
+                if inp == 'q':
+                    break
+                elif int(inp) >= 0:
+                    option.depth = inp
+                    break
+                else :
+                    print("Invalid input")
         elif ui == 'D':
-            option.stranddepth = int(input('Enter minimum number of reads matching SNP per strand: '))
+            while True:
+                inp = input('Enter minimum number of reads matching SNP per strand: ').lower()
+                if inp == 'q':
+                    break
+                elif int(inp) >= 0:
+                    option.stranddepth = inp
+                    break
+                else :
+                    print("Invalid input")
         elif ui == 'A':
-            option.anomolous = input('Enter true or false or Q to go back to the menu: ').lower() == 'true'
+            while True:
+                inp = input('Enter true or false or Q to go back to the menu: ').lower()
+                print(inp)
+                if inp == 'q':
+                    break
+                elif inp in ['true', 'false']:
+                    option.anomolous = inp == 'true'
+                    break
+                else :
+                    print("Invalid input")
         elif ui == 'B':
-            option.BAQ = input('Enter true or false or Q to go back to the menu: ').lower() == 'true'
+            while True:
+                inp = input('Enter true or false or Q to go back to the menu: ').lower()
+                print(inp)
+                if inp == 'q':
+                    break
+                elif inp in ['true', 'false']:
+                    option.BAQ = inp == 'true'
+                    break
+                else :
+                    print("Invalid input")
         elif ui == 'c':
-            option.circular = input('Enter true or false or Q to go back to the menu: ').lower() == 'true'
+            while True:
+                inp = input('Enter true or false or Q to go back to the menu: ').lower()
+                print(inp)
+                if inp == 'q':
+                    break
+                elif inp in ['true', 'false']:
+                    option.circular = inp == 'true'
+                    break
+                else :
+                    print("Invalid input")
         elif ui == 'R':
             option.ratio = float(input('Enter SNP/Mapping quality ratio cutoff: '))
         elif ui == 'P':
             option.prior = float(input('Enter mutation rate: '))
         elif ui == 'C':
-            option.call = input('Enter bcftools caller (c or m) or Q to go back to the menu: ')
+            while True:
+                inp = input('Enter bcftools caller (c or m) or Q to go back to the menu: ').lower()
+                if inp == 'q':
+                    break
+                elif inp in ['c', 'm']:
+                    option.call = inp
+                    break
+                else :
+                    print("Invalid input")
         elif ui == 'e':
-            option.embl = input('Enter reference annotation or Q to go back to the menu: ')
+            inp = input('Enter reference annotation or Q to go back to the menu: ')
+            if inp != 'Q':
+                option.embl = inp
         elif ui == 'o':
-            option.output = input('Enter output file prefix or Q to go back to the menu: ')
+            inp = input('Enter output file prefix or Q to go back to the menu: ')
+            if inp != 'Q':
+                option.output = inp
         elif ui == 'O':
-            option.diroutput = input('Enter output directory suffix or Q to go back to the menu: ')
+            inp = input('Enter output directory suffix or Q to go back to the menu: ')
+            if inp != 'Q':
+                option.diroutput = inp
         elif ui == 'f':
-            option.force = input('Enter true or false or Q to go back to the menu: ').lower() == 'true'
+            while True:
+                inp = input('Enter true or false or Q to go back to the menu: ').lower()
+                if inp == 'q':
+                    break
+                elif inp in ['true', 'false']:
+                    option.force = inp == 'true'
+                    break
+                else :
+                    print("Invalid input")
         elif ui == 'F':
-            option.filter = input('Enter filter or split bam file (1, 2, 3, 4, 5) or Q to go back to the menu: ')
+            while True:
+                inp = input('Enter filter or split bam file (1, 2, 3, 4, 5) or Q to go back to the menu: ').lower()
+                print(inp)
+                if inp == 'q':
+                    break
+                elif inp in ['1', '2', '3', '4', '5']:
+                    option.filter = inp
+                    break
+                else :
+                    print("Invalid input")
         elif ui == 't':
-            option.tabfile = input('Enter true or false or Q to go back to the menu: ').lower() == 'true'
+            while True:
+                inp = input('Enter true or false or Q to go back to the menu: ').lower()
+                if inp == 'q':
+                    break
+                elif inp in ['true', 'false']:
+                    option.tabfile = inp == 'true'
+                    break
+                else :
+                    print("Invalid input")
         elif ui == 'a':
-            option.alnfile = input('Enter true or false or Q to go back to the menu: ').lower() == 'true'
+            while True:
+                inp = input('Enter true or false or Q to go back to the menu: ').lower()
+                if inp == 'q':
+                    break
+                elif inp in ['true', 'false']:
+                    option.alnfile = inp == 'true'
+                    break
+                else :
+                    print("Invalid input")
         elif ui == 'Y':
-            option.raxml = input('Enter true or false or Q to go back to the menu: ').lower() == 'true'
+            while True:
+                inp = input('Enter true or false or Q to go back to the menu: ').lower()
+                if inp == 'q':
+                    break
+                elif inp in ['true', 'false']:
+                    option.raxml = inp == 'true'
+                    break
+                else :
+                    print("Invalid input")
         elif ui == 'm':
-            option.model = input(
-                'Enter model of evolution to use (GTRGAMMA, GTRGAMMAI, GTRCAT, GTRMIX, GTRMIXI) or Q to go back to the menu: ')
+            while True:
+                inp = input('Enter true or false or Q to go back to the menu: ')
+                if inp == 'Q':
+                    break
+                elif inp in ['GTRGAMMA', 'GTRGAMMAI', 'GTRCAT', 'GTRMIX', 'GTRMIXI']:
+                    option.force = inp
+                    break
+                else :
+                    print("Invalid input")
         elif ui == 'b':
-            option.bootstrap = int(input('Enter number of bootstrap replicates: '))
+            inp = input('Enter number of bootstrap replicates: ')
+            if inp == 'Q':
+                continue
+            elif int(inp) >= 0:
+                option.bootstrap = inp
+                break
         elif ui == 'k':
-            option.keep = input('Enter true or false or Q to go back to the menu: ').lower() == 'true'
+            while True:
+                inp = input('Enter true or false or Q to go back to the menu: ').lower()
+                if inp == 'q':
+                    break
+                elif inp in ['true', 'false']:
+                    option.keep = inp == 'true'
+                    break
+                else :
+                    print("Invalid input")
         elif ui == 'L':
-            option.LSF = input('Enter true or false or Q to go back to the menu: ').lower() == 'true'
+            while True:
+                inp = input('Enter true or false or Q to go back to the menu: ').lower()
+                if inp == 'q':
+                    break
+                elif inp in ['true', 'false']:
+                    option.LSF = inp == 'true'
+                    break
+                else :
+                    print("Invalid input")
         elif ui == 'U':
-            option.LSFQ = input(
-                'Enter LSF queue to submit to (normal, long, basement, hugemem) or Q to go back to the menu: ')
+            while True:
+                inp = input('Enter LSF queue to submit to (normal, long, basement, hugemem) or Q to go back to the menu: ').lower()
+                if inp == 'q':
+                    break
+                elif inp in ['normal', 'long', 'basement', 'hugemem']:
+                    option.LSFQ = inp
+                    break
+                else :
+                    print("Invalid input")
         elif ui == 'M':
-            option.mem = int(input('Enter amount of memory required for analysis (Gb): '))
+            inp = input('Enter amount of memory required for analysis (Gb): ')
+            if inp == 'Q':
+                continue
+            if inp >=0:
+                option.mem = inp
         elif ui == 'n':
-            option.nodes = int(input('Enter maximum number of jobs to run on nodes in parallel: '))
+            inp = input('Enter maximum number of jobs to run on nodes in parallel: ')
+            if inp == 'Q':
+                continue
+            if inp >=0:
+                option.nodes = inp
         elif ui == 'y':
-            option.dirty = input('Enter true or false or Q to go back to the menu: ').lower() == 'true'
+            while True:
+                inp = input('Enter true or false or Q to go back to the menu: ').lower()
+                if inp == 'q':
+                    break
+                elif inp in ['true', 'false']:
+                    option.dirty = inp == 'true'
+                    break
+                else :
+                    print("Invalid input")
         elif ui == 'quit':
             sys.exit()
     return option
@@ -211,8 +515,6 @@ def menu_system(option):
 
 def build_command(option):
     command = "nextflow run scripts/main.nf"
-    if option.mapfiles is not None:
-        command += f" --mapfiles {option.mapfiles}"
     if option.ref:
         command += f" --ref {option.ref}"
     if option.program:
@@ -297,9 +599,25 @@ def build_command(option):
         command += f" --nodes {option.nodes}"
     if option.dirty is not None:
         command += f" --dirty {option.dirty}"
+    if len(option.mapfiles) > 0:
+        command += f" --mapfiles \""
+        for file in option.mapfiles:
+            command += f"{file},"
+        command = command[:-1]
+        command += "\""
     command += f" -process.echo"
     return command
 
+def validate_inputs(option):
+    if option.ref == '':
+        print("Reference file is required. Press any key to continue")
+        inp = input()
+        option = menu_system(option)
+    elif option.maxinsertsize < 10 or option.maxinsertsize > 10000:
+        print("Maximum insert size should be between 10 and 10,000. Press any key to continue")
+        inp = input()
+        option = menu_system(option)
+    
 
 def run_pipeline(option):
     command = build_command(option)
@@ -310,4 +628,5 @@ def run_pipeline(option):
 if __name__ == "__main__":
     options = Options()
     options = menu_system(options)
+    validate_inputs(options)
     run_pipeline(options)
