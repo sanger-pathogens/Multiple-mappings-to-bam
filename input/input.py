@@ -294,21 +294,24 @@ def menu_system(option):
                 inp = input('Enter minimum base call quality: ').lower()
                 if inp == 'q':
                     break
-                elif int(inp) >= 0:
+                elif int(inp) > 0 and int(inp) < 100:
                     option.quality = inp
                     break
                 else :
-                    print("Invalid input")
+                    print("The value should be in range [1, 99]")
         elif ui == 'Q':
             while True:
                 inp = input('Enter minimum mapping quality: ').lower()
                 if inp == 'q':
                     break
-                elif int(inp) >= 0:
+                elif int(inp) > 0 and (int(inp) < 30 or option.program != 'bwa') and (int(inp) < 60 or option.program == 'bwa'):
                     option.mapq = inp
                     break
                 else :
-                    print("Invalid input")
+                    if option.program == 'bwa':
+                        print("Mapping quality score (-Q) must be between 0 and 30 for BWA.")
+                    else:
+                        print(f"Mapping quality score (-Q) must be between 0 and 60 for {option.program}")
         elif ui == 'd':
             while True:
                 inp = input('Enter minimum number of reads matching SNP: ').lower()
@@ -363,9 +366,19 @@ def menu_system(option):
                 else :
                     print("Invalid input")
         elif ui == 'R':
-            option.ratio = float(input('Enter SNP/Mapping quality ratio cutoff: '))
+            while True:
+                inp = float (input('Enter SNP/Mapping quality ratio cutoff: '))
+                if inp>1 or inp<0:
+                    print("SNP/site mapping quality ratio cutoff (-R) must be between 0 and 1")
+                else:
+                    option.ratio = inp
         elif ui == 'P':
-            option.prior = float(input('Enter mutation rate: '))
+            while True:
+                inp = float (input('Enter mutation rate: '))
+                if inp>1 or inp<0:
+                    print("Estimated mutation rate (-P) must be between 0 and 1")
+                else:
+                    option.prior = inp
         elif ui == 'C':
             while True:
                 inp = input('Enter bcftools caller (c or m) or Q to go back to the menu: ').lower()
@@ -490,8 +503,11 @@ def menu_system(option):
             inp = input('Enter amount of memory required for analysis (Gb): ')
             if inp == 'Q':
                 continue
-            if inp >=0:
+            if inp >= 0 and inp <= 30:
                 option.mem = inp
+            else:
+                print("Memory requirement (-M) must be between 0 and 30Gb")
+
         elif ui == 'n':
             inp = input('Enter maximum number of jobs to run on nodes in parallel: ')
             if inp == 'Q':
@@ -608,15 +624,38 @@ def build_command(option):
     command += f" -process.echo"
     return command
 
-def validate_inputs(option):
-    if option.ref == '':
-        print("Reference file is required. Press any key to continue")
-        inp = input()
-        option = menu_system(option)
-    elif option.maxinsertsize < 10 or option.maxinsertsize > 10000:
-        print("Maximum insert size should be between 10 and 10,000. Press any key to continue")
-        inp = input()
-        option = menu_system(option)
+
+
+def DoError (errorString, options):
+    print ("\nError: ", errorString)
+    print ("Press any key to continue.")
+    inp = input()
+    options = menu_system (options)
+    return options
+
+
+
+def validate_inputs(options):
+
+    if options.output == '':
+        options.output = options.ref.split("/")[-1].split(".")[0]+"_"+options.program
+
+    while options.force==False and os.path.isfile(options.output+".aln"):
+        output = ""
+        output = input ("\nOutput files with chosen prefix already exist.\n\nWould you like to overwrite (o), choose a new output file prefix (n) or quit (Q): ")
+        if output == 'Q':
+            sys.exit()
+        elif output == "o":
+            options.force=True
+            break
+        elif output == "n":
+            options.output = input("Enter a new output file prefix: ")
+    if options.ref == '':
+        options = DoError("No reference DNA file (-r) selected!", options)
+    if not options.mapfiles:
+        options = DoError("No input files selected!", options)
+    options.program=options.program.upper()
+    return options
     
 
 def run_pipeline(option):
@@ -628,5 +667,5 @@ def run_pipeline(option):
 if __name__ == "__main__":
     options = Options()
     options = menu_system(options)
-    validate_inputs(options)
+    options = validate_inputs(options)
     run_pipeline(options)
