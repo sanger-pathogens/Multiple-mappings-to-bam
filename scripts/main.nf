@@ -1,6 +1,6 @@
 nextflow.enable.dsl=2
-// nextflow run scripts/main.nf --ref /home/darshil/LED/Setups/ref.txt --program bwa --domapping True --human False --pairedend True --maxinsertsize 1000 --mininsertsize 50 --ssahaquality 30 --maprepeats False --GATK True --markdup True --detectOverlaps False --pseudosequence True --incref True --indels True --quality 50 --mapq 20 --depth 8 --stranddepth 3 --anomolous True --BAQ True --circular True --ratio 0.8 --prior 0.001 --call c --force False --filter 1 --tabfile False --alnfile False --raxml False --model GTRGAMMA --bootstrap 100 --keep False --LSF True --LSFQ normal --mem 5 --nodes 20 --dirty False --mapfiles "/home/darshil/LED/Setups/ref.txt,/home/darshil/LED/Setups/ref.txt" -process.echo
-include { validateInputs } from './validate_input.nf'
+// nextflow run scripts/main.nf --ref /home/ref.txt --program bwa --domapping True --human False --pairedend True --maxinsertsize 1000 --mininsertsize 50 --ssahaquality 30 --maprepeats False --GATK True --markdup True --detectOverlaps False --pseudosequence True --incref True --indels True --quality 50 --mapq 20 --depth 8 --stranddepth 3 --anomolous True --BAQ True --circular True --ratio 0.8 --prior 0.001 --call c --force False --filter 1 --tabfile False --alnfile False --raxml False --model GTRGAMMA --bootstrap 100 --keep False --LSF True --LSFQ normal --mem 5 --nodes 20 --dirty False --mapfiles "/home/ref.txt,/home/ref2.txt" -process.echo
+// include { validateInputs } from './validate_input.nf'
 
 params.mapfiles = ""
 params.ref = ""
@@ -90,8 +90,6 @@ process processArgs {
     echo "Mapfiles: ${params.mapfiles}"
     """
 }
-
 workflow {
-    validateInputs()
     processArgs()
 }
