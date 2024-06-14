@@ -94,6 +94,7 @@ process processArgs {
 }
 
 workflow {
-    processArgs()
-    runSsaha(params.ref, '', 'name', true, 'runname', params.ssahaquality, params.maxinsertsize, params.mininsertsize, params.circular)
+    // processArgs()
+    bashfile = file("${projectDir}/temp.sh")
+    runSsaha(bashfile, params.ref, '', 'name', true, 'runname', params.ssahaquality, params.maxinsertsize, params.mininsertsize, params.circular)
 }
