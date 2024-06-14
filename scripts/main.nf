@@ -1,6 +1,8 @@
 nextflow.enable.dsl=2
-import java.io.File
+
 // nextflow run scripts/main.nf --ref /home/ref.txt --program bwa --domapping True --human False --pairedend True --maxinsertsize 1000 --mininsertsize 50 --ssahaquality 30 --maprepeats False --GATK True --markdup True --detectOverlaps False --pseudosequence True --incref True --indels True --quality 50 --mapq 20 --depth 8 --stranddepth 3 --anomolous True --BAQ True --circular True --ratio 0.8 --prior 0.001 --call c --force False --filter 1 --tabfile False --alnfile False --raxml False --model GTRGAMMA --bootstrap 100 --keep False --LSF True --LSFQ normal --mem 5 --nodes 20 --dirty False --mapfiles "/home/ref.txt,/home/ref2.txt" -process.echo
+
+include { runSsaha } from './SNPanalysis/runssaha.nf'
 
 params.mapfiles = ""
 params.ref = ""
@@ -91,51 +93,7 @@ process processArgs {
     """
 }
 
-def SNPanalysis(String fastq = '', String Name = '', Map mapped = [:], String runssaha = 'n', String CDSseq = '', int number = 0) {
-    // A map representing the object with properties and methods
-    def object = [
-        fastq: fastq,
-        name: Name,
-        runname: '',
-        fastqdir: '',
-        number: number,
-        pairedend: true,
-        is_zipped: true,
-
-        runSsaha: { String bashfilePath, String name, String runname, String fastqdir, Boolean pairedend ->
-
-            println "Running Ssaha on ${name} ..."
-
-            File bashfile = new File (bashfilePath)
-
-            if (!params.pairedend) {
-                bashfile.append("ssaha2 -score ${params.ssahaquality} -kmer 13 -skip 2 -seeds 2 -score 12 -cmatch 9 -ckmer 6 -diff 0 -output sam_soft -outfile ${runname}/tmp1.sam ${params.ref} ${fastqdir}${name}.fastq\n")
-            } else { // Paired end
-                println 'Here'
-                bashfile.append("ssaha2 -score ${params.ssahaquality} -kmer 13 -skip 2 -seeds 2 -score 12 -cmatch 9 -ckmer 6 -diff 0 -outfile ${runname}/tmp1.sam -pair ${params.mininsertsize},${params.maxinsertsize} -output sam_soft ${params.ref} ${fastqdir}${name}_1.fastq ${fastqdir}${name}_2.fastq\n")
-            }
-            bashfile.append("samtools view -b -S ${runname}/tmp1.sam -t ${params.ref}.fai > ${runname}/tmp1.bam\n")
-
-            if (pairedend && params.circular) {
-                bashfile.append("fix_circular_bams.py -b ${runname}/tmp1.bam -o ${runname}/tmp\n")
-                bashfile.append("rm ${runname}/tmp1.bam\n")
-            } else {
-                bashfile.append("mv ${runname}/tmp1.bam ${runname}/tmp.bam\n")
-            }
-
-            bashfile.append("samtools view -H ${runname}/tmp.bam > ${runname}/tmp2.sam\n")
-            bashfile.append("cat ${runname}/tmp2.sam ${runname}/tmp1.sam > ${runname}/tmp.sam\n")
-            bashfile.append("rm ${runname}/tmp2.sam ${runname}/tmp1.sam\n")
-        },
-    ]
-    
-    return object
-}
-
 workflow {
     processArgs()
-
-    def obj = SNPanalysis('fastq', 'name')
-
-    obj.runSsaha('./temp.sh', obj.name, obj.runname, obj.fastqdir, obj.pairedend)
+    runSsaha(params.ref, '', 'name', true, 'runname', params.ssahaquality, params.maxinsertsize, params.mininsertsize, params.circular)
 }
