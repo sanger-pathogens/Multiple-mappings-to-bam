@@ -13,10 +13,6 @@ process runSMALT {
         val domapping
         val newsmalt
         val tmpname
-        val maprepeats
-        val nomapid
-        val maxinsertsize
-        val mininsertsize
         val bam
     
     output:
@@ -37,26 +33,26 @@ process runSMALT {
         fi
 
         if [ "${pairedend}" = "true" ]; then
-            if [ "${maprepeats}" = "true" ]; then
-                echo "smalt map -y ${nomapid} -x -r 0 -i ${maxinsertsize} -j ${mininsertsize} -f ${params.smaltoutput} -o ${runname}/tmp1.${params.smaltoutputsuffix} ${tmpname}.index ${fastqdir}${name}_1.fastq ${fastqdir}${name}_2.fastq" >> ${bashfile}
+            if [ "${params.maprepeats}" = "true" ]; then
+                echo "smalt map -y ${params.nomapid} -x -r 0 -i ${params.maxinsertsize} -j ${params.mininsertsize} -f ${params.smaltoutput} -o ${runname}/tmp1.${params.smaltoutputsuffix} ${tmpname}.index ${fastqdir}${name}_1.fastq ${fastqdir}${name}_2.fastq" >> ${bashfile}
             else
                 if [ "${newsmalt}" = "true" ]; then
                     ${params.rbit}=" -r -1"
                 else
                     ${params.rbit}=""
                 fi
-                echo "smalt map -y ${nomapid}${params.rbit} -x -i ${maxinsertsize} -j ${mininsertsize} -f ${params.smaltoutput} -o ${runname}/tmp1.${params.smaltoutputsuffix} ${tmpname}.index ${fastqdir}${name}_1.fastq ${fastqdir}${name}_2.fastq" >> ${bashfile}
+                echo "smalt map -y ${params.nomapid}${params.rbit} -x -i ${params.maxinsertsize} -j ${params.mininsertsize} -f ${params.smaltoutput} -o ${runname}/tmp1.${params.smaltoutputsuffix} ${tmpname}.index ${fastqdir}${name}_1.fastq ${fastqdir}${name}_2.fastq" >> ${bashfile}
             fi
         else
-            if [ "${maprepeats}" = "true" ]; then
-                echo "smalt map -y ${nomapid} -x -r 0 -f ${params.smaltoutput} -o ${runname}/tmp1.${params.smaltoutputsuffix} ${tmpname}.index ${fastqdir}${name}.fastq" >> ${bashfile}
+            if [ "${params.maprepeats}" = "true" ]; then
+                echo "smalt map -y ${params.nomapid} -x -r 0 -f ${params.smaltoutput} -o ${runname}/tmp1.${params.smaltoutputsuffix} ${tmpname}.index ${fastqdir}${name}.fastq" >> ${bashfile}
             else
                 if [ "${newsmalt}" = "true" ]; then
                     ${params.rbit}=" -r -1"
                 else
                     ${params.rbit}=""
                 fi
-                echo "smalt map -y ${nomapid}${params.rbit} -x -f ${params.smaltoutput} -o ${runname}/tmp1.${params.smaltoutputsuffix} ${tmpname}.index ${fastqdir}${name}.fastq" >> ${bashfile}
+                echo "smalt map -y ${params.nomapid}${params.rbit} -x -f ${params.smaltoutput} -o ${runname}/tmp1.${params.smaltoutputsuffix} ${tmpname}.index ${fastqdir}${name}.fastq" >> ${bashfile}
             fi
         fi
 
