@@ -1,8 +1,8 @@
 def getSamtoolsVersion() {
     try {
-        def samtools_version_text = "g++ --version".execute().text
+        def samtools_version_text = "samtools --version".execute().text
         def samtools_version_firstline = samtools_version_text.readLines().first()
-        def version = samtools_version_firstline.split()[3]
+        def version = samtools_version_firstline.split()[1]
         return version
     } catch (Exception e) {
         println e
