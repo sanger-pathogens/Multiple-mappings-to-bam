@@ -1,6 +1,6 @@
 nextflow.enable.dsl=2
 
-process runSsaha {
+process RUN_SSAHA {
     input:
         path bashfile
         val fastqdir

@@ -10,7 +10,7 @@ def getSamtoolsVersion() {
     }
 }
 
-process makePileupFromSam {
+process MAKEPILEUP_FROM_SAM {
     input:
     path bashfile
     val runname

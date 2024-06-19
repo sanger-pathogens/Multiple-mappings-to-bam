@@ -1,4 +1,4 @@
-process runBWA {
+process RUN_BWA {
     input:
         path bashfile
         val fastqdir

@@ -2,7 +2,7 @@ params.smaltoutput="bam"
 params.smaltoutputsuffix="bam"
 params.rbit=""
 
-process runSMALT {
+process RUN_SMALT {
     input:
         path bashfile
         val ref
