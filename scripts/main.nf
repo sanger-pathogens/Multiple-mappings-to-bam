@@ -53,5 +53,5 @@ process processArgs {
 }
 
 workflow {
-    makePileupFromSam()
+    
 }

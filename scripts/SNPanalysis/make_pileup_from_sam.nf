@@ -15,42 +15,51 @@ process makePileupFromSam {
     path bashfile
     val runname
     val name
+    val newsmalt
+    val cmdline
 
     script:
     def version = getSamtoolsVersion()
 
     """
+    touch ${bashfile}
     chevron=""
     suffix=""
     anomolous=""
-    if [ ${version} -gt 1.2 ]
-    then
+    if echo "${version} > 1.2" | bc -l | grep -q 1; then
         chevron=">"
         suffix=".bam"
     fi
 
     if [ ${params.markdup} ]
     then
-        echo "samtools sort ${runname}/tmp1.bam ${chevron} ${runname}/tmpsort${suffix}" >> ${bashfile}
+        echo "samtools sort ${runname}/tmp1.bam \$chevron ${runname}/tmpsort\$suffix" >> ${bashfile}
         echo "picard MarkDuplicates INPUT=${runname}/tmpsort.bam OUTPUT=${runname}/tmp1.bam METRICS_FILE=${runname}/${name}_metrics.txt" >> ${bashfile}
         echo "rm ${runname}/tmpsort.bam" >> ${bashfile}
     fi
 
-    echo "samtools sort ${runname}/tmp1.bam ${chevron} ${runname}/${name}${suffix}" >> ${bashfile}
+    echo "samtools sort ${runname}/tmp1.bam \$chevron ${runname}/${name}\$suffix" >> ${bashfile}
     echo "samtools index ${runname}/${name}.bam" >> ${bashfile}
     echo "rm ${runname}/tmp1.bam" >> ${bashfile}
 
     echo "samtools view -H ${runname}/${name}.bam | sed 's/SO:unknown/SO:coordinate/g' | sed 's/\\\\x00//g' > ${runname}/tmphead.sam" >> ${bashfile}
 
-    now=$(date +'%Y-%m-%dT%H:%M:%S')
+    now=\$(date +'%Y-%m-%dT%H:%M:%S')
 
     if [ "${params.program}" = "smalt" ] || [ "${params.program}" = "SMALT" ]
     then
         echo "echo \"@RG\\tID:${name}\\tCN:Sanger\\tDT:\$now\\tPG:SMALT\\tPL:ILLUMINA\\tSM:${name}\" >> ${runname}/tmphead.sam" >> ${bashfile}
-        if [ ${params.domapping} ] && [ ! ${params.newsmalt} ]
+        if [ ${params.domapping} ] && [ ${newsmalt} = "false" ]
         then
-            echo "smaltversion=$( smalt version | grep Version | awk '{print \$2}' )" >> ${bashfile}
-            echo "echo \"@PG\\tID:SMALT\\tPN:SMALT\\tCL:${params.cmdline}\\tVN:\$smaltversion\" >> ${runname}/tmphead.sam" >> ${bashfile}
+            echo "smaltversion=\$( smalt version | grep Version | awk '{print \$2}' )" >> ${bashfile}
+
+            #Unresolved issue below
+
+            echo "echo \"@PG\\tID:SMALT\\tPN:SMALT\\tCL:${cmdline}\\tVN:\$smaltversion\" >> ${runname}/tmphead.sam" >> ${bashfile}
+
+            #Above line has unresolved issue
+
+        
         fi
     elif [ "${params.program}" = "bwa" ] || [ "${params.program}" = "BWA" ]
     then
@@ -74,7 +83,7 @@ process makePileupFromSam {
         echo "rm ${runname}/tmp1.bam.bai ${runname}/tmpref.* ${runname}/tmp.intervals ${runname}/tmphead.*" >> ${bashfile}
     fi
 
-    echo "samtools sort ${runname}/tmp1.bam ${chevron} ${runname}/tmp${suffix}" >> ${bashfile}
+    echo "samtools sort ${runname}/tmp1.bam \$chevron ${runname}/tmp\$suffix" >> ${bashfile}
     echo "rm ${runname}/tmp1.bam" >> ${bashfile}
 
     if [ "${params.filter}" = "1" ]
@@ -103,7 +112,7 @@ process makePileupFromSam {
         anomolous=""
     fi
 
-    echo "echo \"${name}    1 > ${runname}/${name}.ploidy\"" >> ${bashfile}
+    echo 'echo "${name}    1 > ${runname}/${name}.ploidy"' >> ${bashfile}
 
     BAQ=""
     overlaps=""
