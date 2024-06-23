@@ -1,4 +1,6 @@
 process RUN_BWA {
+    container 'biodepot/alpine-bwa-samtools'
+    tag "${name}"
     input:
         path bashfile
         val fastqdir
@@ -14,10 +16,7 @@ process RUN_BWA {
 
     script:
     """
-    # Create the bashfile if it does not exist
     touch ${bashfile}
-
-    echo "Running BWA on ${name}..."
 
     if [ "${domapping}" = "true" ]; then
         if [ "${is_zipped}" = "true" ]; then

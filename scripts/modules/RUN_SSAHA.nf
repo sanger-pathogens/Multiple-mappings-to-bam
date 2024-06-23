@@ -1,6 +1,7 @@
 nextflow.enable.dsl=2
 
 process RUN_SSAHA {
+    tag "${name}"
     input:
         path bashfile
         val fastqdir
@@ -13,7 +14,6 @@ process RUN_SSAHA {
 
     script:
     """
-        echo "\nRunning Ssaha on ${name}..."
         touch ${bashfile}
 
         if [ "${pairedend}" = "false" ]; then

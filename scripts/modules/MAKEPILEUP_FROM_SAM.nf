@@ -23,6 +23,8 @@ process MAKEPILEUP_FROM_SAM {
 
     """
     touch ${bashfile}
+
+    #Detect version of SAMTOOLS, as "samtools sort" differs in usage depending on the version
     chevron=""
     suffix=""
     anomolous=""
@@ -31,6 +33,7 @@ process MAKEPILEUP_FROM_SAM {
         suffix=".bam"
     fi
 
+    #Sort and mark duplicates
     if [ ${params.markdup} ]
     then
         echo "samtools sort ${runname}/tmp1.bam \$chevron ${runname}/tmpsort\$suffix" >> ${bashfile}
@@ -41,6 +44,10 @@ process MAKEPILEUP_FROM_SAM {
     echo "samtools sort ${runname}/tmp1.bam \$chevron ${runname}/${name}\$suffix" >> ${bashfile}
     echo "samtools index ${runname}/${name}.bam" >> ${bashfile}
     echo "rm ${runname}/tmp1.bam" >> ${bashfile}
+
+
+    #Add read groups and fix smalt header
+    #sed is used to substitute the SO:unknown to SO:coordinate in the header
 
     echo "samtools view -H ${runname}/${name}.bam | sed 's/SO:unknown/SO:coordinate/g' | sed 's/\\\\x00//g' > ${runname}/tmphead.sam" >> ${bashfile}
 
@@ -55,7 +62,7 @@ process MAKEPILEUP_FROM_SAM {
 
             #Unresolved issue below
 
-            echo "echo \"@PG\\tID:SMALT\\tPN:SMALT\\tCL:${cmdline}\\tVN:\$smaltversion\" >> ${runname}/tmphead.sam" >> ${bashfile}
+            #echo "echo \"@PG\\tID:SMALT\\tPN:SMALT\\tCL:${cmdline}\\tVN:\$smaltversion\" >> ${runname}/tmphead.sam" >> ${bashfile}
 
             #Above line has unresolved issue
 
@@ -71,6 +78,7 @@ process MAKEPILEUP_FROM_SAM {
     echo "mv ${runname}/tmp.bam ${runname}/tmp1.bam" >> ${bashfile}
     echo "rm ${runname}/${name}.bam" >> ${bashfile}
 
+    #run GATK indel realignment if selected
     if [ ${params.GATK} ]
     then
         echo "samtools index ${runname}/tmp1.bam" >> ${bashfile}
@@ -86,6 +94,7 @@ process MAKEPILEUP_FROM_SAM {
     echo "samtools sort ${runname}/tmp1.bam \$chevron ${runname}/tmp\$suffix" >> ${bashfile}
     echo "rm ${runname}/tmp1.bam" >> ${bashfile}
 
+    #Filter the bam file if requested
     if [ "${params.filter}" = "1" ]
     then
         echo "mv ${runname}/tmp.bam ${runname}/${name}.bam" >> ${bashfile}
@@ -103,7 +112,11 @@ process MAKEPILEUP_FROM_SAM {
         echo "samtools view -f 2 -b -o ${runname}/${name}.bam ${runname}/tmp.bam && samtools view -F 2 -b -o ${runname}/${name}_unpaired.bam ${runname}/tmp.bam"
     fi
 
+    #Index the bam file to get the bai file
     echo "samtools index ${runname}/${name}.bam" >> ${bashfile}
+
+
+    #produce the pileup file
 
     if [ ${params.anomolous} ]
     then
@@ -111,6 +124,9 @@ process MAKEPILEUP_FROM_SAM {
     else
         anomolous=""
     fi
+
+
+    #Make ploidy file for sample
 
     echo 'echo "${name}    1 > ${runname}/${name}.ploidy"' >> ${bashfile}
 
@@ -153,10 +169,14 @@ process MAKEPILEUP_FROM_SAM {
     echo "bcftools call -P ${params.prior} -O b -A -M -v -S ${runname}/${name}.ploidy -${params.call} ${runname}/tmp.mpileup > ${runname}/${name}_variant.bcf" >> ${bashfile}
     echo "bcftools index ${runname}/${name}_variant.bcf" >> ${bashfile}
 
+    # clean up:
+
     if [ ${params.dirty} = "false" ]
     then
         echo "rm ${runname}/tmp.*" >> ${bashfile}
     fi
+
+    #Produce the pseudosequence if requested
 
     if [ "${params.pseudosequence}" = "true" ]; then
         if [ "${params.call}" = "m" ]; then

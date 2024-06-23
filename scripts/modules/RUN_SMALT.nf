@@ -3,6 +3,8 @@ params.smaltoutputsuffix="bam"
 params.rbit=""
 
 process RUN_SMALT {
+    tag "${name}"
+    
     input:
         path bashfile
         val ref
@@ -22,7 +24,6 @@ process RUN_SMALT {
     """
     touch ${bashfile}
     if [ "${domapping}" = "true" ]; then
-        echo "Running SMALT on ${name}..."
 
         if [ "${newsmalt}" = "true" ]; then
             ${params.smaltoutput}="bam"
