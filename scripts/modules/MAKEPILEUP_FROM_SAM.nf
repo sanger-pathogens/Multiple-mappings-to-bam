@@ -11,8 +11,9 @@ def getSamtoolsVersion() {
 }
 
 process MAKEPILEUP_FROM_SAM {
+    container 'quay.io/ssd28/gsoc-experimental/makepileup-from-sam:0.0.1'
+
     input:
-    path bashfile
     val runname
     val name
     val newsmalt
@@ -22,7 +23,6 @@ process MAKEPILEUP_FROM_SAM {
     def version = getSamtoolsVersion()
 
     """
-    touch ${bashfile}
 
     #Detect version of SAMTOOLS, as "samtools sort" differs in usage depending on the version
     chevron=""
@@ -36,29 +36,29 @@ process MAKEPILEUP_FROM_SAM {
     #Sort and mark duplicates
     if [ ${params.markdup} ]
     then
-        echo "samtools sort ${runname}/tmp1.bam \$chevron ${runname}/tmpsort\$suffix" >> ${bashfile}
-        echo "picard MarkDuplicates INPUT=${runname}/tmpsort.bam OUTPUT=${runname}/tmp1.bam METRICS_FILE=${runname}/${name}_metrics.txt" >> ${bashfile}
-        echo "rm ${runname}/tmpsort.bam" >> ${bashfile}
+        samtools sort ${runname}/tmp1.bam \$chevron ${runname}/tmpsort\$suffix
+        picard MarkDuplicates INPUT=${runname}/tmpsort.bam OUTPUT=${runname}/tmp1.bam METRICS_FILE=${runname}/${name}_metrics.txt
+        rm ${runname}/tmpsort.bam
     fi
 
-    echo "samtools sort ${runname}/tmp1.bam \$chevron ${runname}/${name}\$suffix" >> ${bashfile}
-    echo "samtools index ${runname}/${name}.bam" >> ${bashfile}
-    echo "rm ${runname}/tmp1.bam" >> ${bashfile}
+    samtools sort ${runname}/tmp1.bam \$chevron ${runname}/${name}\$suffix
+    samtools index ${runname}/${name}.bam
+    rm ${runname}/tmp1.bam
 
 
     #Add read groups and fix smalt header
     #sed is used to substitute the SO:unknown to SO:coordinate in the header
 
-    echo "samtools view -H ${runname}/${name}.bam | sed 's/SO:unknown/SO:coordinate/g' | sed 's/\\\\x00//g' > ${runname}/tmphead.sam" >> ${bashfile}
+    samtools view -H ${runname}/${name}.bam | sed 's/SO:unknown/SO:coordinate/g' | sed 's/\\\\x00//g' > ${runname}/tmphead.sam
 
     now=\$(date +'%Y-%m-%dT%H:%M:%S')
 
     if [ "${params.program}" = "smalt" ] || [ "${params.program}" = "SMALT" ]
     then
-        echo "echo \"@RG\\tID:${name}\\tCN:Sanger\\tDT:\$now\\tPG:SMALT\\tPL:ILLUMINA\\tSM:${name}\" >> ${runname}/tmphead.sam" >> ${bashfile}
+        echo \"@RG\\tID:${name}\\tCN:Sanger\\tDT:\$now\\tPG:SMALT\\tPL:ILLUMINA\\tSM:${name}\" >> ${runname}/tmphead.sam
         if [ ${params.domapping} ] && [ ${newsmalt} = "false" ]
         then
-            echo "smaltversion=\$( smalt version | grep Version | awk '{print \$2}' )" >> ${bashfile}
+            smaltversion=\$( smalt version | grep Version | awk '{print \$2}' )
 
             #Unresolved issue below
 
@@ -70,34 +70,34 @@ process MAKEPILEUP_FROM_SAM {
         fi
     elif [ "${params.program}" = "bwa" ] || [ "${params.program}" = "BWA" ]
     then
-        echo "echo '@RG\\tID:${name}\\tCN:Sanger\\tDT:\$now\\tPG:BWA MEM\\tPL:ILLUMINA\\tSM:${name}' >> ${runname}/tmphead.sam" >> ${bashfile}
+        echo '@RG\\tID:${name}\\tCN:Sanger\\tDT:\$now\\tPG:BWA MEM\\tPL:ILLUMINA\\tSM:${name}' >> ${runname}/tmphead.sam
     fi
 
-    echo "samtools view -b -o ${runname}/tmphead.bam -H ${runname}/${name}.bam" >> ${bashfile}
-    echo "samtools merge -c -p -f -r -h ${runname}/tmphead.sam ${runname}/tmp.bam ${runname}/${name}.bam ${runname}/tmphead.bam" >> ${bashfile}
-    echo "mv ${runname}/tmp.bam ${runname}/tmp1.bam" >> ${bashfile}
-    echo "rm ${runname}/${name}.bam" >> ${bashfile}
+    samtools view -b -o ${runname}/tmphead.bam -H ${runname}/${name}.bam
+    samtools merge -c -p -f -r -h ${runname}/tmphead.sam ${runname}/tmp.bam ${runname}/${name}.bam ${runname}/tmphead.bam
+    mv ${runname}/tmp.bam ${runname}/tmp1.bam
+    rm ${runname}/${name}.bam
 
     #run GATK indel realignment if selected
     if [ ${params.GATK} ]
     then
-        echo "samtools index ${runname}/tmp1.bam" >> ${bashfile}
-        echo "cp ${params.ref} ${runname}/tmpref.fa" >> ${bashfile}
-        echo "samtools faidx ${runname}/tmpref.fa" >> ${bashfile}
-        echo "picard CreateSequenceDictionary R=${runname}/tmpref.fa O=${runname}/tmpref.dict" >> ${bashfile}
-        echo "gatk -I ${runname}/tmp1.bam -R ${runname}/tmpref.fa -T RealignerTargetCreator -o ${runname}/tmp.intervals" >> ${bashfile}
-        echo "gatk -I ${runname}/tmp1.bam -R ${runname}/tmpref.fa -T IndelRealigner --filter_bases_not_stored -targetIntervals ${runname}/tmp.intervals -o ${runname}/tmp.bam" >> ${bashfile}
-        echo "mv ${runname}/tmp.bam ${runname}/tmp1.bam" >> ${bashfile}
-        echo "rm ${runname}/tmp1.bam.bai ${runname}/tmpref.* ${runname}/tmp.intervals ${runname}/tmphead.*" >> ${bashfile}
+        samtools index ${runname}/tmp1.bam
+        cp ${params.ref} ${runname}/tmpref.fa
+        samtools faidx ${runname}/tmpref.fa
+        picard CreateSequenceDictionary R=${runname}/tmpref.fa O=${runname}/tmpref.dict
+        gatk -I ${runname}/tmp1.bam -R ${runname}/tmpref.fa -T RealignerTargetCreator -o ${runname}/tmp.intervals
+        gatk -I ${runname}/tmp1.bam -R ${runname}/tmpref.fa -T IndelRealigner --filter_bases_not_stored -targetIntervals ${runname}/tmp.intervals -o ${runname}/tmp.bam
+        mv ${runname}/tmp.bam ${runname}/tmp1.bam
+        rm ${runname}/tmp1.bam.bai ${runname}/tmpref.* ${runname}/tmp.intervals ${runname}/tmphead.*
     fi
 
-    echo "samtools sort ${runname}/tmp1.bam \$chevron ${runname}/tmp\$suffix" >> ${bashfile}
-    echo "rm ${runname}/tmp1.bam" >> ${bashfile}
+    samtools sort ${runname}/tmp1.bam \$chevron ${runname}/tmp\$suffix
+    rm ${runname}/tmp1.bam
 
     #Filter the bam file if requested
     if [ "${params.filter}" = "1" ]
     then
-        echo "mv ${runname}/tmp.bam ${runname}/${name}.bam" >> ${bashfile}
+        mv ${runname}/tmp.bam ${runname}/${name}.bam
     elif [ "${params.filter}" = "2" ]
     then
         echo "samtools view -F 4 -b -o ${runname}/${name}.bam ${runname}/tmp.bam"
@@ -113,7 +113,7 @@ process MAKEPILEUP_FROM_SAM {
     fi
 
     #Index the bam file to get the bai file
-    echo "samtools index ${runname}/${name}.bam" >> ${bashfile}
+    samtools index ${runname}/${name}.bam
 
 
     #produce the pileup file
@@ -147,7 +147,7 @@ process MAKEPILEUP_FROM_SAM {
         else
             overlaps="-x"
         fi
-        echo "samtools mpileup -t DP,DP4 -C 50 -L 1000 -d 1000 -m ${params.depth} \$anomolous \$BAQ \$overlaps -ugf ${params.ref} ${runname}/${name}.bam > ${runname}/tmp.mpileup" >> ${bashfile}
+        samtools mpileup -t DP,DP4 -C 50 -L 1000 -d 1000 -m ${params.depth} \$anomolous \$BAQ \$overlaps -ugf ${params.ref} ${runname}/${name}.bam > ${runname}/tmp.mpileup
     else
         if [ ${params.BAQ} = "true" ]
         then
@@ -161,28 +161,28 @@ process MAKEPILEUP_FROM_SAM {
         else
             overlaps=""
         fi
-        echo "samtools mpileup -t DP,DP4 -L 1000 -d 1000 -m ${params.depth} \$anomolous \$BAQ \$overlaps -ugf ${params.ref} ${runname}/${name}.bam > ${runname}/tmp.mpileup" >> ${bashfile}
+        samtools mpileup -t DP,DP4 -L 1000 -d 1000 -m ${params.depth} \$anomolous \$BAQ \$overlaps -ugf ${params.ref} ${runname}/${name}.bam > ${runname}/tmp.mpileup
     fi
 
-    echo "bcftools call -P ${params.prior} -O b -A -M -S ${runname}/${name}.ploidy -${params.call} ${runname}/tmp.mpileup > ${runname}/${name}.bcf" >> ${bashfile}
-    echo "bcftools index ${runname}/${name}.bcf" >> ${bashfile}
-    echo "bcftools call -P ${params.prior} -O b -A -M -v -S ${runname}/${name}.ploidy -${params.call} ${runname}/tmp.mpileup > ${runname}/${name}_variant.bcf" >> ${bashfile}
-    echo "bcftools index ${runname}/${name}_variant.bcf" >> ${bashfile}
+    bcftools call -P ${params.prior} -O b -A -M -S ${runname}/${name}.ploidy -${params.call} ${runname}/tmp.mpileup > ${runname}/${name}.bcf
+    bcftools index ${runname}/${name}.bcf
+    bcftools call -P ${params.prior} -O b -A -M -v -S ${runname}/${name}.ploidy -${params.call} ${runname}/tmp.mpileup > ${runname}/${name}_variant.bcf
+    bcftools index ${runname}/${name}_variant.bcf
 
     # clean up:
 
     if [ ${params.dirty} = "false" ]
     then
-        echo "rm ${runname}/tmp.*" >> ${bashfile}
+        rm ${runname}/tmp.*
     fi
 
     #Produce the pseudosequence if requested
 
     if [ "${params.pseudosequence}" = "true" ]; then
         if [ "${params.call}" = "m" ]; then
-            echo "bcf_2_pseudosequence.py -A -b ${runname}/${name}.bcf -B ${runname}/${name}.bam -r ${params.ratio} -d ${params.depth} -D ${params.stranddepth} -q ${params.quality} -m ${params.mapq} -o ${runname}/${name}" >> ${bashfile}
+            bcf_2_pseudosequence.py -A -b ${runname}/${name}.bcf -B ${runname}/${name}.bam -r ${params.ratio} -d ${params.depth} -D ${params.stranddepth} -q ${params.quality} -m ${params.mapq} -o ${runname}/${name}
         elif [ "${params.call}" = "c" ]; then
-            echo "bcf_2_pseudosequence.py -A -b ${runname}/${name}.bcf -B ${runname}/${name}.bam -r ${params.ratio} -d ${params.depth} -D ${params.stranddepth} -q ${params.quality} -m ${params.mapq} -o ${runname}/${name}" >> ${bashfile}
+            bcf_2_pseudosequence.py -A -b ${runname}/${name}.bcf -B ${runname}/${name}.bam -r ${params.ratio} -d ${params.depth} -D ${params.stranddepth} -q ${params.quality} -m ${params.mapq} -o ${runname}/${name}
         fi
     fi
     """

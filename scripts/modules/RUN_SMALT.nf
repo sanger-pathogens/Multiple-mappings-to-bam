@@ -1,12 +1,10 @@
-params.smaltoutput="bam"
-params.smaltoutputsuffix="bam"
-params.rbit=""
-
 process RUN_SMALT {
+
+    container 'quay.io/ssd28/gsoc-experimental/run-smalt:0.0.1'
+
     tag "${name}"
     
     input:
-        path bashfile
         val ref
         val fastqdir
         val name
@@ -16,57 +14,58 @@ process RUN_SMALT {
         val newsmalt
         val tmpname
         val bam
-    
-    output:
-        path bashfile
 
     script:
     """
-    touch ${bashfile}
+
+    smaltoutput="bam"
+    smaltoutputsuffix="bam"
+    rbit=""
+
     if [ "${domapping}" = "true" ]; then
 
         if [ "${newsmalt}" = "true" ]; then
-            ${params.smaltoutput}="bam"
-            ${params.smaltoutputsuffix}="bam"
+            smaltoutput="bam"
+            smaltoutputsuffix="bam"
         else
-            ${params.smaltoutput}="samsoft"
-            ${params.smaltoutputsuffix}="sam"
+            smaltoutput="samsoft"
+            smaltoutputsuffix="sam"
         fi
 
         if [ "${pairedend}" = "true" ]; then
             if [ "${params.maprepeats}" = "true" ]; then
-                echo "smalt map -y ${params.nomapid} -x -r 0 -i ${params.maxinsertsize} -j ${params.mininsertsize} -f ${params.smaltoutput} -o ${runname}/tmp1.${params.smaltoutputsuffix} ${tmpname}.index ${fastqdir}${name}_1.fastq ${fastqdir}${name}_2.fastq" >> ${bashfile}
+                smalt map -y ${params.nomapid} -x -r 0 -i ${params.maxinsertsize} -j ${params.mininsertsize} -f \$smaltoutput -o ${runname}/tmp1.\$smaltoutputsuffix ${tmpname}.index ${fastqdir}${name}_1.fastq ${fastqdir}${name}_2.fastq
             else
                 if [ "${newsmalt}" = "true" ]; then
-                    ${params.rbit}=" -r -1"
+                    rbit=" -r -1"
                 else
-                    ${params.rbit}=""
+                    rbit=""
                 fi
-                echo "smalt map -y ${params.nomapid}${params.rbit} -x -i ${params.maxinsertsize} -j ${params.mininsertsize} -f ${params.smaltoutput} -o ${runname}/tmp1.${params.smaltoutputsuffix} ${tmpname}.index ${fastqdir}${name}_1.fastq ${fastqdir}${name}_2.fastq" >> ${bashfile}
+                smalt map -y ${params.nomapid}\$rbit -x -i ${params.maxinsertsize} -j ${params.mininsertsize} -f \$smaltoutput -o ${runname}/tmp1.\$smaltoutputsuffix ${tmpname}.index ${fastqdir}${name}_1.fastq ${fastqdir}${name}_2.fastq
             fi
         else
             if [ "${params.maprepeats}" = "true" ]; then
-                echo "smalt map -y ${params.nomapid} -x -r 0 -f ${params.smaltoutput} -o ${runname}/tmp1.${params.smaltoutputsuffix} ${tmpname}.index ${fastqdir}${name}.fastq" >> ${bashfile}
+                smalt map -y ${params.nomapid} -x -r 0 -f \$smaltoutput -o ${runname}/tmp1.\$smaltoutputsuffix ${tmpname}.index ${fastqdir}${name}.fastq
             else
                 if [ "${newsmalt}" = "true" ]; then
-                    ${params.rbit}=" -r -1"
+                    \$rbit=" -r -1"
                 else
-                    ${params.rbit}=""
+                    \$rbit=""
                 fi
-                echo "smalt map -y ${params.nomapid}${params.rbit} -x -f ${params.smaltoutput} -o ${runname}/tmp1.${params.smaltoutputsuffix} ${tmpname}.index ${fastqdir}${name}.fastq" >> ${bashfile}
+                smalt map -y ${params.nomapid}\$rbit -x -f \$smaltoutput -o ${runname}/tmp1.\$smaltoutputsuffix ${tmpname}.index ${fastqdir}${name}.fastq
             fi
         fi
 
         if [ "${newsmalt}" = "false" ]; then
-            echo "samtools view -b -S ${runname}/tmp1.sam -t ${ref}.fai > ${runname}/tmp1.bam" >> ${bashfile}
-            echo "rm ${runname}/tmp1.sam" >> ${bashfile}
+            samtools view -b -S ${runname}/tmp1.sam -t ${ref}.fai > ${runname}/tmp1.bam
+            rm ${runname}/tmp1.sam
         fi
     else
-        echo "cp ${bam} ${runname}/tmp1.bam" >> ${bashfile}
+        cp ${bam} ${runname}/tmp1.bam
     fi
 
     if [ "${fastqdir}" = "${tmpname}_unzipped/" ]; then
-        echo "rm ${fastqdir}${name}_1.fastq ${fastqdir}${name}_2.fastq" >> ${bashfile}
+        rm ${fastqdir}${name}_1.fastq ${fastqdir}${name}_2.fastq
     fi
     """
 }

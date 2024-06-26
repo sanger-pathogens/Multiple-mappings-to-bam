@@ -1,8 +1,7 @@
 process RUN_BWA {
-    container 'biodepot/alpine-bwa-samtools'
+    container 'quay.io/ssd28/gsoc-experimental/run-bwa:0.0.1'
     tag "${name}"
     input:
-        path bashfile
         val fastqdir
         val name
         val pairedend
@@ -10,33 +9,29 @@ process RUN_BWA {
         val domapping
         val is_zipped
         val bam
-    
-    output:
-        path bashfile
 
     script:
     """
-    touch ${bashfile}
 
     if [ "${domapping}" = "true" ]; then
         if [ "${is_zipped}" = "true" ]; then
             if [ "${pairedend}" = "true" ]; then
-                echo "bwa mem -v 1 -M -a -t 1 ${params.ref} ${fastqdir}${name}_1.fastq.gz ${fastqdir}${name}_2.fastq.gz > ${runname}/tmp.sam" >> ${bashfile}
+                bwa mem -v 1 -M -a -t 1 ${params.ref} ${fastqdir}${name}_1.fastq.gz ${fastqdir}${name}_2.fastq.gz > ${runname}/tmp.sam
             else
-                echo "bwa mem -v 1 -M -a -t 1 ${params.ref} ${fastqdir}${name}.fastq.gz > ${runname}/tmp.sam" >> ${bashfile}
+                bwa mem -v 1 -M -a -t 1 ${params.ref} ${fastqdir}${name}.fastq.gz > ${runname}/tmp.sam
             fi
         else
             if [ "${pairedend}" = "true" ]; then
-                echo "bwa mem -v 1 -M -a -t 1 ${params.ref} ${fastqdir}${name}_1.fastq ${fastqdir}${name}_2.fastq > ${runname}/tmp.sam" >> ${bashfile}
+                bwa mem -v 1 -M -a -t 1 ${params.ref} ${fastqdir}${name}_1.fastq ${fastqdir}${name}_2.fastq > ${runname}/tmp.sam
             else
-                echo "bwa mem -v 1 -M -a -t 1 ${params.ref} ${fastqdir}${name}.fastq > ${runname}/tmp.sam" >> ${bashfile}
+                bwa mem -v 1 -M -a -t 1 ${params.ref} ${fastqdir}${name}.fastq > ${runname}/tmp.sam
             fi
         fi
 
-        echo "samtools view -b -S ${runname}/tmp.sam -t ${params.ref}.fai > ${runname}/tmp1.bam" >> ${bashfile}
-        echo "rm -f ${runname}/tmp.sam" >> ${bashfile}
+        samtools view -b -S ${runname}/tmp.sam -t ${params.ref}.fai > ${runname}/tmp1.bam
+        rm -f ${runname}/tmp.sam
     else
-        echo "cp ${bam} ${runname}/tmp1.bam" >> ${bashfile}
+        cp ${bam} ${runname}/tmp1.bam
     fi
     """
 }

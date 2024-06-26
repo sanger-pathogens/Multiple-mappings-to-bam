@@ -63,6 +63,4 @@ process LOG_COMMANDLINE {
 
 workflow {
     log_ch = LOG_COMMANDLINE()
-
-
 }
