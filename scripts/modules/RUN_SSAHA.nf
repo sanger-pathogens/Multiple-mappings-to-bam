@@ -1,5 +1,3 @@
-nextflow.enable.dsl=2
-
 process RUN_SSAHA {
     container 'quay.io/sangerpathogens/ssaha2:v2.5.5_cv3'
     tag "${name}"

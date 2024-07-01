@@ -5,7 +5,7 @@ nextflow.enable.dsl=2
 include { RUN_BWA } from './modules/RUN_BWA.nf'
 include { RUN_SMALT } from './modules/RUN_SMALT.nf'
 include { RUN_SSAHA } from './modules/RUN_SSAHA.nf'
-include { MAKEPILEUP_FROM_SAM } from './modules/MAKEPILEUP_FROM_SAM.nf'
+include { mpfs } from './sub-workflows/makepileup_from_sam.nf'
 
 process LOG_COMMANDLINE {
     output:

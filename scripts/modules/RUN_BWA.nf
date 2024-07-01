@@ -13,7 +13,7 @@ process RUN_BWA {
     script:
     """
 
-    if [ "${domapping}" = "true" ]; then
+    #if [ "${domapping}" = "true" ]; then
         if [ "${is_zipped}" = "true" ]; then
             if [ "${pairedend}" = "true" ]; then
                 bwa mem -v 1 -M -a -t 1 ${params.ref} ${fastqdir}${name}_1.fastq.gz ${fastqdir}${name}_2.fastq.gz > ${runname}/tmp.sam
@@ -30,8 +30,8 @@ process RUN_BWA {
 
         samtools view -b -S ${runname}/tmp.sam -t ${params.ref}.fai > ${runname}/tmp1.bam
         rm -f ${runname}/tmp.sam
-    else
-        cp ${bam} ${runname}/tmp1.bam
-    fi
+    #else
+    #    cp ${bam} ${runname}/tmp1.bam
+    #fi
     """
 }
