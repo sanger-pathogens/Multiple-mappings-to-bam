@@ -1,22 +1,21 @@
 process INDEL_REALIGNMENT {
     input:
-    path tmp1_bam
+    tuple val(name), path (tmp1_bam)
     path ref
-    val runname
 
     output:
-    path "${runname}/tmp1.bam"
+    tuple val(name), path ("${params.runname}/tmp1.bam")
 
     script:
     """
-    mkdir -p "${runname}"
+    mkdir -p "${params.runname}"
     samtools index ${tmp1_bam}
-    cp ${ref} ${runname}/tmpref.fa
-    samtools faidx ${runname}/tmpref.fa
-    picard CreateSequenceDictionary R=${runname}/tmpref.fa O=${runname}/tmpref.dict
-    gatk -I ${tmp1_bam} -R ${runname}/tmpref.fa -T RealignerTargetCreator -o ${runname}/tmp.intervals
-    gatk -I ${tmp1_bam} -R ${runname}/tmpref.fa -T IndelRealigner --filter_bases_not_stored -targetIntervals ${runname}/tmp.intervals -o ${runname}/tmp.bam
-    mv ${runname}/tmp.bam ${runname}/tmp1.bam
-    rm *.bai ${runname}/tmpref.* ${runname}/tmp.intervals ${runname}/tmphead.*
+    cp ${ref} ${params.runname}/tmpref.fa
+    samtools faidx ${params.runname}/tmpref.fa
+    picard CreateSequenceDictionary R=${params.runname}/tmpref.fa O=${params.runname}/tmpref.dict
+    gatk -I ${tmp1_bam} -R ${params.runname}/tmpref.fa -T RealignerTargetCreator -o ${params.runname}/tmp.intervals
+    gatk -I ${tmp1_bam} -R ${params.runname}/tmpref.fa -T IndelRealigner --filter_bases_not_stored -targetIntervals ${params.runname}/tmp.intervals -o ${params.runname}/tmp.bam
+    mv ${params.runname}/tmp.bam ${params.runname}/tmp1.bam
+    rm *.bai ${params.runname}/tmpref.* ${params.runname}/tmp.intervals ${params.runname}/tmphead.*
     """
 }

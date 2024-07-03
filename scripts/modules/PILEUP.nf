@@ -1,14 +1,14 @@
 process PILEUP {
     input:
     path ref
-    path name_bam
-    val runname
+    tuple val(name), path (name_bam)
 
     output:
-    path "${runname}/tmp.mpileup", emit: tmp_mpileup
+    tuple val(name), path ("${params.runname}/tmp.mpileup"), emit: tmp_mpileup
 
     script:
     """
+    mkdir -p "${params.runname}"
     if [ ${params.anomolous} ]
     then
         anomolous=" -A "
@@ -30,7 +30,7 @@ process PILEUP {
         else
             overlaps="-x"
         fi
-        samtools mpileup -t DP,DP4 -C 50 -L 1000 -d 1000 -m ${params.depth} \$anomolous \$BAQ \$overlaps -ugf ${ref} ${name_bam} > ${runname}/tmp.mpileup
+        samtools mpileup -t DP,DP4 -C 50 -L 1000 -d 1000 -m ${params.depth} \$anomolous \$BAQ \$overlaps -ugf ${ref} ${name_bam} > ${params.runname}/tmp.mpileup
     else
         if [ ${params.BAQ} = "true" ]
         then
@@ -44,7 +44,7 @@ process PILEUP {
         else
             overlaps=""
         fi
-        samtools mpileup -t DP,DP4 -L 1000 -d 1000 -m ${params.depth} \$anomolous \$BAQ \$overlaps -ugf ${ref} ${name_bam} > ${runname}/tmp.mpileup
+        samtools mpileup -t DP,DP4 -L 1000 -d 1000 -m ${params.depth} \$anomolous \$BAQ \$overlaps -ugf ${ref} ${name_bam} > ${params.runname}/tmp.mpileup
     fi
     """
 }

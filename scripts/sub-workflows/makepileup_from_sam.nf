@@ -1,8 +1,7 @@
 include { SORT_AND_MARK_DUPLICATES } from './../modules/SORT_AND_MARK_DUPLICATES.nf'
-include { SAMTOOLS_SORT;SAMTOOLS_SORT_1;SAMTOOLS_INDEX } from './../modules/SAMTOOLS_SORT.nf'
+include { SAMTOOLS_SORT;SAMTOOLS_SORT_1;SAMTOOLS_INDEX;SAMTOOLS_MERGE } from './../modules/SAMTOOLS_SORT.nf'
 include { SMALT } from './../modules/SMALT.nf'
 include { BWA } from './../modules/BWA.nf'
-include { SAMTOOLS_MERGE } from './../modules/SAMTOOLS_MERGE.nf'
 include { INDEL_REALIGNMENT } from './../modules/INDEL_REALIGNMENT.nf'
 include { FILTER_BAM } from './../modules/FILTER_BAM.nf'
 include { PILEUP } from './../modules/PILEUP.nf'
@@ -13,9 +12,7 @@ import java.math.BigDecimal
 workflow mpfs {
 
     take:
-    tmp1_bam
-    runname
-    name
+    name_tmp1_bam      //tuple(name, path tmp1_bam)
     cmdline
 
     main:
@@ -23,10 +20,10 @@ workflow mpfs {
     ref = channel.fromPath(params.ref)
 
     if (params.markdup == "true") {
-        (tmp1_bam, matrix_file_ch) = SORT_AND_MARK_DUPLICATES(runname, name, tmp1_bam)
+        (tmp1_bam, matrix_file_ch) = SORT_AND_MARK_DUPLICATES(name_tmp1_bam)
     }
 
-    (name_bam, tmphead_sam, bam_bai) = SAMTOOLS_SORT(tmp1_bam, name, runname)
+    (name_bam, tmphead_sam, bam_bai) = SAMTOOLS_SORT(name_tmp1_bam)
 
     if (params.program == "smalt" || params.program == "SMALT") {
         tmphead_sam = SMALT(tmphead_sam, cmdline)
@@ -34,24 +31,24 @@ workflow mpfs {
         tmphead_sam = BWA(tmphead_sam, name)
     }
 
-    (tmp1_bam, tmphead_bam) = SAMTOOLS_MERGE(runname, name, name_bam, tmphead_sam)
+    (tmp1_bam, tmphead_bam) = SAMTOOLS_MERGE(name_bam, tmphead_sam[1])
 
     if (params.GATK == 'true') {
-        tmp1_bam = INDEL_REALIGNMENT(tmp1_bam, ref, runname)
+        tmp1_bam = INDEL_REALIGNMENT(tmp1_bam, ref)
     }
 
     tmp_bam = SAMTOOLS_SORT_1(tmp1_bam)
 
-    (name_bam, filter_bam_ch) = FILTER_BAM(tmp_bam, runname, name)
+    (name_bam, filter_bam_ch) = FILTER_BAM(tmp_bam)
 
-    bam_bai = SAMTOOLS_INDEX(name_bam)
+    bam_bai = SAMTOOLS_INDEX(name_bam[1])
 
-    tmp_mpileup = PILEUP(ref, name_bam, runname)
+    tmp_mpileup = PILEUP(ref, name_bam)
 
-    (name_ploidy, name_bcf, name_variant_bcf, name_variant_bcf, name_variant_bcf_csi) = BCFTOOLS_CALL(runname, name, tmp_mpileup)
+    (name_ploidy, name_bcf, name_variant_bcf, name_bcf_csi, name_variant_bcf_csi) = BCFTOOLS_CALL(tmp_mpileup)
 
     if (params.pseudosequence == "true") {
-        pseudosequence = PSEUDOSEQUENCE(name_bcf, name_bam)
+        pseudosequence = PSEUDOSEQUENCE(name_bcf, name_bam[1])
     }
 
     emit:
