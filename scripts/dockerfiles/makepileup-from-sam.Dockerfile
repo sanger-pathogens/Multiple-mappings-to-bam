@@ -1,16 +1,28 @@
 FROM debian:bullseye-20240612-slim
 
+# Install dependencies, including Python, and remove unnecessary files in one layer
 RUN apt-get update && apt-get install -y --no-install-recommends \
     wget \
     bcftools \
     samtools \
-    ca-certificates\
-    openjdk-17-jre-headless
+    ca-certificates \
+    openjdk-17-jre-headless \
+    unzip \
+    python3 \
+    python2 \
+    python-is-python3 \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN mkdir /opt/picard
-RUN wget -P /opt/picard https://github.com/broadinstitute/picard/releases/download/3.1.1/picard.jar
-RUN echo "alias picard='java -jar /opt/picard/picard.jar'" >> ~/.bashrc
+# Install GATK and clean up
+RUN mkdir /opt/gatk && \
+    wget -P /opt/gatk https://github.com/broadinstitute/gatk/releases/download/4.5.0.0/gatk-4.5.0.0.zip && \
+    unzip /opt/gatk/gatk-4.5.0.0.zip -d /opt/gatk && \
+    rm /opt/gatk/gatk-4.5.0.0.zip && \
+    echo "alias gatk='/opt/gatk/gatk-4.5.0.0/gatk'" >> ~/.bashrc
 
-# Pending: Install GATK
+COPY dependencies/bcf_2_pseudosequence.py /opt/bcf_2_pseudosequence/bcf_2_pseudosequence.py
+
+RUN echo "alias bcf_2_pseudosequence.py='python2 /opt/bcf_2_pseudosequence/bcf_2_pseudosequence.py'" >> ~/.bashrc
 
 CMD ["/bin/bash"]
