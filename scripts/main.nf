@@ -6,59 +6,6 @@ include { mpfs } from './sub-workflows/makepileup_from_sam.nf'
 
 process LOG_COMMANDLINE {
     output:
-    path "MM_command_*.txt"
-
-    script:
-    """
-    timestamp=\$(date +"%Y-%m-%d.%H.%M.%S")
-
-    # Create MM_command.txt file
-    output_file="MM_command_\$timestamp.txt"
-
-    # Write the initial command to the file
-    echo "nextflow run scripts/main.nf \
-    --ref ${params.ref} \
-    --program ${params.program} \
-    --domapping ${params.domapping} \
-    --human ${params.human} \
-    --pairedend ${params.pairedend} \
-    --maxinsertsize ${params.maxinsertsize} \
-    --mininsertsize ${params.mininsertsize} \
-    --ssahaquality ${params.ssahaquality} \
-    --maprepeats ${params.maprepeats} \
-    --GATK ${params.GATK} \
-    --markdup ${params.markdup} \
-    --detectOverlaps ${params.detectOverlaps} \
-    --pseudosequence ${params.pseudosequence} \
-    --incref ${params.incref} \
-    --indels ${params.indels} \
-    --quality ${params.quality} \
-    --mapq ${params.mapq} \
-    --depth ${params.depth} \
-    --stranddepth ${params.stranddepth} \
-    --anomolous ${params.anomolous} \
-    --BAQ ${params.BAQ} \
-    --circular ${params.circular} \
-    --ratio ${params.ratio} \
-    --prior ${params.prior} \
-    --call ${params.call} \
-    --force ${params.force} \
-    --filter ${params.filter} \
-    --tabfile ${params.tabfile} \
-    --alnfile ${params.alnfile} \
-    --raxml ${params.raxml} \
-    --model ${params.model} \
-    --bootstrap ${params.bootstrap} \
-    --keep ${params.keep} \
-    --LSF ${params.LSF} \
-    --LSFQ ${params.LSFQ} \
-    --mem ${params.mem} \
-    --nodes ${params.nodes} \
-    --dirty ${params.dirty} \
-    --mapfiles \"${params.mapfiles}\" \
-    -process.echo" > "\$output_file"
-process LOG_COMMANDLINE {
-    output:
     path 'MM_command_*.txt'
 
     script:
@@ -111,6 +58,19 @@ process LOG_COMMANDLINE {
     """
 }
 
+process RANDOM_NAME {
+    output:
+    stdout
+
+    exec:
+    def chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+    def random = new Random()
+    def length = random.nextInt(3) + 8
+    def tmpname = 'tmp' + (1..length).collect { chars[random.nextInt(chars.length())] }.join('')
+    println tmpname
+}
+
 workflow {
     log_ch = LOG_COMMANDLINE()
+    tmpname = RANDOM_NAME()
 }
