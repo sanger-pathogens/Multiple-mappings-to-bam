@@ -79,16 +79,18 @@ workflow {
     poolsort = []
 
     tmpname = RANDOM_NAME()
+    // files = GENERATE_FILES()
+    files = Channel.from(params.mapfiles).splitCsv()
+    files.view()
+    (ziplist, bamlist, poolsort, pools, a, b, c) = MAPPING (files.flatten(), tmpname, ziplist, bamlist, poolsort, pools)
 
-    (ziplist, bamlist, poolsort, pools) = MAPPING (Channel.from(params.mapfiles.split(',')).flatten(), tmpname, ziplist, bamlist, poolsort, pools)
+    // pools.take(1)
+    // bamlist.take(1)
+    // poolsort.take(1)
+    // ziplist.take(1)
 
-    pools = pools.take(1)
-    bamlist = bamlist.take(1)
-    ziplist = ziplist.take(1)
-    poolsort = poolsort.take(1)
-
-    // pools.view()
-    // bamlist.view()
-    // poolsort.view()
-    // ziplist.view()
+    pools.view { "pools $it" }
+    bamlist.view {"bamlist $it"}
+    poolsort.view {"poolsort $it"}
+    ziplist.view {"ziplist $it"}
 }

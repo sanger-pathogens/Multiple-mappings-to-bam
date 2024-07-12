@@ -1,4 +1,6 @@
 process MAPPING {
+    publishDir "results", mode: 'copy'
+
     input:
     val pool
     val tmpname
@@ -12,9 +14,12 @@ process MAPPING {
     val bamlist
     val poolsort
     val pools
+    path "${pool}"
+    path "${tmpname}_unbammed", optional: true
+    path "${tmpname}_unzipped", optional: true
 
     script:
-
+    println pool
     if (pool[-1] == '/') {
         pool = pool[0..-2]
     }
@@ -39,7 +44,7 @@ process MAPPING {
     is_zipped = false
     unbammed = false
     unzipped = false
-    if (params.program != 'BWA' && pool.split('\\.')[-1] == "gz" && pool.split('\\.')[-2] == "fastq") {
+    if (params.program != 'bwa' && pool.split('\\.')[-1] == "gz" && pool.split('\\.')[-2] == "fastq") {
         // command = "mkdir -p ${tmpname}_unzipped"
         // process = command.execute()
         // process.waitFor()
@@ -57,11 +62,10 @@ process MAPPING {
         
         pool = "${tmpname}_unzipped/" + (pool.split('/')[-1].split('\\.')[0..-2]).join('.')
         is_zipped = true
-    } else if (params.program == 'BWA' && pool.split('\\.')[-1] == "gz") {
+    } else if (params.program == 'bwa' && pool.split('\\.')[-1] == "gz") {
         is_zipped = true
         pool = originalfastqdir + (pool.split('/')[-1].split('\\.')[0..-2]).join('.')
     } else if (pool.split('\\.')[-1] == "bam") {
-        println "here " + pool
         if (params.domapping) {
             // command = "mkdir -p ${tmpname}_unbammed"
             // process = command.execute()
@@ -122,6 +126,9 @@ process MAPPING {
     }
 
     if (pool in poolsort) {
+        println "returning"
+        println "pool " + pool
+        println "poolsort " + poolsort
         return
     }
     println pool+'...'
@@ -144,7 +151,9 @@ process MAPPING {
     } else {
         mp["domapping"] = true
     }
+    // println "pools "+ pools
     pools << mp
+    // println "pools "+ pools
     poolsort << pool
 
     println "ok"
