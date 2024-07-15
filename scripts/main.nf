@@ -2,8 +2,9 @@ nextflow.enable.dsl=2
 
 // nextflow run scripts/main.nf --ref /home/ref.txt --program bwa --domapping True --human False --pairedend True --maxinsertsize 1000 --mininsertsize 50 --ssahaquality 30 --maprepeats False --GATK True --markdup True --detectOverlaps False --pseudosequence True --incref True --indels True --quality 50 --mapq 20 --depth 8 --stranddepth 3 --anomolous True --BAQ True --circular True --ratio 0.8 --prior 0.001 --call c --force False --filter 1 --tabfile False --alnfile False --raxml False --model GTRGAMMA --bootstrap 100 --keep False --LSF True --LSFQ normal --mem 5 --nodes 20 --dirty False --mapfiles "/home/ref.txt,/home/ref2.txt" -process.echo
 
-include { mpfs } from './sub-workflows/makepileup_from_sam.nf'
+include { MAKEPILEUP_FROM_SAM } from './sub-workflows/MAKEPILEUP_FROM_SAM.nf'
 include { MAPPING } from './modules/MAPPING.nf'
+include { INPUT_CHECK } from './sub-workflows/INPUT_CHECK.nf'
 
 process LOG_COMMANDLINE {
     output:
@@ -59,15 +60,13 @@ process LOG_COMMANDLINE {
     """
 }
 
-process RANDOM_NAME {
-    output:
-    val tmpname
-
-    exec:
+def RANDOM_NAME () {
     chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
     rnd = new Random()
     length = rnd.nextInt(3) + 8
     tmpname = 'tmp' + (1..length).collect { chars[random.nextInt(chars.length())] }.join('')
+
+    return tmpname
 }
 
 workflow {
@@ -79,18 +78,5 @@ workflow {
     poolsort = []
 
     tmpname = RANDOM_NAME()
-    // files = GENERATE_FILES()
-    files = Channel.from(params.mapfiles).splitCsv()
-    files.view()
-    (ziplist, bamlist, poolsort, pools, a, b, c) = MAPPING (files.flatten(), tmpname, ziplist, bamlist, poolsort, pools)
-
-    // pools.take(1)
-    // bamlist.take(1)
-    // poolsort.take(1)
-    // ziplist.take(1)
-
-    pools.view { "pools $it" }
-    bamlist.view {"bamlist $it"}
-    poolsort.view {"poolsort $it"}
-    ziplist.view {"ziplist $it"}
+    INPUT_CHECK(tmpname)
 }

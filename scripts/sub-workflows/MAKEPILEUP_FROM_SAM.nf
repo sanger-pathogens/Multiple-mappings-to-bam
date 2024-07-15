@@ -9,7 +9,7 @@ include { BCFTOOLS_CALL } from './../modules/BCFTOOLS_CALL.nf'
 
 import java.math.BigDecimal
 
-workflow mpfs {
+workflow MAKEPILEUP_FROM_SAM {
 
     take:
     name_tmp1_bam      //tuple(name, path tmp1_bam)
