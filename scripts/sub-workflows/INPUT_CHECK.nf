@@ -11,41 +11,40 @@ workflow INPUT_CHECK {
 
     files = Channel.from(params.mapfiles.split(','))
         .map { row -> 
-            mapping (row, tmpname, ziplist, bamlist, poolsort, dirs)
+            process_inputs (row, tmpname, ziplist, bamlist, poolsort)
         }
-        .map { pools, ziplist, bamlist, poolsort, dirs -> [pools, ziplist, bamlist, poolsort, dirs] }
+        .map { pools, ziplist, bamlist, poolsort -> [pools, ziplist, bamlist, poolsort] }
 
-    
-    make_dirs = PROCESS_DIRS(files.take(1))
-    GENERATE_DIR(make_dirs.flatten())
+    (zl, bl, ps) = PROCESS_LISTS(files.take(1))
+
+    emit:
+    files
+    zl
+    bl
+    ps
 
 }
-process PROCESS_DIRS {
+
+process PROCESS_LISTS {
     input:
     val files
 
     output:
-    val make_dirs
+    val zl
+    val bl
+    val ps
 
     exec:
-    make_dirs = files[4]
-}
-process GENERATE_DIR {
-    publishDir "${params.outdir}", mode: 'copy'
+    zl = files[1]
+    bl = files[2]
+    ps = files[3]
 
-    input:
-    val dir
-
-    output:
-    path "${dir}"
-
-    script:
-    """
-    mkdir -p ${dir}
-    """
+    if (ps.size() == 0) {
+        exit 1, "No valid input file"
+    }
 }
 
-def mapping (String pool, String tmpname, Map<String, String> ziplist, Map<String, String> bamlist, List<String> poolsort, List<String> dirs) {
+def process_inputs (String pool, String tmpname, Map<String, String> ziplist, Map<String, String> bamlist, List<String> poolsort) {
     // println tmpname
     if (pool[-1] == '/') {
         pool = pool[0..-2]
@@ -77,7 +76,6 @@ def mapping (String pool, String tmpname, Map<String, String> ziplist, Map<Strin
         // command = "mkdir -p ${tmpname}_unzipped"
         // process = command.execute()
         // process.waitFor()
-        dirs << "${tmpname}_unzipped"
 
         if (params.pairedend) {
             if (pool.split('\\.')[-3].endsWith("_1") || pool.split('\\.')[-3].endsWith("_2")) {
@@ -99,7 +97,6 @@ def mapping (String pool, String tmpname, Map<String, String> ziplist, Map<Strin
             // command = "mkdir -p ${tmpname}_unbammed"
             // process = command.execute()
             // process.waitFor()
-            dirs << "${tmpname}_unbammed"
 
             key = pool.replace("#", "_")
             bamlist[key.split('/')[-1].split('\\.')[0..-2].join('.')]=pool
@@ -162,7 +159,6 @@ def mapping (String pool, String tmpname, Map<String, String> ziplist, Map<Strin
     // command = "mkdir -p ${pool}"
     // process = command.execute()
     // process.waitFor()
-    dirs << "${pool}"
 
     pools = [:]
     pools["runname"] = pool
@@ -185,5 +181,5 @@ def mapping (String pool, String tmpname, Map<String, String> ziplist, Map<Strin
 
     println "ok"
 
-    return [pools, ziplist, bamlist, poolsort, dirs]
+    return [pools, ziplist, bamlist, poolsort]
 }
