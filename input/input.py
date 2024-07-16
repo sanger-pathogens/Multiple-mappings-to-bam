@@ -655,6 +655,8 @@ def validate_inputs(options):
     if not options.mapfiles:
         options = DoError("No input files selected!", options)
     options.program=options.program.upper()
+    if options.mem == 0:
+        options.mem = 2
     return options
     
 
