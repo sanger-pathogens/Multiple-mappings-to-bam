@@ -4,14 +4,12 @@ workflow INPUT_CHECK {
 
     main:
     ziplist = [:].withDefault { [] }
-    bamlist = [:]
     poolsort = []
-    // pools = []
     dirs = []
-
+    list_mp = params.mapfiles.split(',').collect()
     files = Channel.from(params.mapfiles.split(','))
         .map { row -> 
-            process_inputs (row, tmpname, ziplist, bamlist, poolsort)
+            process_inputs (row, tmpname, ziplist, poolsort, list_mp)
         }
         .map { pools, ziplist, bamlist, poolsort -> [pools, ziplist, bamlist, poolsort] }
 
@@ -44,7 +42,8 @@ process PROCESS_LISTS {
     }
 }
 
-def process_inputs (String pool, String tmpname, Map<String, String> ziplist, Map<String, String> bamlist, List<String> poolsort) {
+def process_inputs (String pool, String tmpname, Map<String, List<String>> ziplist, List<String> poolsort, List<String> list_mp) {
+    bamlist = ""
     // println tmpname
     if (pool[-1] == '/') {
         pool = pool[0..-2]
@@ -99,7 +98,7 @@ def process_inputs (String pool, String tmpname, Map<String, String> ziplist, Ma
             // process.waitFor()
 
             key = pool.replace("#", "_")
-            bamlist[key.split('/')[-1].split('\\.')[0..-2].join('.')]=pool
+            bamlist=pool
             pool = pool.replace("#", "_")
             pool = "${tmpname}_unbammed/" + pool.split('/')[-1].split('\\.')[0..-2].join('.') + ".bam"
         } else {
@@ -120,18 +119,18 @@ def process_inputs (String pool, String tmpname, Map<String, String> ziplist, Ma
     pairedend = ""
     if (params.pairedend && filetype != ".bam") {
         if (pool[-2..-1] == '_1') {
-            file1 = new File(originalfastqdir+pool[0..-3]+"_2"+nonhumanpool+".fastq")
-            file2 = new File(originalfastqdir+pool[0..-3]+"_2"+nonhumanpool+".fastq.gz")
-            if (!file1.exists() && !file2.exists()) {
+            file1 = originalfastqdir+pool[0..-3]+"_2"+nonhumanpool+".fastq"
+            file2 = originalfastqdir+pool[0..-3]+"_2"+nonhumanpool+".fastq.gz"
+            if (!list_mp.contains(file1) && !list_mp.contains(file2)) {
                 println "File "+pool+"_2.fastq not found! Treating "+pool+" as unpaired..."
                 pairedend=false
             } else {
                 pool = pool[0..-3]
             }
         } else if (pool[-2..-1] == '_2') {
-            file1 = new File(originalfastqdir+pool[0..-3]+"_1"+nonhumanpool+".fastq")
-            file2 = new File(originalfastqdir+pool[0..-3]+"_1"+nonhumanpool+".fastq.gz")
-            if (!file1.exists() && !file2.exists()) {
+            file1 = originalfastqdir+pool[0..-3]+"_1"+nonhumanpool+".fastq"
+            file2 = originalfastqdir+pool[0..-3]+"_1"+nonhumanpool+".fastq.gz"
+            if (!list_mp.contains(file1) && !list_mp.contains(file2)) {
                 println "File "+pool+"_1.fastq not found! Treating "+pool+" as unpaired..."
                 pairedend=false
             } else {

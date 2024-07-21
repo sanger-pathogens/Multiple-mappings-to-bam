@@ -4,6 +4,8 @@ nextflow.enable.dsl=2
 
 include { MAKEPILEUP_FROM_SAM } from './sub-workflows/MAKEPILEUP_FROM_SAM.nf'
 include { INPUT_CHECK } from './sub-workflows/INPUT_CHECK.nf'
+include { INDEX } from './modules/INDEX.nf'
+include { CALL_MAPPING } from './sub-workflows/CALL_MAPPING.nf'
 
 process LOG_COMMANDLINE {
     output:
@@ -69,13 +71,19 @@ def RANDOM_NAME () {
 }
 
 workflow {
+
     log_ch = LOG_COMMANDLINE()
 
     tmpname = RANDOM_NAME()
 
-    (files, ziplist, bamlist, poolsort) = INPUT_CHECK(tmpname)
+    ref = Channel.fromPath(params.ref)
 
+    (files, ziplist, bamlist, poolsort) = INPUT_CHECK(tmpname)
     
+    files.view()
+    // MAPPING(runnames)
+    CALL_MAPPING(files, ziplist, tmpname)
+
 
     
 }
