@@ -14,7 +14,7 @@ workflow CALL_MAPPING {
     files = UNZIP_GZ(files, tmpname)
 
     files = UN_BAM (files)
-    
+
     bwa_ch = files.combine(ref).combine(ref_fai)
     smalt_ch = bwa_ch.combine(tmpname_index)
 
@@ -23,7 +23,7 @@ workflow CALL_MAPPING {
     if (params.program == "BWA") {
         files = RUN_BWA (bwa_ch, ref_index)
     } else if (params.program == "SMALT") {
-        //Working here
+        (cmdline, files) = RUN_SMALT(tmpname, smalt_ch)
     }
 
     
