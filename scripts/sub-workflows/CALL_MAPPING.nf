@@ -1,4 +1,6 @@
 include { RUN_BWA } from './../modules/BWA.nf'
+include { RUN_SMALT } from './../modules/SMALT.nf'
+include { RUN_SSAHA } from './../modules/RUN_SSAHA.nf'
 
 workflow CALL_MAPPING {
     take:
@@ -24,6 +26,8 @@ workflow CALL_MAPPING {
         files = RUN_BWA (bwa_ch, ref_index)
     } else if (params.program == "SMALT") {
         (cmdline, files) = RUN_SMALT(tmpname, smalt_ch)
+    } else if (params.program == "SSAHA") {
+        files = RUN_SSAHA(bwa_ch)
     }
 
     
