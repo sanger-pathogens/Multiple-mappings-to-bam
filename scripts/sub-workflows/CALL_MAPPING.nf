@@ -1,30 +1,31 @@
-include { RUN_BWA } from './../modules/RUN_BWA.nf'
+include { RUN_BWA } from './../modules/BWA.nf'
 
 workflow CALL_MAPPING {
     take:
     files
-    ziplist
     tmpname
+    ref
+    ref_fai
+    ref_index
+    tmpname_index
 
     main:
 
-    gz_files = ziplist
-        .map { it.values() }
-        .flatten()
+    files = UNZIP_GZ(files, tmpname)
 
-    bam_ch = files.map { row ->
-        def bam_path = ""
-        if (row[2] == "") {
-            bam_path = baseDir+"/"+params.nfile
-        } else {
-            bam_path = row[2]
-        }
-        [bam_path, row[0].fastqdir, row[0].name]
-    }
+    files = UN_BAM (files)
     
-    UNZIP_GZ(gz_files, fastqdir_zip)
+    bwa_ch = files.combine(ref).combine(ref_fai)
+    smalt_ch = bwa_ch.combine(tmpname_index)
 
-    UN_BAM (bam_ch)
+    ref_index = ref_index.collect()
+
+    if (params.program == "BWA") {
+        files = RUN_BWA (bwa_ch, ref_index)
+    } else if (params.program == "SMALT") {
+        //Working here
+    }
+
     
 }
 
@@ -32,47 +33,72 @@ process UNZIP_GZ {
     publishDir "${params.outdir}", mode: 'copy'
 
     input:
-    path gz_file
-    val fastqdir
+    tuple val(files), path(file1), path(file2)
+    val tmpname
 
     output:
-    path "${outputFilename}"
-
-    when:
-    params.keep == false
+    tuple val(files), path(outputFileName), path(outputFileName2)
 
     script:
-    outputFilename = fastqdir + gz_file.getName().split('\\.')[0..-2].join('.')
-    """
-    mkdir -p ${fastqdir}
-    zcat ${gz_file} > ${outputFilename}
-    """
+    fastqdir = files.fastqdir
+    outputFileName=file1
+    outputFileName2=file2
+    
+    paramsNfile = params.nfile
+    if (params.keep == false && params.program != "BWA" && file1.name.endsWith('.fastq.gz')) {
+        outputFileName = fastqdir+file1.name.split('\\.')[0..-2].join('.')
+        outputFileName2 = fastqdir+file2.name.split('\\.')[0..-2].join('.')
+        """
+        mkdir -p ${fastqdir}
+        zcat ${file1} > ${outputFileName}
+
+        if [ "${file2.name}" != "${paramsNfile}" ]; then
+            zcat ${file2} > ${outputFileName2}
+        else
+            cp ${file2} ${outputFileName2}
+        fi
+        """
+    } else {
+        """
+        """
+    }
 }
 
 process UN_BAM {
     publishDir "${params.outdir}", mode: 'copy'
 
     input:
-    tuple path(bamlist), val(fastqdir), val(name)
+    tuple val(pools), path(file1), path(file2)
 
     output:
-    path "${outputFilename}"
-
-    when:
-    params.keep == false && bamlist != ""
+    tuple val(pools), path(outputFileName), path(outputFileName2)
 
     script:
-    outputFilename = "${fastqdir}${name}"
+    outputFileName = file1
+    outputFileName2 = file2
+    fastqdir = pools.fastqdir
+    name = pools.name
     
-    if (params.pairedend) {
+    if (!(params.keep == false && params.program != "BWA" && file1.name.endsWith('.fastq.gz')) && 
+        !(params.program == "BWA" && file1.name.endsWith('.gz')) && 
+        file1.name.endsWith('.bam') && 
+        params.domapping == true) {
+        outputFileName = "${fastqdir}${name}"
+        if (params.pairedend) {
         """
         mkdir -p ${fastqdir}
-        bam_filter.py -t all -b ${bamlist} -o ${outputFilename}
+        bam_filter.py -t all -b ${file1} -o ${outputFilename}
         """
+        } else {
+            """
+            mkdir -p ${fastqdir}
+            bam_filter.py -t all -f fasta -b ${file1} -o ${outputFilename}
+            """
+        }
     } else {
         """
-        mkdir -p ${fastqdir}
-        bam_filter.py -t all -f fasta -b ${bamlist} -o ${outputFilename}
         """
     }
+    
+    
 }

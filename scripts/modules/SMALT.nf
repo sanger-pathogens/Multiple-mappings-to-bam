@@ -36,6 +36,7 @@ process RUN_SMALT {
     val domapping
     val newsmalt
     val tmpname
+    tuple val(pools), path(name_1_fastq), path(name_2_fastq), path(ref), path(ref_fai), path(tmpname_index)
 
     output:
     env cmdline, emit: cmdline

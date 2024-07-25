@@ -78,11 +78,11 @@ workflow {
 
     ref = Channel.fromPath(params.ref)
 
-    (files, ziplist, bamlist, poolsort) = INPUT_CHECK(tmpname)
+    files = INPUT_CHECK(tmpname)
+
+    (ref_fai, ref_index, tmpname_index) = INDEX(tmpname, ref)
     
-    files.view()
-    // MAPPING(runnames)
-    CALL_MAPPING(files, ziplist, tmpname)
+    CALL_MAPPING(files, tmpname, ref, ref_fai, ref_index, tmpname_index)
 
 
     

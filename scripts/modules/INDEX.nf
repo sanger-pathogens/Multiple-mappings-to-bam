@@ -6,7 +6,9 @@ process INDEX {
     path ref
 
     output:
-    path "${ref}*", emit: mapping_index_ch
+    path "${ref}.fai"
+    path "${tmpname}.index", optional: true
+    path "${ref}*"
 
     script:
     """
@@ -20,6 +22,6 @@ process INDEX {
         fi
     fi
 
-    samtools faidx ${ref}
+    #samtools faidx ${ref}
     """
 }

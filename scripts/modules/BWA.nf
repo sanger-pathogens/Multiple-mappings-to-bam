@@ -16,37 +16,39 @@ process RUN_BWA {
     container 'quay.io/ssd28/gsoc-experimental/run-bwa:0.0.1'
     tag "${name}"
 
+    publishDir "${params.outdir}", mode: 'copy'
+
     input:
-    path ref
-    tuple val(name), path name_fastq
-    path name_1_fastq
-    path name_2_fastq
-    path ref_fai
-    val fastqdir
-    val pairedend
-    val is_zipped
+    tuple val(pools), path(name_1_fastq), path(name_2_fastq), path(ref), path(ref_fai)
+    tuple path(f1), path(f2), path(f3), path(f4), path(f5)
     
     output:
-    path "${params.runname}/tmp1.bam", emit: tmp1_bam
+    tuple val(pools), path(name_1_fastq), path(name_2_fastq), path ("${runname}/tmp1.bam")
 
-    script:
+    exec:
+    name = pools.name
+    runname = pools.runname
+    is_zipped = pools.is_zipped
+    pairedend = pools.pairedend
+    
     """
     mkdir -p "${runname}"
     if [ "${is_zipped}" = "true" ]; then
         if [ "${pairedend}" = "true" ]; then
-            bwa mem -v 1 -M -a -t 1 ${ref} ${name_1_fastq} ${name_2_fastq} > ${params.runname}/tmp.sam
+            bwa mem -v 1 -M -a -t 1 ${ref} ${name_1_fastq} ${name_2_fastq} > ${runname}/tmp.sam
         else
-            bwa mem -v 1 -M -a -t 1 ${ref} ${name_fastq} > ${params.runname}/tmp.sam
+            bwa mem -v 1 -M -a -t 1 ${ref} ${name_1_fastq} > ${runname}/tmp.sam
         fi
     else
         if [ "${pairedend}" = "true" ]; then
-            bwa mem -v 1 -M -a -t 1 ${ref} ${name_1_fastq} ${name_2_fastq} > ${params.runname}/tmp.sam
+            bwa mem -v 1 -M -a -t 1 ${ref} ${name_1_fastq} ${name_2_fastq} > ${runname}/tmp.sam
         else
-            bwa mem -v 1 -M -a -t 1 ${ref} ${name_fastq} > ${params.runname}/tmp.sam
+            bwa mem -v 1 -M -a -t 1 ${ref} ${name_1_fastq} > ${runname}/tmp.sam
         fi
     fi
 
-    samtools view -b -S ${params.runname}/tmp.sam -t ${ref_fai} > ${params.runname}/tmp1.bam
-    rm -f ${params.runname}/tmp.sam
-    """
+    samtools view -b -S ${runname}/tmp.sam -t ${ref_fai} > ${runname}/tmp1.bam
+    rm -f ${runname}/tmp.sam
+    """ 
+    
 }
