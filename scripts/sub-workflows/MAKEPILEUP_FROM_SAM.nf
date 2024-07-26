@@ -6,66 +6,60 @@ include { INDEL_REALIGNMENT } from './../modules/INDEL_REALIGNMENT.nf'
 include { FILTER_BAM } from './../modules/FILTER_BAM.nf'
 include { PILEUP } from './../modules/PILEUP.nf'
 include { BCFTOOLS_CALL } from './../modules/BCFTOOLS_CALL.nf'
+include { PSEUDOSEQUENCE } from './../modules/PSEUDOSEQUENCE.nf'
 
 import java.math.BigDecimal
 
 workflow MAKEPILEUP_FROM_SAM {
 
     take:
-    name_tmp1_bam      //tuple(name, path tmp1_bam)
-    cmdline
+    files
 
     main:
 
     ref = channel.fromPath(params.ref)
 
     if (params.markdup == "true") {
-        (tmp1_bam, matrix_file_ch) = SORT_AND_MARK_DUPLICATES(name_tmp1_bam)
+        (files, matrix_file_ch) = SORT_AND_MARK_DUPLICATES(files)
     }
 
-    (name_bam, tmphead_sam, bam_bai) = SAMTOOLS_SORT(name_tmp1_bam)
+    files = SAMTOOLS_SORT(files)
 
-    if (params.program == "smalt" || params.program == "SMALT") {
-        tmphead_sam = SMALT(tmphead_sam, cmdline)
-    } else if (params.program == "bwa" || params.program == "BWA") {
-        tmphead_sam = BWA(tmphead_sam, name)
+    if (params.program == "SMALT") {
+        files = SMALT(files)
+    } else if (params.program == "BWA") {
+        files = BWA(files)
     }
 
-    (tmp1_bam, tmphead_bam) = SAMTOOLS_MERGE(name_bam, tmphead_sam[1])
+    (files, tmphead_bam) = SAMTOOLS_MERGE(files)
 
-    if (params.GATK == 'true') {
-        tmp1_bam = INDEL_REALIGNMENT(tmp1_bam, ref)
+    if (params.GATK == true) {
+        files = INDEL_REALIGNMENT(files, ref)
     }
 
-    tmp_bam = SAMTOOLS_SORT_1(tmp1_bam)
+    files = SAMTOOLS_SORT_1(files)
 
-    (name_bam, filter_bam_ch) = FILTER_BAM(tmp_bam)
+    (files, filter_bam_ch) = FILTER_BAM(files)
 
-    bam_bai = SAMTOOLS_INDEX(name_bam[1])
+    files = SAMTOOLS_INDEX(files)
 
-    tmp_mpileup = PILEUP(ref, name_bam)
+    files = PILEUP(files, ref)
 
-    (name_ploidy, name_bcf, name_variant_bcf, name_bcf_csi, name_variant_bcf_csi) = BCFTOOLS_CALL(tmp_mpileup)
+    (files, name_ploidy, name_variant_bcf, name_bcf_csi, name_variant_bcf_csi) = BCFTOOLS_CALL(files)
 
-    if (params.pseudosequence == "true") {
-        pseudosequence = PSEUDOSEQUENCE(name_bcf, name_bam[1])
+    if (params.pseudosequence == true) {
+        pseudosequence = PSEUDOSEQUENCE(files)
     }
 
     emit:
     // All the files generated above
-    matrix_file_ch
-    name_bam
-    filter_bam_ch
-    bam_bai
-    tmp_mpileup
-    name_ploidy
-    name_bcf
-    name_variant_bcf
-    name_variant_bcf_csi
-    tmp1_bam
-    tmphead_sam
-    tmphead_bam
-    tmp_bam
-    pseudosequence
-
+    files
+    // tmphead_bam
+    // matrix_file_ch
+    // pseudosequence
+    // filter_bam_ch
+    // name_ploidy
+    // name_variant_bcf
+    // name_bcf_csi
+    // name_variant_bcf_csi
 }

@@ -1,9 +1,9 @@
 process BWA {
     input:
-    tuple val(name), path(tmphead_sam)
+    tuple val(pools), path(file1), path(file2), path (name_bam), val(cmdline), path(tmphead_sam), path(bam_bai)
 
     output:
-    tuple val(name), path(tmphead_sam)
+    tuple val(pools), path(file1), path(file2), path (name_bam), path(tmphead_sam), path(bam_bai)
 
     script:
     """
@@ -20,16 +20,17 @@ process RUN_BWA {
 
     input:
     tuple val(pools), path(name_1_fastq), path(name_2_fastq), path(ref), path(ref_fai)
-    tuple path(f1), path(f2), path(f3), path(f4), path(f5)
+    tuple path(f1), path(f2), path(f3), path(f4), path(f5), path(f6)
     
     output:
-    tuple val(pools), path(name_1_fastq), path(name_2_fastq), path ("${runname}/tmp1.bam")
+    tuple val(pools), path(name_1_fastq), path(name_2_fastq), path ("${runname}/tmp1.bam"), val(cmdline)
 
-    exec:
+    script:
     name = pools.name
     runname = pools.runname
     is_zipped = pools.is_zipped
     pairedend = pools.pairedend
+    cmdline = ""
     
     """
     mkdir -p "${runname}"
@@ -50,5 +51,27 @@ process RUN_BWA {
     samtools view -b -S ${runname}/tmp.sam -t ${ref_fai} > ${runname}/tmp1.bam
     rm -f ${runname}/tmp.sam
     """ 
-    
 }
+
+process BWA_INDEX {
+
+    publishDir "${params.outdir}", mode: 'copy'
+
+    input:
+    path ref
+
+    output:
+    tuple path("*.amb"), path("*.ann"), path("*.bwt"), path("*.pac"), path("*.sa"), path("*.alt")
+    path("*.fai"), emit: fai
+
+    when:
+    params.program == "BWA"
+
+    script:
+    """
+    bwa index ${ref}
+    samtools faidx ${ref}
+    touch ${ref}.alt
+    """
+}
+

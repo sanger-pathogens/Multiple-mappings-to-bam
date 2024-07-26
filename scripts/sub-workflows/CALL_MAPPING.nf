@@ -1,6 +1,7 @@
 include { RUN_BWA } from './../modules/BWA.nf'
 include { RUN_SMALT } from './../modules/SMALT.nf'
 include { RUN_SSAHA } from './../modules/RUN_SSAHA.nf'
+include { MAKEPILEUP_FROM_SAM } from './../sub-workflows/MAKEPILEUP_FROM_SAM.nf'
 
 workflow CALL_MAPPING {
     take:
@@ -9,7 +10,6 @@ workflow CALL_MAPPING {
     ref
     ref_fai
     ref_index
-    tmpname_index
 
     main:
 
@@ -18,19 +18,19 @@ workflow CALL_MAPPING {
     files = UN_BAM (files)
 
     bwa_ch = files.combine(ref).combine(ref_fai)
-    smalt_ch = bwa_ch.combine(tmpname_index)
 
     ref_index = ref_index.collect()
 
     if (params.program == "BWA") {
         files = RUN_BWA (bwa_ch, ref_index)
     } else if (params.program == "SMALT") {
-        (cmdline, files) = RUN_SMALT(tmpname, smalt_ch)
+        files = RUN_SMALT(tmpname, bwa_ch, ref_index)
     } else if (params.program == "SSAHA") {
         files = RUN_SSAHA(bwa_ch)
     }
 
-    
+    files = MAKEPILEUP_FROM_SAM(files)
+
 }
 
 process UNZIP_GZ {
@@ -91,12 +91,12 @@ process UN_BAM {
         if (params.pairedend) {
         """
         mkdir -p ${fastqdir}
-        bam_filter.py -t all -b ${file1} -o ${outputFilename}
+        bam_filter.py -t all -b ${file1} -o ${outputFileName}
         """
         } else {
             """
             mkdir -p ${fastqdir}
-            bam_filter.py -t all -f fasta -b ${file1} -o ${outputFilename}
+            bam_filter.py -t all -f fasta -b ${file1} -o ${outputFileName}
             """
         }
     } else {

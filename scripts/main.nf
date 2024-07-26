@@ -4,10 +4,12 @@ nextflow.enable.dsl=2
 
 include { MAKEPILEUP_FROM_SAM } from './sub-workflows/MAKEPILEUP_FROM_SAM.nf'
 include { INPUT_CHECK } from './sub-workflows/INPUT_CHECK.nf'
-include { INDEX } from './modules/INDEX.nf'
 include { CALL_MAPPING } from './sub-workflows/CALL_MAPPING.nf'
+include { BWA_INDEX } from './modules/BWA.nf'
+include { SMALT_INDEX } from './modules/SMALT.nf'
 
 process LOG_COMMANDLINE {
+    publishDir "${params.outdir}", mode: 'copy'
     output:
     path 'MM_command_*.txt'
 
@@ -80,10 +82,11 @@ workflow {
 
     files = INPUT_CHECK(tmpname)
 
-    (ref_fai, ref_index, tmpname_index) = INDEX(tmpname, ref)
+    if (params.program == "BWA") {
+        (index_ch, fai) = BWA_INDEX(ref)
+    } else if (params.program == "SMALT") {
+        (index_ch, fai) = SMALT_INDEX(ref, tmpname)
+    }
     
-    CALL_MAPPING(files, tmpname, ref, ref_fai, ref_index, tmpname_index)
-
-
-    
+    CALL_MAPPING(files, tmpname, ref, fai, index_ch)
 }

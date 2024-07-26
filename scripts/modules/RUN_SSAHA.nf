@@ -8,12 +8,12 @@ process RUN_SSAHA {
     tuple val(pools), path(name_1_fastq), path(name_2_fastq), path(ref), path(ref_fai)
 
     output:
-    path "${runname}/tmp.sam", emit: tmp_sam
-    tuple val(pools), path(name_1_fastq), path(name_2_fastq), path(ref), path(ref_fai), path("${runname}/tmp.sam")
+    tuple val(pools), path(name_1_fastq), path(name_2_fastq), path("${runname}/tmp1.bam"), val(cmdline)
 
     script:
     runname = pools.runname
     pairedend = pools.pairedend
+    cmdline=""
     """
     mkdir -p "${runname}"
     if [ "${pairedend}" = "false" ]; then
@@ -33,6 +33,8 @@ process RUN_SSAHA {
 
     samtools view -H ${runname}/tmp.bam > ${runname}/tmp2.sam
     cat ${runname}/tmp2.sam ${runname}/tmp1.sam > ${runname}/tmp.sam
+    samtools view -b -S ${runname}/tmp.sam -t ${ref_fai} > ${runname}/tmp1.bam
+    rm -f ${runname}/tmp.sam
     rm ${runname}/tmp2.sam ${runname}/tmp1.sam
     """
 }
