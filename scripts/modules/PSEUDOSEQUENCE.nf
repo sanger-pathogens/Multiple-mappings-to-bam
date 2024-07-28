@@ -1,5 +1,6 @@
 process PSEUDOSEQUENCE {
-    publishDir "${params.outdir}", mode: 'copy'
+    publishDir "${params.outdir}", mode: 'copy', overwrite: true
+    container 'bcf_2_pseudosequence'
     input:
     tuple val(pools), path(file1), path(file2), path (name_bam), path(tmphead_sam), path(bam_bai), path(tmp_mpileup), path (name_bcf)
 

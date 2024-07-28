@@ -1,5 +1,6 @@
 process SAMTOOLS_SORT {
-    container 'quay.io/biocontainers/samtools:1.3--1'
+    container 'samtools-1.3'
+    publishDir "${params.outdir}", mode: 'copy', overwrite: true
 
     input:
     tuple val(pools), path(file1), path(file2), path(tmp1_bam), val(cmdline)
@@ -29,7 +30,8 @@ process SAMTOOLS_SORT {
 }
 
 process SAMTOOLS_SORT_1 {
-    container 'quay.io/biocontainers/samtools:1.3--1'
+    container 'samtools-1.3'
+    publishDir "${params.outdir}", mode: 'copy', overwrite: true
 
     input:
     tuple val(pools), path(file1), path(file2), path (tmp1_bam), path(tmphead_sam), path(bam_bai)
@@ -46,7 +48,8 @@ process SAMTOOLS_SORT_1 {
 }
 
 process SAMTOOLS_INDEX {
-    container 'quay.io/biocontainers/samtools:1.3--1'
+    container 'samtools-1.3'
+    publishDir "${params.outdir}", mode: 'copy', overwrite: true
 
     input:
     tuple val(pools), path(file1), path(file2), path (name_bam), path(tmphead_sam), path(bam_bai)
@@ -61,6 +64,9 @@ process SAMTOOLS_INDEX {
 
 }
 process SAMTOOLS_MERGE {
+    container 'samtools-1.3'
+    publishDir "${params.outdir}", mode: 'copy', overwrite: true
+    
     input:
     tuple val(pools), path(file1), path(file2), path (name_bam), path(tmphead_sam), path(bam_bai)
 

@@ -1,4 +1,7 @@
 process FILTER_BAM {
+    container 'samtools-1.3'
+    publishDir "${params.outdir}", mode: 'copy', overwrite: true
+
     input:
     tuple val(pools), path(file1), path(file2), path (tmp_bam), path(tmphead_sam), path(bam_bai)
 

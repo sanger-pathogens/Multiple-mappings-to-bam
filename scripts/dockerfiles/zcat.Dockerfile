@@ -1,6 +1,5 @@
-FROM samtools-1.3:latest
+FROM debian:buster-slim
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    smalt
-
+    gzip
 CMD ["/bin/bash"]

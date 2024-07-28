@@ -1,4 +1,5 @@
 process SMALT {
+    publishDir "${params.outdir}", mode: 'copy', overwrite: true
     input:
     tuple val(pools), path(file1), path(file2), path (name_bam), val(cmdline), path(tmphead_sam), path(bam_bai)
 
@@ -19,8 +20,8 @@ process SMALT {
 
 
 process RUN_SMALT {
-
-    container 'quay.io/ssd28/gsoc-experimental/run-smalt:0.0.1'
+    publishDir "${params.outdir}", mode: 'copy', overwrite: true
+    container 'smalt-samtools'
 
     publishDir "${params.outdir}", mode: 'copy'
 
@@ -104,6 +105,8 @@ process RUN_SMALT {
 }
 
 process SMALT_INDEX {
+    publishDir "${params.outdir}", mode: 'copy', overwrite: true
+    container 'samtools-1.3'
     input:
     path ref
     val tmpname

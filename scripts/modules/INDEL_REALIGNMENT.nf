@@ -1,4 +1,7 @@
 process INDEL_REALIGNMENT {
+    container 'mpfs-gatk'
+    publishDir "${params.outdir}", mode: 'copy', overwrite: true
+
     input:
     tuple val(pools), path(file1), path(file2), path (tmp1_bam), path(tmphead_sam), path(bam_bai)
     path ref

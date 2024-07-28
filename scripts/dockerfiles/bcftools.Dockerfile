@@ -1,6 +1,5 @@
-FROM samtools-1.3:latest
+FROM debian:bullseye-20240612-slim
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    smalt
-
+    bcftools
 CMD ["/bin/bash"]

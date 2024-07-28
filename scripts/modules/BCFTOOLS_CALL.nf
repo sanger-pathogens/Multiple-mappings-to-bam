@@ -1,4 +1,8 @@
 process BCFTOOLS_CALL {
+    publishDir "${params.outdir}", mode: 'copy', overwrite: true
+
+    container 'bcftools'
+
     input:
     tuple val(pools), path(file1), path(file2), path (name_bam), path(tmphead_sam), path(bam_bai), path(tmp_mpileup)
 

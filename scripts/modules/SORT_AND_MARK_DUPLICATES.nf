@@ -1,7 +1,7 @@
 // include './../sub-workflows/makepileup_from_sam.nf'
 
 process SORT_AND_MARK_DUPLICATES {
-    container 'quay.io/ssd28/gsoc-experimental/sort-and-mark-duplicates:0.0.1'
+    container 'mpfs-gatk'
     publishDir "${params.outdir}", mode: 'copy'
 
     input:

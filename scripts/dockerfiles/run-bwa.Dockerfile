@@ -1,7 +1,5 @@
-FROM debian:buster-slim
+FROM samtools-1.3:latest
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    bwa \
-    samtools
-
+    bwa 
 CMD ["/bin/bash"]

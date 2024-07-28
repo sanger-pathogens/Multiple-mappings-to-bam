@@ -13,10 +13,10 @@ process BWA {
 
 
 process RUN_BWA {
-    container 'quay.io/ssd28/gsoc-experimental/run-bwa:0.0.1'
+    container 'bwa-samtools'
     tag "${name}"
 
-    publishDir "${params.outdir}", mode: 'copy'
+    publishDir "${params.outdir}", mode: 'copy', overwrite: true
 
     input:
     tuple val(pools), path(name_1_fastq), path(name_2_fastq), path(ref), path(ref_fai)
@@ -54,7 +54,7 @@ process RUN_BWA {
 }
 
 process BWA_INDEX {
-
+    container 'bwa-samtools'
     publishDir "${params.outdir}", mode: 'copy'
 
     input:

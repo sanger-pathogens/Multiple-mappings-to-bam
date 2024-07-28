@@ -1,5 +1,8 @@
 process PILEUP {
-    publishDir "${params.outdir}", mode: 'copy'
+    publishDir "${params.outdir}", mode: 'copy', overwrite: true
+
+    container 'samtools-1.3'
+
     input:
     tuple val(pools), path(file1), path(file2), path (name_bam), path(tmphead_sam), path(bam_bai)
     path ref

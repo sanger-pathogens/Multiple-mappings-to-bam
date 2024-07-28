@@ -34,6 +34,7 @@ workflow CALL_MAPPING {
 }
 
 process UNZIP_GZ {
+    container 'zcat'
     publishDir "${params.outdir}", mode: 'copy'
 
     input:
@@ -69,6 +70,7 @@ process UNZIP_GZ {
 }
 
 process UN_BAM {
+    container 'bam_filter'
     publishDir "${params.outdir}", mode: 'copy'
 
     input:
