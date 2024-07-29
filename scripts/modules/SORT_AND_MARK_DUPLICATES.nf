@@ -17,7 +17,11 @@ process SORT_AND_MARK_DUPLICATES {
     """
     mkdir -p ${runname}
     samtools sort ${bam_file} > ${runname}/tmpsort.bam
-    picard MarkDuplicates INPUT=${runname}/tmpsort.bam OUTPUT=${runname}/tmp1.bam METRICS_FILE=${runname}/${name}_metrics.txt
+    #picard MarkDuplicates INPUT=${runname}/tmpsort.bam OUTPUT=${runname}/tmp1.bam METRICS_FILE=${runname}/${name}_metrics.txt
+    gatk MarkDuplicates \
+    -I ${runname}/tmpsort.bam \
+    -O ${runname}/tmp1.bam \
+    -M ${runname}/${name}_metrics.txt
     rm ${runname}/tmpsort.bam
     """
 }

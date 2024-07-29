@@ -15,7 +15,12 @@ process INDEL_REALIGNMENT {
     samtools index ${tmp1_bam}
     cp ${ref} ${runname}/tmpref.fa
     samtools faidx ${runname}/tmpref.fa
-    picard CreateSequenceDictionary R=${runname}/tmpref.fa O=${runname}/tmpref.dict
+
+    #picard CreateSequenceDictionary R=${runname}/tmpref.fa O=${runname}/tmpref.dict
+    gatk CreateSequenceDictionary \
+    -R ${runname}/tmpref.fa \
+    -O ${runname}/tmpref.dict
+    
     gatk -I ${tmp1_bam} -R ${runname}/tmpref.fa -T RealignerTargetCreator -o ${runname}/tmp.intervals
     gatk -I ${tmp1_bam} -R ${runname}/tmpref.fa -T IndelRealigner --filter_bases_not_stored -targetIntervals ${runname}/tmp.intervals -o ${runname}/tmp.bam
     mv ${runname}/tmp.bam ${runname}/tmp1.bam

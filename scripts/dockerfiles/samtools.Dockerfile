@@ -18,6 +18,11 @@ RUN wget https://sourceforge.net/projects/samtools/files/samtools/1.3/samtools-1
 # Stage 2: Runtime environment
 FROM debian:bullseye-20240612-slim
 
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends libncurses5-dev zlib1g-dev\
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
 # Copy samtools from the build stage
 COPY --from=build samtools-1.3/samtools samtools/
 
