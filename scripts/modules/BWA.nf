@@ -6,6 +6,7 @@ process BWA {
     tuple val(pools), path(file1), path(file2), path (name_bam), path(tmphead_sam), path(bam_bai)
 
     script:
+    name = pools.name
     """
     echo '@RG\\tID:${name}\\tCN:Sanger\\tDT:\$now\\tPG:BWA MEM\\tPL:ILLUMINA\\tSM:${name}' >> ${tmphead_sam}
     """
@@ -13,7 +14,7 @@ process BWA {
 
 
 process RUN_BWA {
-    container 'bwa-samtools'
+    container 'bwa-samtools:latest'
     tag "${name}"
 
     publishDir "${params.outdir}", mode: 'copy', overwrite: true
@@ -54,7 +55,7 @@ process RUN_BWA {
 }
 
 process BWA_INDEX {
-    container 'bwa-samtools'
+    container 'bwa-samtools:latest'
     publishDir "${params.outdir}", mode: 'copy'
 
     input:

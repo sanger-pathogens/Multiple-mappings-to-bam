@@ -75,11 +75,13 @@ process SAMTOOLS_MERGE {
     path ("${runname}/tmphead.bam")
 
     script:
+    runname = pools.runname
+    name = pools.name
     """
     mkdir -p ${runname}
     samtools view -b -o ${runname}/tmphead.bam -H ${name_bam}
     samtools merge -c -p -f -r -h ${tmphead_sam} ${runname}/tmp.bam ${name_bam} ${runname}/tmphead.bam
     mv ${runname}/tmp.bam ${runname}/tmp1.bam
-    rm ${runname}/${name}.bam
+    rm ${name}.bam
     """
 }

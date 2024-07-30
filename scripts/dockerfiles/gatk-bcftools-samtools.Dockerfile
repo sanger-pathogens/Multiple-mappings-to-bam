@@ -32,7 +32,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY --from=build /opt/gatk/gatk-4.5.0.0 /opt/gatk/gatk-4.5.0.0
 
 # Set up the GATK alias
-RUN echo "alias gatk='/opt/gatk/gatk-4.5.0.0/gatk'" >> ~/.bashrc
+# RUN echo "alias gatk='/opt/gatk/gatk-4.5.0.0/gatk'" >> ~/.bashrc
+ENV PATH="/opt/gatk/gatk-4.5.0.0:${PATH}"
 
 # Copy the Python script
 COPY dependencies/bcf_2_pseudosequence.py /opt/bcf_2_pseudosequence/bcf_2_pseudosequence.py

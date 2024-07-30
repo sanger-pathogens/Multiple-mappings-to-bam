@@ -24,9 +24,9 @@ RUN apt-get update && \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy samtools from the build stage
-COPY --from=build samtools-1.3/samtools samtools/
+COPY --from=build samtools-1.3/samtools st/samtools
 
 # Set up the alias
-RUN echo "alias samtools='./samtools/samtools'" >> ~/.bashrc
+ENV PATH="/st:${PATH}"
 
 CMD ["/bin/bash"]

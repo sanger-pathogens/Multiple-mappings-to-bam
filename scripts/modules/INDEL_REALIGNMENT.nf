@@ -10,6 +10,8 @@ process INDEL_REALIGNMENT {
     tuple val(pools), path(file1), path(file2), path ("${runname}/tmp1.bam"), path(tmphead_sam), path(bam_bai)
 
     script:
+    runname = pools.runname
+    name = pools.name
     """
     mkdir -p "${runname}"
     samtools index ${tmp1_bam}
@@ -20,7 +22,7 @@ process INDEL_REALIGNMENT {
     gatk CreateSequenceDictionary \
     -R ${runname}/tmpref.fa \
     -O ${runname}/tmpref.dict
-    
+
     gatk -I ${tmp1_bam} -R ${runname}/tmpref.fa -T RealignerTargetCreator -o ${runname}/tmp.intervals
     gatk -I ${tmp1_bam} -R ${runname}/tmpref.fa -T IndelRealigner --filter_bases_not_stored -targetIntervals ${runname}/tmp.intervals -o ${runname}/tmp.bam
     mv ${runname}/tmp.bam ${runname}/tmp1.bam
