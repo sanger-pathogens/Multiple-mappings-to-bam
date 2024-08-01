@@ -23,8 +23,17 @@ process INDEL_REALIGNMENT {
     -R ${runname}/tmpref.fa \
     -O ${runname}/tmpref.dict
 
-    gatk -I ${tmp1_bam} -R ${runname}/tmpref.fa -T RealignerTargetCreator -o ${runname}/tmp.intervals
-    gatk -I ${tmp1_bam} -R ${runname}/tmpref.fa -T IndelRealigner --filter_bases_not_stored -targetIntervals ${runname}/tmp.intervals -o ${runname}/tmp.bam
+    #gatk -I ${tmp1_bam} -R ${runname}/tmpref.fa -T RealignerTargetCreator -o ${runname}/tmp.intervals
+    #gatk -I ${tmp1_bam} -R ${runname}/tmpref.fa -T IndelRealigner --filter_bases_not_stored -targetIntervals ${runname}/tmp.intervals -o ${runname}/tmp.bam
+
+    # Generate GVCF file
+    gatk HaplotypeCaller \
+        -R ${runname}/tmpref.fa \
+        -I ${tmp1_bam} \
+        -O ${runname}/tmp.g.vcf \
+        -bamout ${runname}/tmp.bam
+
+
     mv ${runname}/tmp.bam ${runname}/tmp1.bam
     rm *.bai ${runname}/tmpref.* ${runname}/tmp.intervals ${runname}/tmphead.*
     """
