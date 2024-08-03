@@ -40,10 +40,11 @@ process SAMTOOLS_SORT_1 {
     tuple val(pools), path(file1), path(file2), path ("${runname}/tmp.bam"), path(tmphead_sam), path(bam_bai)
 
     script:
+    runname=pools.runname
     """
     mkdir -p "${runname}"
     samtools sort ${tmp1_bam} > ${runname}/tmp.bam
-    rm ${runname}/tmp1.bam
+    #rm ${runname}/tmp1.bam
     """
 }
 
@@ -55,9 +56,10 @@ process SAMTOOLS_INDEX {
     tuple val(pools), path(file1), path(file2), path (name_bam), path(tmphead_sam), path(bam_bai)
 
     output:
-    tuple val(pools), path(file1), path(file2), path (name_bam), path(tmphead_sam), path("*.bai")
+    tuple val(pools), path(file1), path(file2), path (name_bam), path(tmphead_sam), path("${name}.bam.bai")
 
     script:
+    name = pools.name
     """
     samtools index ${name_bam}
     """
@@ -81,7 +83,8 @@ process SAMTOOLS_MERGE {
     mkdir -p ${runname}
     samtools view -b -o ${runname}/tmphead.bam -H ${name_bam}
     samtools merge -c -p -f -r -h ${tmphead_sam} ${runname}/tmp.bam ${name_bam} ${runname}/tmphead.bam
-    mv ${runname}/tmp.bam ${runname}/tmp1.bam
+    samtools reheader ${tmphead_sam} ${runname}/tmp.bam > ${runname}/tmp1.bam
+    #mv ${runname}/tmp.bam ${runname}/tmp1.bam
     rm ${name}.bam
     """
 }

@@ -4,13 +4,13 @@ process PILEUP {
     container 'samtools-1.3'
 
     input:
-    tuple val(pools), path(file1), path(file2), path (name_bam), path(tmphead_sam), path(bam_bai)
-    path ref
+    tuple val(pools), path(file1), path(file2), path (name_bam), path(tmphead_sam), path(bam_bai), path(ref)
 
     output:
     tuple val(pools), path(file1), path(file2), path (name_bam), path(tmphead_sam), path(bam_bai), path("${runname}/tmp.mpileup")
 
     script:
+    runname = pools.runname
     """
     mkdir -p "${runname}"
     if [ ${params.anomolous} ]

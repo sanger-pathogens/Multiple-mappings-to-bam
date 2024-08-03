@@ -31,6 +31,9 @@ workflow CALL_MAPPING {
 
     files = MAKEPILEUP_FROM_SAM(files)
 
+    emit:
+    files
+
 }
 
 process UNZIP_GZ {
@@ -93,12 +96,12 @@ process UN_BAM {
         if (params.pairedend) {
         """
         mkdir -p ${fastqdir}
-        bam_filter.py -t all -b ${file1} -o ${outputFileName}
+        python2 /opt/bam_filter/bam_filter.py -t all -b ${file1} -o ${outputFileName}
         """
         } else {
             """
             mkdir -p ${fastqdir}
-            bam_filter.py -t all -f fasta -b ${file1} -o ${outputFileName}
+            python2 /opt/bam_filter/bam_filter.py -t all -f fasta -b ${file1} -o ${outputFileName}
             """
         }
     } else {

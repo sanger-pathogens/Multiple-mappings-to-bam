@@ -7,6 +7,7 @@ include { INPUT_CHECK } from './sub-workflows/INPUT_CHECK.nf'
 include { CALL_MAPPING } from './sub-workflows/CALL_MAPPING.nf'
 include { BWA_INDEX } from './modules/BWA.nf'
 include { SMALT_INDEX } from './modules/SMALT.nf'
+include { PSEUDOSEQUENCE_GENERATION } from './sub-workflows/PSEUDOSEQUENCE_GENERATION.nf'
 
 process LOG_COMMANDLINE {
     publishDir "${params.outdir}", mode: 'copy'
@@ -73,7 +74,6 @@ def RANDOM_NAME () {
 }
 
 workflow {
-
     log_ch = LOG_COMMANDLINE()
 
     tmpname = RANDOM_NAME()
@@ -88,5 +88,7 @@ workflow {
         (index_ch, fai) = SMALT_INDEX(ref, tmpname)
     }
     
-    CALL_MAPPING(files, tmpname, ref, fai, index_ch)
+    files = CALL_MAPPING(files, tmpname, ref, fai, index_ch)
+    (mfas_txt, files) = PSEUDOSEQUENCE_GENERATION(files, tmpname)
+    
 }

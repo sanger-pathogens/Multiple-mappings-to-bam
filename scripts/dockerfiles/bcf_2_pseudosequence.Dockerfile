@@ -1,7 +1,8 @@
-FROM debian:bullseye-20240612-slim
+FROM samtools-1.3
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    python2
+    python2 \
+    bcftools
 
 COPY dependencies/bcf_2_pseudosequence.py /opt/bcf_2_pseudosequence/bcf_2_pseudosequence.py
 

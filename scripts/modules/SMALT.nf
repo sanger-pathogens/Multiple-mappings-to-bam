@@ -7,13 +7,15 @@ process SMALT {
     tuple val(pools), path(file1), path(file2), path (name_bam), path(tmphead_sam), path(bam_bai)
 
     script:
+    name = pools.name
+    newsmalt = "true"
     """
     now=\$(date +'%Y-%m-%dT%H:%M:%S')
-    echo "@RG\\tID:${name}\\tCN:Sanger\\tDT:\$now\\tPG:SMALT\\tPL:ILLUMINA\\tSM:${name}" >> ${tmphead_sam}
+    echo "@RG\tID:${name}\tCN:Sanger\tDT:"\$now"\tPG:SMALT\tPL:ILLUMINA\tSM:${name}" >> ${tmphead_sam}
     if [ ${params.domapping} ] && [ ${newsmalt} = "false" ]
     then
         smaltversion=\$( smalt version | grep Version | awk '{print \$2}' )
-        echo "@PG\\tID:SMALT\\tPN:SMALT\\tCL:${cmdline}\\tVN:\$smaltversion" >> ${tmphead_sam}
+        echo "@PG\tID:SMALT\tPN:SMALT\tCL:${cmdline}\tVN:\$smaltversion" >> ${tmphead_sam}
     fi
     """
 }

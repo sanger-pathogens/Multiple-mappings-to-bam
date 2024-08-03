@@ -32,9 +32,9 @@ workflow MAKEPILEUP_FROM_SAM {
     }
 
     (files, tmphead_bam) = SAMTOOLS_MERGE(files)
-
+    files_ref = files.combine(ref)
     if (params.GATK == true) {
-        files = INDEL_REALIGNMENT(files, ref)
+        // files = INDEL_REALIGNMENT(files_ref)
     }
 
     files = SAMTOOLS_SORT_1(files)
@@ -42,8 +42,8 @@ workflow MAKEPILEUP_FROM_SAM {
     (files, filter_bam_ch) = FILTER_BAM(files)
 
     files = SAMTOOLS_INDEX(files)
-
-    files = PILEUP(files, ref)
+    files_ref = files.combine(ref)
+    files = PILEUP(files_ref)
 
     (files, name_ploidy, name_variant_bcf, name_bcf_csi, name_variant_bcf_csi) = BCFTOOLS_CALL(files)
 

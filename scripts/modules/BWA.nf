@@ -1,4 +1,5 @@
 process BWA {
+    publishDir "${params.outdir}", mode: 'copy'
     input:
     tuple val(pools), path(file1), path(file2), path (name_bam), val(cmdline), path(tmphead_sam), path(bam_bai)
 
@@ -7,8 +8,11 @@ process BWA {
 
     script:
     name = pools.name
+    runname = pools.runname
     """
-    echo '@RG\\tID:${name}\\tCN:Sanger\\tDT:\$now\\tPG:BWA MEM\\tPL:ILLUMINA\\tSM:${name}' >> ${tmphead_sam}
+    now=\$(date +'%Y-%m-%dT%H:%M:%S')
+    echo '@RG\tID:${name}\tCN:Sanger\tDT:'\$now'\tPG:BWA MEM\tPL:ILLUMINA\tSM:${name}' >> ${tmphead_sam}
+    echo '@RG\tID:${name}\tCN:Sanger\tDT:'\$now'\tPG:BWA MEM\tPL:ILLUMINA\tSM:${name}'
     """
 }
 

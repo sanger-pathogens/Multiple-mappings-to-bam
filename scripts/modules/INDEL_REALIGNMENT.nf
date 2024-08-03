@@ -3,8 +3,7 @@ process INDEL_REALIGNMENT {
     publishDir "${params.outdir}", mode: 'copy', overwrite: true
 
     input:
-    tuple val(pools), path(file1), path(file2), path (tmp1_bam), path(tmphead_sam), path(bam_bai)
-    path ref
+    tuple val(pools), path(file1), path(file2), path (tmp1_bam), path(tmphead_sam), path(bam_bai), path (ref)
 
     output:
     tuple val(pools), path(file1), path(file2), path ("${runname}/tmp1.bam"), path(tmphead_sam), path(bam_bai)
@@ -17,7 +16,7 @@ process INDEL_REALIGNMENT {
     samtools index ${tmp1_bam}
     cp ${ref} ${runname}/tmpref.fa
     samtools faidx ${runname}/tmpref.fa
-
+    echo "before ${runname}"
     #picard CreateSequenceDictionary R=${runname}/tmpref.fa O=${runname}/tmpref.dict
     gatk CreateSequenceDictionary \
     -R ${runname}/tmpref.fa \
@@ -25,7 +24,7 @@ process INDEL_REALIGNMENT {
 
     #gatk -I ${tmp1_bam} -R ${runname}/tmpref.fa -T RealignerTargetCreator -o ${runname}/tmp.intervals
     #gatk -I ${tmp1_bam} -R ${runname}/tmpref.fa -T IndelRealigner --filter_bases_not_stored -targetIntervals ${runname}/tmp.intervals -o ${runname}/tmp.bam
-
+    echo "Here ${runname}"
     # Generate GVCF file
     gatk HaplotypeCaller \
         -R ${runname}/tmpref.fa \
@@ -33,8 +32,10 @@ process INDEL_REALIGNMENT {
         -O ${runname}/tmp.g.vcf \
         -bamout ${runname}/tmp.bam
 
+    echo "end ${runname}"
+
 
     mv ${runname}/tmp.bam ${runname}/tmp1.bam
-    rm *.bai ${runname}/tmpref.* ${runname}/tmp.intervals ${runname}/tmphead.*
+    #rm *.bai ${runname}/tmpref.* ${runname}/tmp.intervals ${runname}/tmphead.*
     """
 }

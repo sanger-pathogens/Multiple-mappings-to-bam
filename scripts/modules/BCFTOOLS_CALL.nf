@@ -14,6 +14,8 @@ process BCFTOOLS_CALL {
     path "${runname}/${name}_variant.bcf", emit: name_variant_bcf_csi
 
     script:
+    runname = pools.runname
+    name = pools.name
     """
     mkdir -p ${runname}
     echo "${name}    1" > ${runname}/${name}.ploidy
