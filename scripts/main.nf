@@ -89,6 +89,8 @@ workflow {
     }
     
     files = CALL_MAPPING(files, tmpname, ref, fai, index_ch)
-    (mfas_txt, files) = PSEUDOSEQUENCE_GENERATION(files, tmpname)
-    
+    if (params.pseudosequence == true) {
+        (mfas_txt, files) = PSEUDOSEQUENCE_GENERATION(files, tmpname)
+    }
+
 }
