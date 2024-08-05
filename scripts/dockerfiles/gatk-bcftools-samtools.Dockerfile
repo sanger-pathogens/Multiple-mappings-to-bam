@@ -16,7 +16,7 @@ RUN mkdir /opt/gatk && \
     rm /opt/gatk/gatk-4.5.0.0.zip
 
 # Stage 2: Runtime Stage
-FROM samtools-1.3
+FROM bcf_2_pseudosequence
 
 # Install runtime dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -32,13 +32,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY --from=build /opt/gatk/gatk-4.5.0.0 /opt/gatk/gatk-4.5.0.0
 
 # Set up the GATK alias
-# RUN echo "alias gatk='/opt/gatk/gatk-4.5.0.0/gatk'" >> ~/.bashrc
 ENV PATH="/opt/gatk/gatk-4.5.0.0:${PATH}"
-
-# Copy the Python script
-COPY dependencies/bcf_2_pseudosequence.py /opt/bcf_2_pseudosequence/bcf_2_pseudosequence.py
-
-# Set up the Python script alias
-RUN echo "alias bcf_2_pseudosequence.py='python2 /opt/bcf_2_pseudosequence/bcf_2_pseudosequence.py'" >> ~/.bashrc
 
 CMD ["/bin/bash"]

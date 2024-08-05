@@ -5,21 +5,38 @@ workflow PSEUDOSEQUENCE_GENERATION {
 
     main:
     ref = Channel.fromPath(params.ref)
-    mfas_txt = MAKE_MFAS(tmpname)
+    mfas_txt = MAKE_TXT(tmpname)
     output_ch = files.map { row -> 
-        row[0].runname+'/'+row[0].name+'_mfas.txt'
+        row[0].name+'_mfas.mfa'
     }
+    mfa_files = MAKE_MFA(files)
+    mfa_files = mfa_files.collect()
     ls_ch=output_ch.toList()
     mfas_txt = APPEND_MFA(ls_ch, mfas_txt)
 
     ls_space = output_ch.toList()
 
-    output_aln = JOIN_DNA_INDELS(mfas_txt, ref, ls_space)
+    output_aln = JOIN_DNA_INDELS(mfas_txt, ref, mfa_files, ls_space)
 
     SUMMARISE_SNPS(output_aln, ref)
 }
 
-process MAKE_MFAS {
+process MAKE_MFA {
+    input:
+    val files
+
+    output:
+    path "${runname}/${name}_mfas.mfa"
+
+    script:
+    runname = files[0].runname
+    name = files[0].name
+    """
+    mkdir -p ${runname}
+    touch ${runname}/${name}_mfas.mfa
+    """
+}
+process MAKE_TXT {
     input:
     val tmpname
 
@@ -54,6 +71,7 @@ process JOIN_DNA_INDELS {
     input:
     path (mfas_txt)
     path ref
+    path mfa_files
     val ls_space
 
     output:

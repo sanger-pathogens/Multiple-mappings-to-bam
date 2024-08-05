@@ -34,7 +34,7 @@ workflow MAKEPILEUP_FROM_SAM {
     (files, tmphead_bam) = SAMTOOLS_MERGE(files)
     files_ref = files.combine(ref)
     if (params.GATK == true) {
-        // files = INDEL_REALIGNMENT(files_ref)
+        files = INDEL_REALIGNMENT(files_ref)
     }
 
     files = SAMTOOLS_SORT_1(files)
