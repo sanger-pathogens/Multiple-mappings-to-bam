@@ -1,4 +1,8 @@
 process PSEUDOSEQUENCE {
+    label "cpu_1"
+    label "mem_16"
+    label "time_1"
+    
     publishDir "${params.outdir}", mode: 'copy', overwrite: true
 
     container 'bcf_2_pseudosequence'

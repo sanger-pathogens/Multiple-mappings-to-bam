@@ -1,4 +1,8 @@
 process SAMTOOLS_SORT {
+    label "cpu_1"
+    label "mem_16"
+    label "time_1"
+
     container 'samtools-1.3'
     publishDir "${params.outdir}", mode: 'copy', overwrite: true
 
@@ -30,6 +34,10 @@ process SAMTOOLS_SORT {
 }
 
 process SAMTOOLS_SORT_1 {
+    label "cpu_1"
+    label "mem_16"
+    label "time_1"
+
     container 'samtools-1.3'
     publishDir "${params.outdir}", mode: 'copy', overwrite: true
 
@@ -49,6 +57,10 @@ process SAMTOOLS_SORT_1 {
 }
 
 process SAMTOOLS_INDEX {
+    label "cpu_1"
+    label "mem_16"
+    label "time_1"
+
     container 'samtools-1.3'
     publishDir "${params.outdir}", mode: 'copy', overwrite: true
 
@@ -66,6 +78,10 @@ process SAMTOOLS_INDEX {
 
 }
 process SAMTOOLS_MERGE {
+    label "cpu_1"
+    label "mem_16"
+    label "time_1"
+    
     container 'samtools-1.3'
     publishDir "${params.outdir}", mode: 'copy', overwrite: true
     

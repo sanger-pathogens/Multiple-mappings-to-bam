@@ -1,4 +1,8 @@
 process SMALT {
+    label "cpu_1"
+    label "mem_16"
+    label "time_1"
+
     publishDir "${params.outdir}", mode: 'copy', overwrite: true
     input:
     tuple val(pools), path(file1), path(file2), path (name_bam), val(cmdline), path(tmphead_sam), path(bam_bai)
@@ -22,6 +26,10 @@ process SMALT {
 
 
 process RUN_SMALT {
+    label "cpu_1"
+    label "mem_16"
+    label "time_1"
+
     publishDir "${params.outdir}", mode: 'copy', overwrite: true
     container 'smalt-samtools'
 
@@ -107,6 +115,10 @@ process RUN_SMALT {
 }
 
 process SMALT_INDEX {
+    label "cpu_1"
+    label "mem_16"
+    label "time_1"
+    
     publishDir "${params.outdir}", mode: 'copy', overwrite: true
     container 'samtools-1.3'
     input:

@@ -10,6 +10,10 @@ include { SMALT_INDEX } from './modules/SMALT.nf'
 include { PSEUDOSEQUENCE_GENERATION } from './sub-workflows/PSEUDOSEQUENCE_GENERATION.nf'
 
 process LOG_COMMANDLINE {
+    label "cpu_1"
+    label "mem_16"
+    label "time_1"
+    
     publishDir "${params.outdir}", mode: 'copy'
     output:
     path 'MM_command_*.txt'

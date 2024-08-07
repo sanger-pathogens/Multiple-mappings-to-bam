@@ -1,4 +1,8 @@
 process BWA {
+    label "cpu_1"
+    label "mem_16"
+    label "time_1"
+
     publishDir "${params.outdir}", mode: 'copy'
     input:
     tuple val(pools), path(file1), path(file2), path (name_bam), val(cmdline), path(tmphead_sam), path(bam_bai)
@@ -18,6 +22,10 @@ process BWA {
 
 
 process RUN_BWA {
+    label "cpu_1"
+    label "mem_16"
+    label "time_1"
+
     container 'bwa-samtools:latest'
     tag "${name}"
 
@@ -59,7 +67,12 @@ process RUN_BWA {
 }
 
 process BWA_INDEX {
+    label "cpu_1"
+    label "mem_16"
+    label "time_1"
+
     container 'bwa-samtools:latest'
+
     publishDir "${params.outdir}", mode: 'copy'
 
     input:

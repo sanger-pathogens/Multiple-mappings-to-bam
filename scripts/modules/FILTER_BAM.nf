@@ -1,4 +1,8 @@
 process FILTER_BAM {
+    label "cpu_1"
+    label "mem_16"
+    label "time_1"
+    
     container 'samtools-1.3'
     publishDir "${params.outdir}", mode: 'copy', overwrite: true
 

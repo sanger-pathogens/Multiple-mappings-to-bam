@@ -1,4 +1,8 @@
 process RUN_SSAHA {
+    label "cpu_1"
+    label "mem_16"
+    label "time_1"
+    
     container 'quay.io/sangerpathogens/ssaha2:v2.5.5_cv3'
     tag "${name}"
 

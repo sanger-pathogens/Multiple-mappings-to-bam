@@ -1,6 +1,10 @@
 // include './../sub-workflows/makepileup_from_sam.nf'
 
 process SORT_AND_MARK_DUPLICATES {
+    label "cpu_1"
+    label "mem_16"
+    label "time_1"
+    
     container 'mpfs-gatk'
     publishDir "${params.outdir}", mode: 'copy'
 

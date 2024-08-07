@@ -1,4 +1,8 @@
 process INDEL_REALIGNMENT {
+    label "cpu_1"
+    label "mem_16"
+    label "time_12"
+
     container 'mpfs-gatk'
     publishDir "${params.outdir}", mode: 'copy', overwrite: true
 

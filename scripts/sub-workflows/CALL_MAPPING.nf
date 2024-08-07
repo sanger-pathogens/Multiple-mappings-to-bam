@@ -37,6 +37,10 @@ workflow CALL_MAPPING {
 }
 
 process UNZIP_GZ {
+    label "cpu_1"
+    label "mem_16"
+    label "time_1"
+    
     container 'zcat'
     publishDir "${params.outdir}", mode: 'copy'
 
@@ -73,6 +77,10 @@ process UNZIP_GZ {
 }
 
 process UN_BAM {
+    label "cpu_1"
+    label "mem_16"
+    label "time_1"
+
     container 'bam_filter'
     publishDir "${params.outdir}", mode: 'copy'
 
