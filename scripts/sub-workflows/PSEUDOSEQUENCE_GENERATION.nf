@@ -28,6 +28,10 @@ workflow PSEUDOSEQUENCE_GENERATION {
 }
 
 process MAKE_MFA {
+    label "cpu_1"
+    label "mem_16"
+    label "time_1"
+
     input:
     val files
 
@@ -45,6 +49,10 @@ process MAKE_MFA {
     """
 }
 process MAKE_TXT {
+    label "cpu_1"
+    label "mem_16"
+    label "time_1"
+
     input:
     val tmpname
 
@@ -57,6 +65,10 @@ process MAKE_TXT {
     """
 }
 process APPEND_MFA {
+    label "cpu_1"
+    label "mem_16"
+    label "time_1"
+
     publishDir "${params.outdir}", mode: 'copy', overwrite: true
 
     input:
@@ -74,8 +86,14 @@ process APPEND_MFA {
 }
 
 process JOIN_DNA_INDELS {
-    publishDir "${params.outdir}", mode: 'copy'
-    container 'join_dna_files_with_indels'
+    label "cpu_1"
+    label "mem_16"
+    label "time_1"
+
+    publishDir "${params.outdir}", mode: 'copy', overwrite: true
+
+    container 'quay.io/ssd28/gsoc-experimental/join_dna_files_with_indels:0.0.1'
+
     input:
     path (mfas_txt)
     path ref
@@ -105,7 +123,14 @@ process JOIN_DNA_INDELS {
 }
 
 process SUMMARISE_SNPS {
-    container 'summarise_snps'
+    label "cpu_1"
+    label "mem_16"
+    label "time_1"
+
+    publishDir "${params.outdir}", mode: 'copy', overwrite: true
+
+    container 'quay.io/ssd28/gsoc-experimental/summarise_snps:0.0.1'
+
     input:
     path output_aln
     path ref

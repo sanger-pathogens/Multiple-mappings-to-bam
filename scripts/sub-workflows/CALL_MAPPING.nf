@@ -41,7 +41,8 @@ process UNZIP_GZ {
     label "mem_16"
     label "time_1"
     
-    container 'zcat'
+    container 'quay.io/ssd28/gsoc-experimental/zcat:0.0.1'
+
     publishDir "${params.outdir}", mode: 'copy'
 
     input:
@@ -81,7 +82,8 @@ process UN_BAM {
     label "mem_16"
     label "time_1"
 
-    container 'bam_filter'
+    container 'quay.io/ssd28/gsoc-experimental/bam_filter:0.0.1'
+    
     publishDir "${params.outdir}", mode: 'copy'
 
     input:

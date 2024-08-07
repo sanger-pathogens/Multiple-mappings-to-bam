@@ -5,7 +5,8 @@ process SORT_AND_MARK_DUPLICATES {
     label "mem_16"
     label "time_1"
     
-    container 'mpfs-gatk'
+    container 'quay.io/ssd28/gsoc-experimental/gatk_bcftools_samtools:1.3'
+    
     publishDir "${params.outdir}", mode: 'copy'
 
     input:

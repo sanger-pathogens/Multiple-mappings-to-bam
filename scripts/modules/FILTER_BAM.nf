@@ -3,7 +3,7 @@ process FILTER_BAM {
     label "mem_16"
     label "time_1"
     
-    container 'samtools-1.3'
+    container 'quay.io/ssd28/gsoc-experimental/samtools:1.3'
     publishDir "${params.outdir}", mode: 'copy', overwrite: true
 
     input:

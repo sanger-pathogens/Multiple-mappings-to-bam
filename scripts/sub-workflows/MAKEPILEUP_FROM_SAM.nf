@@ -52,14 +52,5 @@ workflow MAKEPILEUP_FROM_SAM {
     }
 
     emit:
-    // All the files generated above
     files
-    // tmphead_bam
-    // matrix_file_ch
-    // pseudosequence
-    // filter_bam_ch
-    // name_ploidy
-    // name_variant_bcf
-    // name_bcf_csi
-    // name_variant_bcf_csi
 }
