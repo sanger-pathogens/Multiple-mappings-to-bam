@@ -3,7 +3,9 @@ process INDEL_REALIGNMENT {
     label "mem_16"
     label "time_12"
 
-    container 'quay.io/ssd28/gsoc-experimental/gatk_bcftools_samtools:1.3'
+    // container 'quay.io/ssd28/gsoc-experimental/gatk_bcftools_samtools:1.3'
+    container 'mpfs-gatk'
+    
     publishDir "${params.outdir}", mode: 'copy', overwrite: true
 
     input:

@@ -19,7 +19,7 @@ RUN wget https://sourceforge.net/projects/samtools/files/samtools/1.3/samtools-1
 FROM debian:bullseye-20240612-slim
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends libncurses5-dev zlib1g-dev\
+    apt-get install -y --no-install-recommends libncurses5-dev zlib1g-dev procps\
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 

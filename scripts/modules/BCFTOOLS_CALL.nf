@@ -4,7 +4,8 @@ process BCFTOOLS_CALL {
     label "time_1"
     publishDir "${params.outdir}", mode: 'copy', overwrite: true
 
-    container 'quay.io/ssd28/gsoc-experimental/bcftools:1.11'
+    // container 'quay.io/ssd28/gsoc-experimental/bcftools:1.11'
+    container 'bcftools'
 
     input:
     tuple val(pools), path(file1), path(file2), path (name_bam), path(tmphead_sam), path(bam_bai), path(tmp_mpileup)

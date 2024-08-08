@@ -5,7 +5,8 @@ process PSEUDOSEQUENCE {
     
     publishDir "${params.outdir}", mode: 'copy', overwrite: true
 
-    container 'quay.io/ssd28/gsoc-experimental/bcf_2_pseudosequence:0.0.1'
+    // container 'quay.io/ssd28/gsoc-experimental/bcf_2_pseudosequence:0.0.1'
+    container 'bcf_2_pseudosequence'
     
     input:
     tuple val(pools), path(file1), path(file2), path (name_bam), path(tmphead_sam), path(bam_bai), path(tmp_mpileup), path (name_bcf)
