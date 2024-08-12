@@ -8,6 +8,7 @@ include { CALL_MAPPING } from './sub-workflows/CALL_MAPPING.nf'
 include { BWA_INDEX } from './modules/BWA.nf'
 include { SMALT_INDEX } from './modules/SMALT.nf'
 include { PSEUDOSEQUENCE_GENERATION } from './sub-workflows/PSEUDOSEQUENCE_GENERATION.nf'
+include { HANDLE_SEQUENCES } from './modules/HANDLE_SEQUENCES'
 
 process LOG_COMMANDLINE {
     label "cpu_1"
@@ -86,6 +87,9 @@ workflow {
 
     files = INPUT_CHECK(tmpname)
 
+    (ref, ref_aln) = HANDLE_SEQUENCES(ref)
+    ref = ref.collect()
+
     if (params.program == "BWA") {
         (index_ch, fai) = BWA_INDEX(ref)
     } else if (params.program == "SMALT") {
@@ -94,7 +98,7 @@ workflow {
     
     files = CALL_MAPPING(files, tmpname, ref, fai, index_ch)
     if (params.pseudosequence == true) {
-        (mfas_txt, files) = PSEUDOSEQUENCE_GENERATION(files, tmpname)
+        (mfas_txt, files) = PSEUDOSEQUENCE_GENERATION(ref, files, tmpname)
     }
 
 }

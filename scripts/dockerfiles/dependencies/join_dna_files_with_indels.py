@@ -377,13 +377,3 @@ if __name__ == "__main__":
 	SeqIO.write(final_sequences, open(options.output,"w"), "fasta")
 	
 	os.system("rm -f "+tmpname+"*")
-	
-	
-	
-	
-		
-		
-	
-	
-
-				

@@ -1,11 +1,10 @@
 workflow PSEUDOSEQUENCE_GENERATION {
     take:
+    ref
     files
     tmpname
 
     main:
-    ref = Channel.fromPath(params.ref)
-
     mfas_txt = MAKE_TXT(tmpname)
 
     output_ch = files.map { row -> 
