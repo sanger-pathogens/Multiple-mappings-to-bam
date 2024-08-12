@@ -49,6 +49,7 @@ class Options:
         self.nodes = 20
         self.dirty = False
         self.mapfiles = []
+        self.outdir = "results"
 
 # Function for UI of CLI and input validity
 def menu_system(option):
@@ -61,6 +62,7 @@ def menu_system(option):
         else:
             print("File: Directory containing the files to be mapped:\t\t" + str(option.mapfiles))
             print("r: Reference dna sequence:\t\t" + option.ref)
+            print("outdir: Output directory name to dump all the outputs:\t\t" + options.outdir)
             print("p: Program:\t\t\t\t" + option.program)
             print("1: Do not remap data:\t\t\t" + str(not option.domapping))
             print("H: Mapping against human:\t\t" + str(option.human))
@@ -110,13 +112,16 @@ def menu_system(option):
             message = "\nPlease select an option or type y to run:"
             input_list = ['r', 'p', '1', 'H', 's', 'i', 'j', 'S', 'E', 'z', 'G', 'u', '2', 'X', 'x', 'I', 'q', 'Q', 'd',
                           'D', 'A', 'B', 'c', 'R', 'P', 'C', 'e', 'o', 'O', 'f', 'F', 't', 'a', 'Y', 'm', 'b', 'k', 'L',
-                          'U', 'M', 'n', 'y', 'Q', 'File']
+                          'U', 'M', 'n', 'y', 'Q', 'File', 'outdir']
         ui = ''
         while ui not in input_list:
             ui = input(message + ' ')
         if ui == 'y':
             os.system('clear')
             run = True
+        elif ui == 'outdir':
+            file_path = input('Enter the path of the output directory')
+            options.outdir = file_path
         elif ui == 'File':
             file_path = input('Enter the path of the files to be mapped: ')
             if os.path.isfile(file_path):
