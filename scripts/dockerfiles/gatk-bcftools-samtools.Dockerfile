@@ -18,7 +18,7 @@ RUN mkdir /opt/gatk && \
 
 # Stage 2: Runtime Stage
 # FROM quay.io/ssd28/gsoc-experimental/bcf_2_pseudosequence:0.0.1
-FROM bcf_2_pseudosequence
+FROM quay.io/ssd28/gsoc-experimental/bcf_2_pseudosequence:0.0.2
 
 # Install runtime dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
