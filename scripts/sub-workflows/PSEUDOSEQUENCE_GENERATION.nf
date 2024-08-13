@@ -30,7 +30,7 @@ process MAKE_MFA {
     label "mem_16"
     label "time_1"
 
-    container 'void'
+    container 'quay.io/ssd28/gsoc-experimental/void:0.0.1'
 
     input:
     val files
@@ -55,7 +55,7 @@ process MAKE_TXT {
     input:
     val tmpname
 
-    container 'void'
+    container 'quay.io/ssd28/gsoc-experimental/void:0.0.1'
 
     output:
     path("${tmpname}_mfas.txt")
@@ -72,7 +72,7 @@ process APPEND_MFA {
 
     publishDir "${params.outdir}", mode: 'copy', overwrite: true
 
-    container 'void'
+    container 'quay.io/ssd28/gsoc-experimental/void:0.0.1'
 
     input:
     val files
@@ -95,8 +95,7 @@ process JOIN_DNA_INDELS {
 
     publishDir "${params.outdir}", mode: 'copy', overwrite: true
 
-    // container 'quay.io/ssd28/gsoc-experimental/join_dna_files_with_indels:0.0.1'
-    container 'join_dna_files_with_indels'
+    container 'quay.io/ssd28/gsoc-experimental/join_dna_files_with_indels:0.0.2'
 
     input:
     path (mfas_txt)
@@ -132,8 +131,7 @@ process SUMMARISE_SNPS {
 
     publishDir "${params.outdir}", mode: 'copy', overwrite: true
 
-    // container 'quay.io/ssd28/gsoc-experimental/summarise_snps:0.0.1'
-    container 'summarise_snps'
+    container 'quay.io/ssd28/gsoc-experimental/summarise_snps:0.0.2'
 
     input:
     path output_aln

@@ -5,7 +5,7 @@ process BWA {
 
     publishDir "${params.outdir}", mode: 'copy'
 
-    container 'void'
+    container 'quay.io/ssd28/gsoc-experimental/void:0.0.1'
 
     input:
     tuple val(pools), path(file1), path(file2), path (name_bam), val(cmdline), path(tmphead_sam), path(bam_bai)
@@ -29,8 +29,8 @@ process RUN_BWA {
     label "mem_16"
     label "time_1"
 
-    // container 'quay.io/ssd28/gsoc-experimental/bwa_samtools:1.3'
-    container 'bwa-samtools'
+    container 'quay.io/ssd28/gsoc-experimental/run-bwa:0.0.2'
+
     tag "${name}"
 
     publishDir "${params.outdir}", mode: 'copy', overwrite: true
@@ -75,8 +75,7 @@ process BWA_INDEX {
     label "mem_16"
     label "time_1"
 
-    // container 'quay.io/ssd28/gsoc-experimental/bwa_samtools:1.3'
-    container 'bwa-samtools'
+    container 'quay.io/ssd28/gsoc-experimental/run-bwa:0.0.2'
 
     publishDir "${params.outdir}", mode: 'copy'
 
