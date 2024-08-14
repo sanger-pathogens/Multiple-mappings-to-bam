@@ -107,12 +107,12 @@ def menu_system(option):
         print("\nquit: QUIT")
         if option.ref == "":
             message = "\nPlease select an option:"
-            input_list = ['r', 'Q']
+            input_list = ['r', 'QUIT']
         else:
             message = "\nPlease select an option or type y to run:"
             input_list = ['r', 'p', '1', 'H', 's', 'i', 'j', 'S', 'E', 'z', 'G', 'u', '2', 'X', 'x', 'I', 'q', 'Q', 'd',
                           'D', 'A', 'B', 'c', 'R', 'P', 'C', 'e', 'o', 'O', 'f', 'F', 't', 'a', 'Y', 'm', 'b', 'k', 'L',
-                          'U', 'M', 'n', 'y', 'Q', 'File', 'outdir']
+                          'U', 'M', 'n', 'y', 'Q', 'File', 'outdir', 'QUIT']
         ui = ''
         while ui not in input_list:
             ui = input(message + ' ')
@@ -529,7 +529,7 @@ def menu_system(option):
                     break
                 else :
                     print("Invalid input")
-        elif ui == 'quit':
+        elif ui == 'QUIT':
             sys.exit()
     return option
 
