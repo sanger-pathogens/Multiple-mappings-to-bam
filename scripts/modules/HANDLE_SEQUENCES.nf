@@ -37,7 +37,6 @@ process HANDLE_SEQUENCES {
         seq_records.append(seq_record)
 
     if not human:
-        print "Inside"
         if len(seq_records) == 0:
             DoError("Cannot open reference fasta file!")
         else:
@@ -64,7 +63,5 @@ process HANDLE_SEQUENCES {
                     SeqIO.write([my_seq_record], open(output+".aln","w"), "fasta")
             else:
                 os.system("rm " + ref_file + ".aln")
-
-    print "Done"
     """
 }
