@@ -19,9 +19,9 @@ process PSEUDOSEQUENCE {
     """
     mkdir -p "${runname}"
     if [ "${params.call}" = "m" ]; then
-        python2 /opt/bcf_2_pseudosequence/bcf_2_pseudosequence.py -A -b ${name_bcf} -B ${name_bam} -r ${params.ratio} -d ${params.depth} -D ${params.stranddepth} -q ${params.quality} -m ${params.mapq} -o ${runname}/${name}
+        bcf_2_pseudosequence.py -A -b ${name_bcf} -B ${name_bam} -r ${params.ratio} -d ${params.depth} -D ${params.stranddepth} -q ${params.quality} -m ${params.mapq} -o ${runname}/${name}
     elif [ "${params.call}" = "c" ]; then
-        python2 /opt/bcf_2_pseudosequence/bcf_2_pseudosequence.py -A -b ${name_bcf} -B ${name_bam} -r ${params.ratio} -d ${params.depth} -D ${params.stranddepth} -q ${params.quality} -m ${params.mapq} -o ${runname}/${name}
+        bcf_2_pseudosequence.py -A -b ${name_bcf} -B ${name_bam} -r ${params.ratio} -d ${params.depth} -D ${params.stranddepth} -q ${params.quality} -m ${params.mapq} -o ${runname}/${name}
     fi
     """
 }

@@ -106,12 +106,12 @@ process UN_BAM {
         if (params.pairedend) {
         """
         mkdir -p ${fastqdir}
-        python2 /opt/bam_filter/bam_filter.py -t all -b ${file1} -o ${outputFileName}
+        bam_filter.py -t all -b ${file1} -o ${outputFileName}
         """
         } else {
             """
             mkdir -p ${fastqdir}
-            python2 /opt/bam_filter/bam_filter.py -t all -f fasta -b ${file1} -o ${outputFileName}
+            bam_filter.py -t all -f fasta -b ${file1} -o ${outputFileName}
             """
         }
     } else {

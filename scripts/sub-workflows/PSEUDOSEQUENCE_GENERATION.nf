@@ -111,7 +111,7 @@ process JOIN_DNA_INDELS {
     str = ls_space.join(' ')
     if (params.indels == true) {
         """
-        python2 /opt/join_dna_files_with_indels/join_dna_files_with_indels.py -r ${ref} -o ${output}.aln -t ${mfas_txt}
+        join_dna_files_with_indels.py -r ${ref} -o ${output}.aln -t ${mfas_txt}
         """
     } else if (params.incref == false) {
         """
@@ -138,7 +138,7 @@ process SUMMARISE_SNPS {
     path ref
 
     script:
-    summarystring = "python2 /opt/summarise_snps/summarise_snps.py -g -w -r "+ params.ref.split("/")[-1].split("\\.")[0] + " -o " + params.output + " -i " + params.output+".aln"
+    summarystring = "summarise_snps.py -g -w -r "+ params.ref.split("/")[-1].split("\\.")[0] + " -o " + params.output + " -i " + params.output+".aln"
     bootstrap = params.bootstrap
 
     if (params.embl != "") {

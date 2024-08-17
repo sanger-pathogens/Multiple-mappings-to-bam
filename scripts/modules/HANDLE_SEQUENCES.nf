@@ -1,6 +1,8 @@
 process HANDLE_SEQUENCES {
     container 'quay.io/ssd28/gsoc-experimental/biopython:0.0.1' // Docker container with Biopython
 
+    stageInMode 'copy'
+
     input:
     path ref  // Reference FASTA file
 
