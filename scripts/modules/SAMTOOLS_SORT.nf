@@ -1,4 +1,4 @@
-process SAMTOOLS_SORT {
+process SAMTOOLS_SORT_BAM_AND_MAKE_HEADER {
     label "cpu_1"
     label "mem_16"
     label "time_1"
@@ -34,7 +34,7 @@ process SAMTOOLS_SORT {
     """
 }
 
-process SAMTOOLS_SORT_1 {
+process SAMTOOLS_SORT {
     label "cpu_1"
     label "mem_16"
     label "time_1"
@@ -54,7 +54,6 @@ process SAMTOOLS_SORT_1 {
     """
     mkdir -p "${runname}"
     samtools sort ${tmp1_bam} > ${runname}/tmp.bam
-    #rm ${runname}/tmp1.bam
     """
 }
 

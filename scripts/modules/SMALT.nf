@@ -1,4 +1,4 @@
-process SMALT {
+process FORMAT_SMALT_HEADER {
     label "cpu_1"
     label "mem_16"
     label "time_1"

@@ -1,7 +1,6 @@
 include { RUN_BWA } from './../modules/BWA.nf'
 include { RUN_SMALT } from './../modules/SMALT.nf'
 include { RUN_SSAHA } from './../modules/RUN_SSAHA.nf'
-include { MAKEPILEUP_FROM_SAM } from './../sub-workflows/MAKEPILEUP_FROM_SAM.nf'
 
 workflow CALL_MAPPING {
     take:
@@ -28,8 +27,6 @@ workflow CALL_MAPPING {
     } else if (params.program == "SSAHA") {
         files = RUN_SSAHA(bwa_ch)
     }
-
-    files = MAKEPILEUP_FROM_SAM(files)
 
     emit:
     files

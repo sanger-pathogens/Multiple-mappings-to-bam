@@ -1,4 +1,4 @@
-process BWA {
+process FORMAT_BWA_HEADER {
     label "cpu_1"
     label "mem_16"
     label "time_1"
@@ -19,7 +19,6 @@ process BWA {
     """
     now=\$(date +'%Y-%m-%dT%H:%M:%S')
     echo '@RG\tID:${name}\tCN:Sanger\tDT:'\$now'\tPG:BWA MEM\tPL:ILLUMINA\tSM:${name}' >> ${tmphead_sam}
-    echo '@RG\tID:${name}\tCN:Sanger\tDT:'\$now'\tPG:BWA MEM\tPL:ILLUMINA\tSM:${name}'
     """
 }
 

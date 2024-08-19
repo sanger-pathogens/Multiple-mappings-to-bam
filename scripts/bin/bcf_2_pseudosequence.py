@@ -277,7 +277,7 @@ if __name__ == "__main__":
 		if count>=hundredth:
 			total=float(BASEINFO["POS"])
 			count=0
-			print("%.0f%% complete\r" % (100*(total/totallength)))
+			#print("%.0f%% complete\r" % (100*(total/totallength)))
 			sys.stdout.flush()
 
 

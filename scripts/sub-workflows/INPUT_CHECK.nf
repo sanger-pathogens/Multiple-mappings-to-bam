@@ -31,12 +31,13 @@ def process_inputs (String pool, String tmpname, Map<String, List<String>> zipli
     if (pool[-1] == '/') {
         pool = pool[0..-2]
     }
-    println pool
+
+    //println pool
+
     filetype = '.' + pool.split('\\.')[-1]
-    println "filetype ${filetype}"
 
     if (!['.fastq', '.bam', '.gz'].contains(filetype)) {
-        println "WARNING: Input file name is not .fastq or .bam!"
+        log.warn "WARNING: Input file name is not .fastq or .bam!"
     }
 
     bam = ""
@@ -55,9 +56,6 @@ def process_inputs (String pool, String tmpname, Map<String, List<String>> zipli
     unbammed = false
     unzipped = false
     if (params.program != 'BWA' && pool.split('\\.')[-1] == "gz" && pool.split('\\.')[-2] == "fastq") {
-        // command = "mkdir -p ${tmpname}_unzipped"
-        // process = command.execute()
-        // process.waitFor()
 
         if (params.pairedend) {
             if (pool.split('\\.')[-3].endsWith("_1") || pool.split('\\.')[-3].endsWith("_2")) {
@@ -76,9 +74,6 @@ def process_inputs (String pool, String tmpname, Map<String, List<String>> zipli
         pool = originalfastqdir + (pool.split('/')[-1].split('\\.')[0..-2]).join('.')
     } else if (pool.split('\\.')[-1] == "bam") {
         if (params.domapping) {
-            // command = "mkdir -p ${tmpname}_unbammed"
-            // process = command.execute()
-            // process.waitFor()
 
             key = pool.replace("#", "_")
             bamlist=pool
@@ -124,13 +119,13 @@ def process_inputs (String pool, String tmpname, Map<String, List<String>> zipli
                 file_2 = file2
             }
             if (!list_mp.contains(file1) && !list_mp.contains(file2)) {
-                println "File "+pool+"_1.fastq not found! Treating "+pool+" as unpaired..."
+                log.warn "File "+pool+"_1.fastq not found! Treating "+pool+" as unpaired..."
                 pairedend=false
             } else {
                 pool = pool[0..-3]
             }
         } else {
-            println "Not a typical paired-end name format! Treating "+pool+" as unpaired..."
+            log.warn "Not a typical paired-end name format! Treating "+pool+" as unpaired..."
             pairedend=false
         }
     }
@@ -146,15 +141,12 @@ def process_inputs (String pool, String tmpname, Map<String, List<String>> zipli
     if (pool in poolsort) {
         return
     }
-    println pool+'...'
+    log.info pool+'...'
 
     if (fastqdir[0] == '/') {
         fastqdir = fastqdir[1..-1]
     }
 
-    // command = "mkdir -p ${pool}"
-    // process = command.execute()
-    // process.waitFor()
 
     pools = [:]
     pools["runname"] = pool
@@ -170,13 +162,9 @@ def process_inputs (String pool, String tmpname, Map<String, List<String>> zipli
     } else {
         pools["domapping"] = true
     }
-    // println "pools "+ pools
-    // pools << pools
-    // println "pools "+ pools
+
     poolsort << pool
     file_1 = temp
-
-    println "ok"
 
     return [pools, file_1, file_2]
 }

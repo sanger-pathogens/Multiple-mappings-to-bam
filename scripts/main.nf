@@ -2,13 +2,17 @@ nextflow.enable.dsl=2
 
 // nextflow run scripts/main.nf --ref /home/darshil/LED/Nextflow/Streptococcus_agalactiae_NGBS128_GCF_001552035_1.fa --program BWA --domapping True --human False --pairedend True --maxinsertsize 1000 --mininsertsize 50 --ssahaquality 30 --maprepeats False --GATK True --markdup True --detectOverlaps False --pseudosequence True --incref True --indels True --quality 50 --mapq 20 --depth 8 --stranddepth 3 --anomolous True --BAQ True --circular True --ratio 0.8 --prior 0.001 --call c --output Streptococcus_agalactiae_NGBS128_GCF_001552035_1_bwa --force False --filter 1 --tabfile False --alnfile False --raxml False --model GTRGAMMA --bootstrap 100 --keep False --LSF True --LSFQ normal --mem 5 --nodes 20 --dirty False --mapfiles "/home/darshil/LED/Nextflow/31663_7#10_1.fastq.gz,/home/darshil/LED/Nextflow/31663_7#10_2.fastq.gz,/home/darshil/LED/Nextflow/31663_7#12_1.fastq.gz,/home/darshil/LED/Nextflow/31663_7#12_2.fastq.gz" -process.echo
 
-include { MAKEPILEUP_FROM_SAM } from './sub-workflows/MAKEPILEUP_FROM_SAM.nf'
-include { INPUT_CHECK } from './sub-workflows/INPUT_CHECK.nf'
-include { CALL_MAPPING } from './sub-workflows/CALL_MAPPING.nf'
+//MODULES
 include { BWA_INDEX } from './modules/BWA.nf'
 include { SMALT_INDEX } from './modules/SMALT.nf'
-include { PSEUDOSEQUENCE_GENERATION } from './sub-workflows/PSEUDOSEQUENCE_GENERATION.nf'
 include { HANDLE_SEQUENCES } from './modules/HANDLE_SEQUENCES'
+
+//SUBWORKFLOWS
+include { INPUT_CHECK } from './sub-workflows/INPUT_CHECK.nf'
+include { CALL_MAPPING } from './sub-workflows/CALL_MAPPING.nf'
+include { MAKE_PILEUP_FROM_SAM } from './sub-workflows/MAKE_PILEUP_FROM_SAM.nf'
+include { PSEUDOSEQUENCE_GENERATION } from './sub-workflows/PSEUDOSEQUENCE_GENERATION.nf'
+
 
 process LOG_COMMANDLINE {
     label "cpu_1"
@@ -85,7 +89,7 @@ workflow {
 
     ref = Channel.fromPath(params.ref)
 
-    files = INPUT_CHECK(tmpname)
+    read_ch = INPUT_CHECK(tmpname)
 
     (ref, ref_aln) = HANDLE_SEQUENCES(ref)
     ref = ref.collect()
@@ -96,9 +100,12 @@ workflow {
         (index_ch, fai) = SMALT_INDEX(ref, tmpname)
     }
     
-    files = CALL_MAPPING(files, tmpname, ref, fai, index_ch)
+    CALL_MAPPING(read_ch, tmpname, ref, fai, index_ch)
+    | MAKE_PILEUP_FROM_SAM
+    | set { called_ch }
+
     if (params.pseudosequence == true) {
-        (mfas_txt, files) = PSEUDOSEQUENCE_GENERATION(ref, files, tmpname)
+        (mfas_txt, read_ch) = PSEUDOSEQUENCE_GENERATION(ref, called_ch, tmpname)
     }
 
 }
