@@ -105,7 +105,7 @@ workflow {
     | set { called_ch }
 
     if (params.pseudosequence == true) {
-        (mfas_txt, read_ch) = PSEUDOSEQUENCE_GENERATION(ref, called_ch, tmpname)
+        PSEUDOSEQUENCE_GENERATION(ref, called_ch, tmpname)
     }
 
 }
