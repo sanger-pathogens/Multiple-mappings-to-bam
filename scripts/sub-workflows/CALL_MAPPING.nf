@@ -4,38 +4,37 @@ include { RUN_SSAHA } from './../modules/RUN_SSAHA.nf'
 
 workflow CALL_MAPPING {
     take:
-    files
-    tmpname
+    read_ch
     ref
     ref_fai
     ref_index
 
     main:
 
-    files = UNZIP_GZ(files, tmpname)
+    unzipped_ch = UNZIP_GZ(read_ch)
 
-    files = UN_BAM (files)
+    unbammed_ch = UN_BAM (unzipped_ch)
 
-    bwa_ch = files.combine(ref).combine(ref_fai)
+    reads_and_ref_ch = unbammed_ch.combine(ref).combine(ref_fai)
 
     ref_index = ref_index.collect()
 
     if (params.program == "BWA") {
-        files = RUN_BWA (bwa_ch, ref_index)
+        mapped_ch = RUN_BWA (reads_and_ref_ch, ref_index)
     } else if (params.program == "SMALT") {
-        files = RUN_SMALT(tmpname, bwa_ch, ref_index)
+        mapped_ch = RUN_SMALT(reads_and_ref_ch, ref_index)
     } else if (params.program == "SSAHA") {
-        files = RUN_SSAHA(bwa_ch)
+        mapped_ch = RUN_SSAHA(reads_and_ref_ch)
     }
 
     emit:
-    files
+    mapped_ch
 
 }
 
 process UNZIP_GZ {
     label "cpu_1"
-    label "mem_16"
+    label "mem_1"
     label "time_1"
     
     container 'quay.io/ssd28/gsoc-experimental/zcat:0.0.2'
@@ -44,7 +43,6 @@ process UNZIP_GZ {
 
     input:
     tuple val(files), path(file1), path(file2)
-    val tmpname
 
     output:
     tuple val(files), path(outputFileName), path(outputFileName2)

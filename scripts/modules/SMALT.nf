@@ -40,7 +40,6 @@ process RUN_SMALT {
     tag "${name}"
     
     input:
-    val tmpname
     tuple val(pools), path(name_1_fastq), path(name_2_fastq), path(ref), path(ref_fai)
     tuple path(f1), path(f2)
 
@@ -76,29 +75,29 @@ process RUN_SMALT {
 
         if [ "${pairedend}" = "true" ]; then
             if [ "${params.maprepeats}" = "true" ]; then
-                smalt map -y ${params.nomapid} -x -r 0 -i ${params.maxinsertsize} -j ${params.mininsertsize} -f \$smaltoutput -o ${runname}/tmp1.\$smaltoutputsuffix ${tmpname}.index ${name_1_fastq} ${name_2_fastq}
-                cmdline="map -y ${params.nomapid} -x -r 0 -i ${params.maxinsertsize} -j ${params.mininsertsize} -f \$smaltoutput -o ${runname}/tmp1.\$smaltoutputsuffix ${tmpname}.index ${fastqdir}${name}_1.fastq ${fastqdir}${name}_2.fastq"
+                smalt map -y ${params.nomapid} -x -r 0 -i ${params.maxinsertsize} -j ${params.mininsertsize} -f \$smaltoutput -o ${runname}/tmp1.\$smaltoutputsuffix ${name}_tmp.index ${name_1_fastq} ${name_2_fastq}
+                cmdline="map -y ${params.nomapid} -x -r 0 -i ${params.maxinsertsize} -j ${params.mininsertsize} -f \$smaltoutput -o ${runname}/tmp1.\$smaltoutputsuffix ${name}_tmp.index ${fastqdir}${name}_1.fastq ${fastqdir}${name}_2.fastq"
             else
                 if [ "${newsmalt}" = "true" ]; then
                     rbit=" -r -1"
                 else
                     rbit=""
                 fi
-                smalt map -y ${params.nomapid}\$rbit -x -i ${params.maxinsertsize} -j ${params.mininsertsize} -f \$smaltoutput -o ${runname}/tmp1.\$smaltoutputsuffix ${tmpname}.index ${name_1_fastq} ${name_2_fastq}
-                cmdline="map -y ${params.nomapid}\$rbit -x -i ${params.maxinsertsize} -j ${params.mininsertsize} -f \$smaltoutput -o ${runname}/tmp1.\$smaltoutputsuffix ${tmpname}.index ${fastqdir}${name}_1.fastq ${fastqdir}${name}_2.fastq"
+                smalt map -y ${params.nomapid}\$rbit -x -i ${params.maxinsertsize} -j ${params.mininsertsize} -f \$smaltoutput -o ${runname}/tmp1.\$smaltoutputsuffix ${name}_tmp.index ${name_1_fastq} ${name_2_fastq}
+                cmdline="map -y ${params.nomapid}\$rbit -x -i ${params.maxinsertsize} -j ${params.mininsertsize} -f \$smaltoutput -o ${runname}/tmp1.\$smaltoutputsuffix ${name}_tmp.index ${fastqdir}${name}_1.fastq ${fastqdir}${name}_2.fastq"
             fi
         else
             if [ "${params.maprepeats}" = "true" ]; then
-                smalt map -y ${params.nomapid} -x -r 0 -f \$smaltoutput -o ${runname}/tmp1.\$smaltoutputsuffix ${tmpname}.index ${name_1_fastq}
-                cmdline="map -y ${params.nomapid} -x -r 0 -f \$smaltoutput -o ${runname}/tmp1.\$smaltoutputsuffix ${tmpname}.index ${fastqdir}${name}.fastq"
+                smalt map -y ${params.nomapid} -x -r 0 -f \$smaltoutput -o ${runname}/tmp1.\$smaltoutputsuffix ${name}_tmp.index ${name_1_fastq}
+                cmdline="map -y ${params.nomapid} -x -r 0 -f \$smaltoutput -o ${runname}/tmp1.\$smaltoutputsuffix ${name}_tmp.index ${fastqdir}${name}.fastq"
             else
                 if [ "${newsmalt}" = "true" ]; then
                     \$rbit=" -r -1"
                 else
                     \$rbit=""
                 fi
-                smalt map -y ${params.nomapid}\$rbit -x -f \$smaltoutput -o ${runname}/tmp1.\$smaltoutputsuffix ${tmpname}.index ${name_1_fastq}
-                cmdline="map -y ${params.nomapid}\$rbit -x -f \$smaltoutput -o ${runname}/tmp1.\$smaltoutputsuffix ${tmpname}.index ${fastqdir}${name}.fastq"
+                smalt map -y ${params.nomapid}\$rbit -x -f \$smaltoutput -o ${runname}/tmp1.\$smaltoutputsuffix ${name}_tmp.index ${name_1_fastq}
+                cmdline="map -y ${params.nomapid}\$rbit -x -f \$smaltoutput -o ${runname}/tmp1.\$smaltoutputsuffix ${name}_tmp.index ${fastqdir}${name}.fastq"
             fi
         fi
 
@@ -109,10 +108,6 @@ process RUN_SMALT {
     else
         cp ${bam} ${runname}/tmp1.bam
     fi
-
-    #if [ "${fastqdir}" = "${tmpname}_unzipped/" ]; then
-    #    rm ${fastqdir}${name}_1.fastq ${fastqdir}${name}_2.fastq
-    #fi
     """
 }
 
@@ -127,7 +122,6 @@ process SMALT_INDEX {
 
     input:
     path ref
-    val tmpname
 
     output:
     tuple path("*.smi"), path("*.sma")
@@ -136,9 +130,9 @@ process SMALT_INDEX {
     script:
     """
     if [ "${params.human}" == "True" ]; then
-        smalt index -k 20 -s 13 ${tmpname}.index ${ref}
+        smalt index -k 20 -s 13 ${name}_tmp.index ${ref}
     else 
-        smalt index -k 13 -s 1 ${tmpname}.index ${ref}
+        smalt index -k 13 -s 1 ${name}_tmp.index ${ref}
     fi
     samtools faidx ${ref}
     """

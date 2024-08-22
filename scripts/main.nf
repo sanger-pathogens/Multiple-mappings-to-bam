@@ -73,23 +73,12 @@ process LOG_COMMANDLINE {
     """
 }
 
-def RANDOM_NAME () {
-    chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
-    rnd = new Random()
-    length = rnd.nextInt(3) + 8
-    tmpname = 'tmp' + (1..length).collect { chars[random.nextInt(chars.length())] }.join('')
-
-    return tmpname
-}
-
 workflow {
     log_ch = LOG_COMMANDLINE()
 
-    tmpname = RANDOM_NAME()
-
     ref = Channel.fromPath(params.ref)
 
-    read_ch = INPUT_CHECK(tmpname)
+    read_ch = INPUT_CHECK()
 
     (ref, ref_aln) = HANDLE_SEQUENCES(ref)
     ref = ref.collect()
@@ -97,15 +86,15 @@ workflow {
     if (params.program == "BWA") {
         (index_ch, fai) = BWA_INDEX(ref)
     } else if (params.program == "SMALT") {
-        (index_ch, fai) = SMALT_INDEX(ref, tmpname)
+        (index_ch, fai) = SMALT_INDEX(ref)
     }
     
-    CALL_MAPPING(read_ch, tmpname, ref, fai, index_ch)
+    CALL_MAPPING(read_ch, ref, fai, index_ch)
     | MAKE_PILEUP_FROM_SAM
     | set { called_ch }
 
     if (params.pseudosequence == true) {
-        PSEUDOSEQUENCE_GENERATION(ref, called_ch, tmpname)
+        PSEUDOSEQUENCE_GENERATION(ref, called_ch)
     }
 
 }

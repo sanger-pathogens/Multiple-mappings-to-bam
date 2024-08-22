@@ -1,7 +1,4 @@
-workflow INPUT_CHECK {
-    take:
-    tmpname
-
+workflow INPUT_CHECK {   
     main:
     ziplist = [:].withDefault { [] }
     poolsort = []
@@ -10,7 +7,7 @@ workflow INPUT_CHECK {
     opt_file = "${baseDir}/${params.nfile}"
     files = Channel.from(params.mapfiles.split(','))
         .map { row -> 
-            process_inputs (row, tmpname, ziplist, poolsort, list_mp, opt_file)
+            process_inputs (row, ziplist, poolsort, list_mp, opt_file)
         }
         .map { pools, file_1, file_2 -> 
             [pools, file_1, file_2]
@@ -22,17 +19,14 @@ workflow INPUT_CHECK {
 
 }
 
-def process_inputs (String pool, String tmpname, Map<String, List<String>> ziplist, List<String> poolsort, List<String> list_mp, String opt_file) {
+def process_inputs (String pool, Map<String, List<String>> ziplist, List<String> poolsort, List<String> list_mp, String opt_file) {
     bamlist = ""
     file_1 = ""
     file_2 = opt_file
     temp = pool
-    // println tmpname
     if (pool[-1] == '/') {
         pool = pool[0..-2]
     }
-
-    //println pool
 
     filetype = '.' + pool.split('\\.')[-1]
 
@@ -67,7 +61,7 @@ def process_inputs (String pool, String tmpname, Map<String, List<String>> zipli
             ziplist[(pool.split('/')[-1].split('\\.')[0..-3]).join('.')] << pool
         }
         
-        pool = "${tmpname}_unzipped/" + (pool.split('/')[-1].split('\\.')[0..-2]).join('.')
+        pool = "tmp_unzipped/" + (pool.split('/')[-1].split('\\.')[0..-2]).join('.')
         is_zipped = true
     } else if (params.program == 'BWA' && pool.split('\\.')[-1] == "gz") {
         is_zipped = true
@@ -78,7 +72,7 @@ def process_inputs (String pool, String tmpname, Map<String, List<String>> zipli
             key = pool.replace("#", "_")
             bamlist=pool
             pool = pool.replace("#", "_")
-            pool = "${tmpname}_unbammed/" + pool.split('/')[-1].split('\\.')[0..-2].join('.') + ".bam"
+            pool = "tmp_unbammed/" + pool.split('/')[-1].split('\\.')[0..-2].join('.') + ".bam"
         } else {
             bam = pool
         }
@@ -105,7 +99,7 @@ def process_inputs (String pool, String tmpname, Map<String, List<String>> zipli
                 file_2 = file2
             }
             if (!list_mp.contains(file1) && !list_mp.contains(file2)) {
-                println "File "+pool+"_2.fastq not found! Treating "+pool+" as unpaired..."
+                log.warn "File "+pool+"_2.fastq not found! Treating "+pool+" as unpaired..."
                 pairedend=false
             } else {
                 pool = pool[0..-3]
@@ -141,7 +135,8 @@ def process_inputs (String pool, String tmpname, Map<String, List<String>> zipli
     if (pool in poolsort) {
         return
     }
-    log.info pool+'...'
+    
+    //log.info pool+'...' //not really needed just prints file into cli
 
     if (fastqdir[0] == '/') {
         fastqdir = fastqdir[1..-1]

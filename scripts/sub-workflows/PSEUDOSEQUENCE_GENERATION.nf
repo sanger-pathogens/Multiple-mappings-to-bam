@@ -2,9 +2,9 @@ include { PSEUDOSEQUENCE } from './../modules/PSEUDOSEQUENCE.nf'
 
 workflow PSEUDOSEQUENCE_GENERATION {
     take:
+
     ref
     called_ch
-    tmpname
 
     main:
     pseudosequence = PSEUDOSEQUENCE(called_ch)
@@ -55,7 +55,7 @@ process SUMMARISE_SNPS {
 
     publishDir "${params.outdir}", mode: 'copy', overwrite: true
 
-    container 'quay.io/ssd28/gsoc-experimental/summarise_snps:0.0.2'
+    container 'quay.io/ssd28/gsoc-experimental/summarise_snps:0.0.3'
 
     input:
     path output_aln

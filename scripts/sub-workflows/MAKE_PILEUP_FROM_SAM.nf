@@ -12,39 +12,48 @@ import java.math.BigDecimal
 workflow MAKE_PILEUP_FROM_SAM {
 
     take:
-    files
+    mapped_sam_ch
 
     main:
 
     ref = channel.fromPath(params.ref)
 
     if (params.markdup == "true") {
-        (files, matrix_file_ch) = SORT_AND_MARK_DUPLICATES(files)
+        (deduped_ch, matrix_file_ch) = SORT_AND_MARK_DUPLICATES(mapped_sam_ch)
+    } else {
+        mapped_sam_ch.set{ deduped_ch }
     }
 
-    files = SAMTOOLS_SORT_BAM_AND_MAKE_HEADER(files)
+    sorted_header_ch = SAMTOOLS_SORT_BAM_AND_MAKE_HEADER(deduped_ch)
 
     if (params.program == "SMALT") {
-        files = FORMAT_SMALT_HEADER(files)
+        formatted_sam_ch = FORMAT_SMALT_HEADER(sorted_header_ch)
     } else if (params.program == "BWA") {
-        files = FORMAT_BWA_HEADER(files)
+        formatted_sam_ch = FORMAT_BWA_HEADER(sorted_header_ch)
     }
+    
 
-    (files, tmphead_bam) = SAMTOOLS_MERGE(files)
-    files_ref = files.combine(ref)
+    (merged_ch, tmphead_bam) = SAMTOOLS_MERGE(formatted_sam_ch)
+
+
+    sam_ref_ch = merged_ch.combine(ref)
+
+
     if (params.GATK == true) {
-        files = INDEL_REALIGNMENT(files_ref)
+        indel_realigned_ch = INDEL_REALIGNMENT(sam_ref_ch)
+    } else {
+        sam_ref_ch.set{ indel_realigned_ch }
     }
 
-    files = SAMTOOLS_SORT(files)
+    sorted_indel_ch = SAMTOOLS_SORT(indel_realigned_ch)
 
-    (files, filter_bam_ch) = FILTER_BAM(files)
+    (filtered_ch, filter_bam_ch) = FILTER_BAM(sorted_indel_ch)
 
-    files = SAMTOOLS_INDEX(files)
-    files_ref = files.combine(ref)
-    files = PILEUP(files_ref)
+    indexed_ch = SAMTOOLS_INDEX(filtered_ch)
+    indexed_plus_ref_ch = indexed_ch.combine(ref)
+    pileup_ch = PILEUP(indexed_plus_ref_ch)
 
-    (called_ch, name_ploidy, name_variant_bcf, name_bcf_csi, name_variant_bcf_csi) = BCFTOOLS_CALL(files)
+    (called_ch, name_ploidy, name_variant_bcf, name_bcf_csi, name_variant_bcf_csi) = BCFTOOLS_CALL(pileup_ch)
 
     emit:
     called_ch
