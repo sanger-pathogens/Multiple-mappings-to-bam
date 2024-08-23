@@ -1,21 +1,38 @@
 process INDEL_REALIGNMENT {
+    label "cpu_1"
+    label "mem_16"
+    label "time_12"
+
+    container 'quay.io/ssd28/gsoc-experimental/gatk-bcftools-samtools:0.0.2'
+    
+    publishDir "${params.outdir}", mode: 'copy', overwrite: true
+
     input:
-    tuple val(name), path (tmp1_bam)
-    path ref
+    tuple val(pools), path(file1), path(file2), path (tmp1_bam), path(tmphead_sam), path(bam_bai), path (ref)
 
     output:
-    tuple val(name), path ("${params.runname}/tmp1.bam")
+    tuple val(pools), path(file1), path(file2), path ("${runname}/tmp1.bam"), path(tmphead_sam), path(bam_bai)
 
     script:
+    runname = pools.runname
+    name = pools.name
     """
-    mkdir -p "${params.runname}"
+    mkdir -p "${runname}"
     samtools index ${tmp1_bam}
-    cp ${ref} ${params.runname}/tmpref.fa
-    samtools faidx ${params.runname}/tmpref.fa
-    picard CreateSequenceDictionary R=${params.runname}/tmpref.fa O=${params.runname}/tmpref.dict
-    gatk -I ${tmp1_bam} -R ${params.runname}/tmpref.fa -T RealignerTargetCreator -o ${params.runname}/tmp.intervals
-    gatk -I ${tmp1_bam} -R ${params.runname}/tmpref.fa -T IndelRealigner --filter_bases_not_stored -targetIntervals ${params.runname}/tmp.intervals -o ${params.runname}/tmp.bam
-    mv ${params.runname}/tmp.bam ${params.runname}/tmp1.bam
-    rm *.bai ${params.runname}/tmpref.* ${params.runname}/tmp.intervals ${params.runname}/tmphead.*
+    cp ${ref} ${runname}/tmpref.fa
+    samtools faidx ${runname}/tmpref.fa
+    
+    gatk CreateSequenceDictionary \
+    -R ${runname}/tmpref.fa \
+    -O ${runname}/tmpref.dict
+
+    # Generate GVCF file
+    gatk HaplotypeCaller \
+        -R ${runname}/tmpref.fa \
+        -I ${tmp1_bam} \
+        -O ${runname}/tmp.g.vcf \
+        -bamout ${runname}/tmp.bam
+
+    mv ${runname}/tmp.bam ${runname}/tmp1.bam
     """
 }

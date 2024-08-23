@@ -1,18 +1,27 @@
 process PSEUDOSEQUENCE {
+    label "cpu_1"
+    label "mem_16"
+    label "time_1"
+    
+    publishDir "${params.outdir}", mode: 'copy', overwrite: true
+
+    container 'quay.io/ssd28/gsoc-experimental/bcf_2_pseudosequence:0.0.2'
+    
     input:
-    path name_bcf
-    path name_bam
+    tuple val(pools), path(file1), path(file2), path (name_bam), path(tmphead_sam), path(bam_bai), path(tmp_mpileup), path (name_bcf)
 
     output:
-    path "${params.runname}/${name}*", emit: pseudosequence
+    path "${runname}/${name}*", emit: pseudosequence
 
     script:
+    runname = pools.runname
+    name = pools.name
     """
-    mkdir -p "${params.runname}"
+    mkdir -p "${runname}"
     if [ "${params.call}" = "m" ]; then
-        bcf_2_pseudosequence.py -A -b ${params.runname}/${name}.bcf -B ${params.runname}/${name}.bam -r ${params.ratio} -d ${params.depth} -D ${params.stranddepth} -q ${params.quality} -m ${params.mapq} -o ${params.runname}/${name}
+        bcf_2_pseudosequence.py -A -b ${name_bcf} -B ${name_bam} -r ${params.ratio} -d ${params.depth} -D ${params.stranddepth} -q ${params.quality} -m ${params.mapq} -o ${runname}/${name}
     elif [ "${params.call}" = "c" ]; then
-        bcf_2_pseudosequence.py -A -b ${params.runname}/${name}.bcf -B ${params.runname}/${name}.bam -r ${params.ratio} -d ${params.depth} -D ${params.stranddepth} -q ${params.quality} -m ${params.mapq} -o ${params.runname}/${name}
+        bcf_2_pseudosequence.py -A -b ${name_bcf} -B ${name_bam} -r ${params.ratio} -d ${params.depth} -D ${params.stranddepth} -q ${params.quality} -m ${params.mapq} -o ${runname}/${name}
     fi
     """
 }

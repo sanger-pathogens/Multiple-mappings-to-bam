@@ -49,6 +49,8 @@ class Options:
         self.nodes = 20
         self.dirty = False
         self.mapfiles = []
+        self.outdir = "results"
+        self.docker = False
 
 # Function for UI of CLI and input validity
 def menu_system(option):
@@ -59,8 +61,9 @@ def menu_system(option):
         if option.ref == '':
             print("r: Reference dna sequence:\t\tNone selected (required)")
         else:
-            print("File: Directory containing the files to be mapped:\t\t" + str(option.mapfiles))
+            print("File: Paths containing the files to be mapped:\t\t" + str(option.mapfiles))
             print("r: Reference dna sequence:\t\t" + option.ref)
+            print("outdir: Output directory name to dump all the outputs:\t\t" + options.outdir)
             print("p: Program:\t\t\t\t" + option.program)
             print("1: Do not remap data:\t\t\t" + str(not option.domapping))
             print("H: Mapping against human:\t\t" + str(option.human))
@@ -102,24 +105,30 @@ def menu_system(option):
             print("M: Amount of memory required for analysis (Gb):\t" + str(option.mem))
             print("n: Maximum number of jobs to run on nodes in parallel:\t" + str(option.nodes))
             print("y: Do not clean up temporary files:\t" + str(option.dirty))
+            print("docker: Run on docker containers (Default singularity):\t\t" + str(option.docker))
         print("\nquit: QUIT")
         if option.ref == "":
             message = "\nPlease select an option:"
-            input_list = ['r', 'Q']
+            input_list = ['r', 'QUIT']
         else:
             message = "\nPlease select an option or type y to run:"
             input_list = ['r', 'p', '1', 'H', 's', 'i', 'j', 'S', 'E', 'z', 'G', 'u', '2', 'X', 'x', 'I', 'q', 'Q', 'd',
                           'D', 'A', 'B', 'c', 'R', 'P', 'C', 'e', 'o', 'O', 'f', 'F', 't', 'a', 'Y', 'm', 'b', 'k', 'L',
-                          'U', 'M', 'n', 'y', 'Q', 'File']
+                          'U', 'M', 'n', 'y', 'Q', 'File', 'outdir', 'docker','QUIT']
         ui = ''
         while ui not in input_list:
             ui = input(message + ' ')
         if ui == 'y':
             os.system('clear')
             run = True
+        elif ui == 'outdir':
+            file_path = input('Enter the path of the output directory: ')
+            options.outdir = file_path
+        elif ui == 'docker':
+            options.docker = input('Enter true or false: ').lower() == 'true'
         elif ui == 'File':
             file_path = input('Enter the path of the files to be mapped: ')
-            if os.path.isfile(file_path):
+            if os.path.isfile(file_path) and file_path not in option.mapfiles:
                 option.mapfiles.append(file_path)
             else:
                 print("File does not exist")
@@ -524,7 +533,7 @@ def menu_system(option):
                     break
                 else :
                     print("Invalid input")
-        elif ui == 'quit':
+        elif ui == 'QUIT':
             sys.exit()
     return option
 
@@ -615,6 +624,10 @@ def build_command(option):
         command += f" --nodes {option.nodes}"
     if option.dirty is not None:
         command += f" --dirty {option.dirty}"
+    if option.docker:
+        command += f" -profile docker"
+    if option.outdir is not "":
+        command += f" --outdir {option.outdir}"
     if len(option.mapfiles) > 0:
         command += f" --mapfiles \""
         for file in option.mapfiles:
@@ -622,6 +635,7 @@ def build_command(option):
         command = command[:-1]
         command += "\""
     command += f" -process.echo"
+    command += f" -resume"
     return command
 
 
@@ -655,6 +669,8 @@ def validate_inputs(options):
     if not options.mapfiles:
         options = DoError("No input files selected!", options)
     options.program=options.program.upper()
+    if options.mem == 0:
+        options.mem = 2
     return options
     
 
