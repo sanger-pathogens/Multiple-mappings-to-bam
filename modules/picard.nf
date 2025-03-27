@@ -34,7 +34,6 @@ process SEQUENCE_DICT {
     
     container 'quay.io/ssd28/gsoc-experimental/picard:1.126'
     
-    publishDir "${params.outdir}", mode: 'copy', pattern: "*.txt"
 
     input:
     tuple path(ref), path(fai)
