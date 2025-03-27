@@ -29,8 +29,6 @@ process SAMTOOLS_SORT_BAM_AND_MAKE_HEADER {
 
     container 'quay.io/ssd28/gsoc-experimental/samtools:1.3'
 
-    publishDir "${params.outdir}", mode: 'copy', overwrite: true
-
     input:
     tuple val(meta), path(bam)
 
@@ -125,7 +123,7 @@ process SAMTOOLS_PILEUP {
     label "mem_250M"
     label "time_1"
     
-    publishDir "${params.outdir}", mode: 'copy', overwrite: true
+    publishDir "${params.outdir}/${meta.ID}_${params.program}", mode: 'copy', overwrite: true, pattern: "*.mpileup"
 
     container 'quay.io/ssd28/gsoc-experimental/samtools:1.3'
 

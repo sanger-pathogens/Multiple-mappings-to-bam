@@ -3,7 +3,7 @@ process SUMMARISE_SNPS {
     label "mem_1"
     label "time_1"
 
-    publishDir "${params.outdir}", mode: 'copy', overwrite: true
+    publishDir "${params.outdir}", mode: 'copy', overwrite: true, pattern: "*.out"
 
     container 'quay.io/ssd28/gsoc-experimental/summarise_snps:0.0.3'
 
