@@ -7,7 +7,7 @@ process FILTER_BAM {
     
     container 'quay.io/ssd28/gsoc-experimental/samtools:1.3'
     
-    publishDir "${params.outdir}", mode: 'copy', overwrite: true
+    publishDir "${params.outdir}/${meta.ID}_${params.program}", mode: 'copy', overwrite: true
 
     input:
     tuple val(meta), path(tmp_bam)

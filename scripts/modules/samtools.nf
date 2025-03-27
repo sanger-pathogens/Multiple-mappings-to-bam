@@ -82,8 +82,6 @@ process SAMTOOLS_INDEX {
 
     container 'quay.io/ssd28/gsoc-experimental/samtools:1.3'
 
-    publishDir "${params.outdir}", mode: 'copy', overwrite: true
-
     input:
     tuple val(meta), path (bam)
 
@@ -105,8 +103,6 @@ process SAMTOOLS_MERGE {
     label "time_1"
     
     container 'quay.io/ssd28/gsoc-experimental/samtools:1.3'
-
-    publishDir "${params.outdir}", mode: 'copy', overwrite: true
     
     input:
     tuple val(meta), path(bam), path(bam_bai), path(header)

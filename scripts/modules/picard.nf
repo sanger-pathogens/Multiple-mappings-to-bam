@@ -7,7 +7,7 @@ process MARK_DUPLICATES {
     
     container 'quay.io/ssd28/gsoc-experimental/picard:1.126'
     
-    publishDir "${params.outdir}", mode: 'copy', pattern: "*.txt"
+    publishDir "${params.outdir}/${meta.ID}_${params.program}", mode: 'copy', overwrite: true, pattern: "*.txt"
 
     input:
     tuple val(meta), path(bam_file)
