@@ -1,11 +1,15 @@
 process CONCAT_REFERENCE {
-    container 'quay.io/sangerpathogens/python_graphics:1.1.5' // Docker container with Biopython
+    label "cpu_1"
+    label "mem_1"
+    label "time_1"
+    
+    container 'quay.io/sangerpathogens/python_graphics:1.1.5'
 
     input:
-    path(ref)  // Reference FASTA file
+    path(ref)
 
     output:
-    path(concatenated_ref) // Updated reference file
+    path(concatenated_ref)
     
     script:
     concatenated_ref = "${ref.simpleName}_concat.fasta"
