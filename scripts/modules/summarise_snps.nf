@@ -8,8 +8,7 @@ process SUMMARISE_SNPS {
     container 'quay.io/ssd28/gsoc-experimental/summarise_snps:0.0.3'
 
     input:
-    path output_aln
-    path ref
+    tuple path(output_aln), path(ref)
 
     output:
     tuple path("${output_aln}.out"), path("${output_aln}_summary.out")

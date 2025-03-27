@@ -12,7 +12,7 @@ process JOIN_DNA_INDELS {
     path(ref)
 
     output:
-    path("${meta.ID}.aln")
+    path("${meta.ID}.aln"), path(ref), emit: indel_joined_ch
 
     script:
     if (params.indels == true) {
