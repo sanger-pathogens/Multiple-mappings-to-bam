@@ -26,7 +26,7 @@ nextflow run scripts/main.nf \\
     --mapq ${params.mapq} \\
     --depth ${params.depth} \\
     --stranddepth ${params.stranddepth} \\
-    --anomolous ${params.anomolous} \\
+    --dontuseanomolous ${params.dontuseanomolous} \\
     --BAQ ${params.BAQ} \\
     --circular ${params.circular} \\
     --ratio ${params.ratio} \\

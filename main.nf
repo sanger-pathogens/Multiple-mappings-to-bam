@@ -24,15 +24,24 @@ workflow {
     }
     | set { read_ch }
 
-    CONCAT_REFERENCE(params.ref)
-    | set{ ref }
+    Channel.fromPath(params.ref)
+    | set { reference_ch }
+
+    if (params.cat_reference) {
+        CONCAT_REFERENCE(reference_ch)
+        | set{ ref }
+    } else {
+
+        reference_ch
+        | set { ref }
+    }
     
-    CALL_MAPPING(read_ch, params.ref)
+    CALL_MAPPING(read_ch, ref)
     | MAKE_PILEUP_FROM_SAM
     | set { called_ch }
 
     if (params.pseudosequence == true) {
-        PSEUDOSEQUENCE_GENERATION(called_ch, params.ref)
+        PSEUDOSEQUENCE_GENERATION(called_ch, ref)
     }
 
 }
