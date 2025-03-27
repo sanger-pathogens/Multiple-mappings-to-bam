@@ -5,7 +5,7 @@ process PSEUDOSEQUENCE {
     label "mem_500M"
     label "time_1"
     
-    publishDir "${params.outdir}", mode: 'copy', overwrite: true
+    publishDir "${params.outdir}/${meta.ID}_${params.program}", mode: 'copy', overwrite: true
 
     container 'quay.io/ssd28/gsoc-experimental/bcf_2_pseudosequence:0.0.2'
     

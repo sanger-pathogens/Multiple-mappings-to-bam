@@ -7,6 +7,8 @@ process BCFTOOLS_CALL {
 
     container 'quay.io/ssd28/gsoc-experimental/bcftools:1.11-c1'
 
+    publishDir "${params.outdir}/${meta.ID}_${params.program}", mode: 'copy', overwrite: true, pattern: "*.{bcf,ploidy}"
+
     input:
     tuple val(meta), path(bam), path(mpileup)
 

@@ -7,7 +7,6 @@ process INDEL_REALIGNMENT {
 
     container 'quay.io/ssd28/gsoc-experimental/gatk:3.7.0 '
 
-
     input:
     tuple val(meta), path(bam), path(bam_bai)
     tuple path(ref), path(fai), path(dict)

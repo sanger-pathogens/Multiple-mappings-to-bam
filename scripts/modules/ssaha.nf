@@ -7,8 +7,6 @@ process RUN_SSAHA {
     
     container 'quay.io/sangerpathogens/ssaha2:v2.5.5_cv3'
 
-    publishDir "${params.outdir}", mode: 'copy'
-
     input:
     tuple val(meta), path(name_1_fastq), path(name_2_fastq), path(ref), path(ref_fai)
 
