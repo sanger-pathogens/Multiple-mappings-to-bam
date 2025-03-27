@@ -45,6 +45,6 @@ nextflow run scripts/main.nf \\
     --mem ${params.mem} \\
     --nodes ${params.nodes} \\
     --dirty ${params.dirty} \\
-    --mapfiles ${params.mapfiles}
+    --read_dir ${params.read_dir}
 """)
 }

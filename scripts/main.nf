@@ -12,7 +12,7 @@ include { PSEUDOSEQUENCE_GENERATION } from './sub-workflows/PSEUDOSEQUENCE_GENER
 workflow {
     log_commandline()
 
-    Channel.fromFilePairs("/lustre/scratch126/pam/teams/team230/sd28/Multiple-mappings-to-bam/test_cases/reads/*_{1,2}.fastq.gz")
+    Channel.fromFilePairs("${params.read_dir}/*_{1,2}.fastq.gz")
     | map { id, reads ->
         meta = [:]
         meta.ID = id
@@ -28,7 +28,7 @@ workflow {
     | set { called_ch }
 
     if (params.pseudosequence == true) {
-        PSEUDOSEQUENCE_GENERATION(params.ref, called_ch)
+        PSEUDOSEQUENCE_GENERATION(called_ch, params.ref)
     }
 
 }

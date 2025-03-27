@@ -5,13 +5,13 @@ include { SUMMARISE_SNPS  } from './../modules/summarise_snps.nf'
 workflow PSEUDOSEQUENCE_GENERATION {
     
     take:
-    ref
     called_ch
+    ref
 
     main:
-    pseudosequence = PSEUDOSEQUENCE(called_ch)
+    PSEUDOSEQUENCE(called_ch)
 
-    output_aln = JOIN_DNA_INDELS(pseudosequence, ref)
+    JOIN_DNA_INDELS(PSEUDOSEQUENCE.out.pseudosequence, ref)
+    | SUMMARISE_SNPS
 
-    SUMMARISE_SNPS(output_aln, ref)
 }
