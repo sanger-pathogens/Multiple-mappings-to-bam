@@ -51,7 +51,7 @@ Instead of using the input CLI, you can run the pipeline directly using the next
 Here's an example usage:
 
 ````sh
-nextflow run scripts/main.nf --ref absolute/path/to/ref/file --program BWA --domapping True --human False --pairedend True --maxinsertsize 1000 --mininsertsize 50 --ssahaquality 30 --maprepeats False --GATK True --markdup True --detectOverlaps False --pseudosequence True --incref True --indels True --quality 50 --mapq 20 --depth 8 --stranddepth 3 --anomolous True --BAQ True --circular True --ratio 0.8 --prior 0.001 --call c --output Streptococcus_agalactiae_NGBS128_GCF_001552035_1_bwa --force False --filter 1 --tabfile False --alnfile False --raxml False --model GTRGAMMA --bootstrap 100 --keep False --LSF True --LSFQ normal --mem 5 --nodes 20 --dirty False --mapfiles "absolute/path/to/ref/file1,absolute/path/to/ref/file2,..(Add more files)" -process.echo -resume
+nextflow run scripts/main.nf --ref absolute/path/to/ref/file --program BWA --read_dir <path/to/directory/containing/reads>
 ````
 
 The outputs would be generated in the directory specified by the `outdir` param (default `results/`)
