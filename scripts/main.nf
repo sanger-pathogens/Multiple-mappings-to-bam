@@ -12,6 +12,10 @@ include { PSEUDOSEQUENCE_GENERATION } from './sub-workflows/PSEUDOSEQUENCE_GENER
 workflow {
     log_commandline()
 
+    if (!params.read_dir) {
+        exit 1, 'Error: Please provide a read directory using --read_dir'
+    }
+
     Channel.fromFilePairs("${params.read_dir}/*_{1,2}.fastq.gz")
     | map { id, reads ->
         meta = [:]

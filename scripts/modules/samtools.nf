@@ -24,7 +24,7 @@ process SAMTOOLS_SORT_BAM_AND_MAKE_HEADER {
     tag "${meta.ID}"
 
     label "cpu_1"
-    label "mem_16"
+    label "mem_1"
     label "time_1"
 
     container 'quay.io/ssd28/gsoc-experimental/samtools:1.3'
@@ -77,7 +77,7 @@ process SAMTOOLS_INDEX {
     tag "${meta.ID}"
 
     label "cpu_1"
-    label "mem_16"
+    label "mem_500M"
     label "time_1"
 
     container 'quay.io/ssd28/gsoc-experimental/samtools:1.3'
@@ -101,7 +101,7 @@ process SAMTOOLS_MERGE {
     tag "${meta.ID}"
     
     label "cpu_1"
-    label "mem_16"
+    label "mem_1"
     label "time_1"
     
     container 'quay.io/ssd28/gsoc-experimental/samtools:1.3'
@@ -126,7 +126,7 @@ process SAMTOOLS_PILEUP {
     tag "${meta.ID}"
 
     label "cpu_1"
-    label "mem_16"
+    label "mem_250M"
     label "time_1"
     
     publishDir "${params.outdir}", mode: 'copy', overwrite: true

@@ -11,7 +11,12 @@ workflow PSEUDOSEQUENCE_GENERATION {
     main:
     PSEUDOSEQUENCE(called_ch)
 
-    JOIN_DNA_INDELS(PSEUDOSEQUENCE.out.pseudosequence, ref)
+    PSEUDOSEQUENCE.out.pseudosequence
+    | map { meta, file -> file.toString() } //store the file name not the contents
+    | collectFile(name: 'mfa_list.txt', newLine: true)
+    | set { mfa_list }
+
+    JOIN_DNA_INDELS(mfa_list, ref)
     | SUMMARISE_SNPS
 
 }

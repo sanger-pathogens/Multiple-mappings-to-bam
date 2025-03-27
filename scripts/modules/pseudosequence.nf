@@ -2,7 +2,7 @@ process PSEUDOSEQUENCE {
     tag "${meta.ID}"
     
     label "cpu_1"
-    label "mem_16"
+    label "mem_500M"
     label "time_1"
     
     publishDir "${params.outdir}", mode: 'copy', overwrite: true

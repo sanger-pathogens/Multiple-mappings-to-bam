@@ -2,7 +2,7 @@ process INDEL_REALIGNMENT {
     tag "${meta.ID}"
     
     label "cpu_4"
-    label "mem_16"
+    label "mem_10"
     label "time_12"
 
     container 'quay.io/ssd28/gsoc-experimental/gatk:3.7.0 '
