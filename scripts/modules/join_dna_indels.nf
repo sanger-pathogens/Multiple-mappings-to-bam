@@ -8,25 +8,15 @@ process JOIN_DNA_INDELS {
     container 'quay.io/ssd28/gsoc-experimental/join_dna_files_with_indels:0.0.2'
 
     input:
-    tuple val(meta), path(mfa)
+    path(mfa_list)
     path(ref)
 
     output:
-    path("${meta.ID}.aln"), path(ref), emit: indel_joined_ch
+    tuple path("${finalName}"), path(ref), emit: indel_joined_ch
 
     script:
-    if (params.indels == true) {
-        """
-        echo ${mfa} > mfa_list.txt
-        join_dna_files_with_indels.py -r ${ref} -o ${meta.ID}.aln -t mfa_list.txt
-        """
-    } else if (params.incref == false) {
-        """
-        cat ${str} > ${output}.aln
-        """
-    } else {
-        """
-        cat ${ref} ${str} > ${output}.aln
-        """
-    }
+    finalName="${ref.simpleName}.aln"
+    """
+    join_dna_files_with_indels.py -r ${ref} -o ${finalName} -t ${mfa_list}
+    """
 }

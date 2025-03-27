@@ -2,7 +2,7 @@ process BCFTOOLS_CALL {
     tag "${meta.ID}"
     
     label "cpu_1"
-    label "mem_16"
+    label "mem_500M"
     label "time_1"
 
     container 'quay.io/ssd28/gsoc-experimental/bcftools:1.11-c1'

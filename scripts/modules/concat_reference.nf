@@ -1,6 +1,6 @@
 process CONCAT_REFERENCE {
     label "cpu_1"
-    label "mem_1"
+    label "mem_250M"
     label "time_1"
     
     container 'quay.io/sangerpathogens/python_graphics:1.1.5'
