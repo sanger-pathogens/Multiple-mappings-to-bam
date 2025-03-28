@@ -12,7 +12,7 @@ process CONCAT_REFERENCE {
     path(concatenated_ref)
     
     script:
-    concatenated_ref = "${ref.simpleName}_concat.fasta"
+    concatenated_ref = "${ref.baseName}_concat.fasta"
     """
     concatenate_reference.py ${ref} ${concatenated_ref}
     """
