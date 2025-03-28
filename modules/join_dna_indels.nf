@@ -15,7 +15,7 @@ process JOIN_DNA_INDELS {
     tuple path("${finalName}"), path(ref), emit: indel_joined_ch
 
     script:
-    finalName="${ref.simpleName}.aln"
+    finalName="${ref.baseName}.aln"
     """
     join_dna_files_with_indels.py -r ${ref} -o ${finalName} -t ${mfa_list}
     """
