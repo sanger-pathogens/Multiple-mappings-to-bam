@@ -14,7 +14,7 @@ process SUMMARISE_SNPS {
     tuple path("${output_aln}.out"), path("${output_aln}_summary.out")
 
     script:
-    summarystring = "summarise_snps.py -g -w -r "+ "${ref.simpleName}" + " -o " + "${output_aln}" + " -i " + output_aln
+    summarystring = "summarise_snps.py -g -w -r "+ "${ref.baseName}" + " -o " + "${output_aln}" + " -i " + output_aln
 
     if (params.embl != "") {
         summarystring = summarystring + " -e "+ params.embl
