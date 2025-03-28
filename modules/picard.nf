@@ -42,7 +42,7 @@ process SEQUENCE_DICT {
     tuple path(ref), path(fai) , path(dict), emit: ref_ch
 
     script:
-    dict="${ref.simpleName}.dict"
+    dict="${ref.baseName}.dict"
     """
     java -jar /usr/local/bin/picard.jar CreateSequenceDictionary \\
         R=${ref} \\
