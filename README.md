@@ -45,7 +45,7 @@ nextflow run main.nf --ref absolute/path/to/ref/file --program BWA --read_dir <p
 
 ### Directly running the pipeline
 
-Without directly cloning the pipeline it can be run at the latest version like so
+The pipeline can be run without having to directly clone this code repository, using the following syntax (will execute the latest pipeline version):
 
 ````sh
 nextflow run sanger-pathogens/Multiple-mappings-to-bam --ref absolute/path/to/ref/file --program BWA --read_dir <path/to/directory/containing/reads>
