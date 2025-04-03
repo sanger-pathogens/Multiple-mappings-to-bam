@@ -40,18 +40,15 @@ cd multiple-mappings-to-bam
 Use the input CLI to pass the parameters. Run the CLI:
 
 ````sh
-python input/input.py
+nextflow run main.nf --ref absolute/path/to/ref/file --program BWA --read_dir <path/to/directory/containing/reads>
 ````
-
-For detailed instructions on how to use the input CLI, refer to the USAGE.md file.
 
 ### Directly running the pipeline
 
-Instead of using the input CLI, you can run the pipeline directly using the nextflow run command. It is not recommended as some input validation is handled by the CLI.  
-Here's an example usage:
+Without directly cloning the pipeline it can be run at the latest version like so
 
 ````sh
-nextflow run scripts/main.nf --ref absolute/path/to/ref/file --program BWA --read_dir <path/to/directory/containing/reads>
+nextflow run sanger-pathogens/Multiple-mappings-to-bam --ref absolute/path/to/ref/file --program BWA --read_dir <path/to/directory/containing/reads>
 ````
 
 The outputs would be generated in the directory specified by the `outdir` param (default `results/`)
