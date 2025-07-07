@@ -65,8 +65,12 @@ workflow MAKE_PILEUP_FROM_SAM {
 
     FILTER_BAM(sorted_indel_ch)
 
+    // combine() takes a channel as input, so coaxing ref (UnixPath)
+    // into a channel
+    ref_ch = Channel.value(ref)
+
     SAMTOOLS_INDEX2(FILTER_BAM.out.bam_ch)
-    | combine(ref)
+    | combine(ref_ch)
     | SAMTOOLS_PILEUP
     | BCFTOOLS_CALL
 
