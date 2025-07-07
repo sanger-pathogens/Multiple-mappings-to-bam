@@ -21,6 +21,9 @@ workflow MAKE_PILEUP_FROM_SAM {
 
     main:
 
+    // Filepath ref is a string, convert to file object
+    ref = file(ref)
+
     if (!params.markdup) {
         SAMTOOLS_SORT1(mapped_sam_ch)
         | MARK_DUPLICATES

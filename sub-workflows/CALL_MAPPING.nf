@@ -13,6 +13,8 @@ workflow CALL_MAPPING {
     UNZIP_GZ(read_ch)
     | set { unzipped_reads }
 
+    // Filepath ref is a string, convert to file object
+    ref = file(ref)
 
     switch (params.program.toUpperCase()) {
         case "BWA":
