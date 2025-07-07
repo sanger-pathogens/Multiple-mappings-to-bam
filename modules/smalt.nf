@@ -109,6 +109,8 @@ process RUN_SMALT {
 }
 
 process SMALT_INDEX {
+    tag "${meta.ID}"
+
     label "cpu_1"
     label "mem_16"
     label "time_1"
@@ -116,10 +118,10 @@ process SMALT_INDEX {
     container 'quay.io/ssd28/gsoc-experimental/run-smalt:0.0.2'
 
     input:
-    path(ref)
+    tuple val(meta), path(ref)
 
     output:
-    tuple path(ref), path("${ref}.*")
+    tuple val(meta), path(ref), path("${ref}.*")
 
     script:
     """
