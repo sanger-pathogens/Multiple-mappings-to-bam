@@ -26,11 +26,13 @@ workflow CALL_MAPPING {
 
         case "SMALT":
             (index_ch, fai) = SMALT_INDEX(ref)
+            reads_and_ref_ch = unzipped_reads.combine(ref).combine(index_ch).combine(fai)
 
             mapped_ch = RUN_SMALT(reads_and_ref_ch)
             break
 
         case "SSAHA":
+            reads_and_ref_ch = unzipped_reads.combine(ref).combine(index_ch)
             mapped_ch = RUN_SSAHA(reads_and_ref_ch)
 
             break
