@@ -99,7 +99,7 @@ process RUN_SMALT {
         fi
 
         if [ "${newsmalt}" = "false" ]; then
-            samtools view -b -S tmp1.sam -t ${ref_fai} > tmp1.bam
+            samtools view -b -S tmp1.sam -t ${smalt_indexes} > tmp1.bam
             rm tmp1.sam
         fi
     else
