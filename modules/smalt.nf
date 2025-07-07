@@ -121,7 +121,7 @@ process SMALT_INDEX {
     tuple val(meta), path(ref)
 
     output:
-    tuple val(meta), path(ref), path("${ref}.*")
+    tuple path(ref), path("${ref}.*")
 
     script:
     """
