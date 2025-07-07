@@ -19,7 +19,7 @@ workflow CALL_MAPPING {
     // Create a channel that combines 'meta' from read_ch and the value of 'ref'
     // to use as input for SMALT_INDEX
     ref_ch = Channel.value(ref)
-    read_ch.map { meta, _, _ -> meta }.combine(ref_ch)
+    read_ch.map { meta, _, __ -> meta }.combine(ref_ch)
     | map { meta, ref -> tuple(meta, ref) }
     | set { meta_ref_ch }
 
