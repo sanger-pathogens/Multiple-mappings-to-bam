@@ -9,6 +9,8 @@ workflow PSEUDOSEQUENCE_GENERATION {
     ref
 
     main:
+    // Filepath ref is a string, convert to file object
+    ref = file(ref)
     PSEUDOSEQUENCE(called_ch)
 
     PSEUDOSEQUENCE.out.pseudosequence
