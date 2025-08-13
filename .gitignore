@@ -10,3 +10,5 @@ results/
 talisman_report.idea
 test*
 work/
+.vscode/
+test_cases/
