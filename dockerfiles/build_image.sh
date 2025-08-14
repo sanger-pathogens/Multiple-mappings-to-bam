@@ -1,3 +1,5 @@
+#!/bin/bash
+
 docker build -f samtools.Dockerfile -t samtools-1.3 .
 docker build -f run-bwa.Dockerfile -t bwa-samtools .
 docker build -f run-smalt.Dockerfile -t smalt-samtools .

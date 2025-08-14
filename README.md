@@ -36,10 +36,9 @@ This project is part of the Google Summer of Code 2024 program. It provides a Ne
    - Use ready-made module: `module load Multiple-mappings-to-bam`  
      :warning: If using the ready-made module, replace `nextflow run main.nf` with `Multiple-mappings-to-bam` in all subsequent commands.
 
-3. Start the pipeline  
+3. Start the pipeline
 
    Example:
-
 
    ```bash
    nextflow run main.nf --manifest ./test_data/inputs/test_manifest.csv --outdir my_output
@@ -48,7 +47,7 @@ This project is part of the Google Summer of Code 2024 program. It provides a Ne
    It is good practice to submit a dedicated job for the nextflow master process (use the `oversubscribed` queue):
 
    ```bash
-   bsub -o output.o -e error.e -q oversubscribed -R "select[mem>4000] rusage[mem=4000]" -M4000 nextflow run main.nf --ref absolute/path/to/ref/file --read_dir <path/to/directory/containing/reads> 
+   bsub -o output.o -e error.e -q oversubscribed -R "select[mem>4000] rusage[mem=4000]" -M4000 nextflow run main.nf --ref absolute/path/to/ref/file --read_dir <path/to/directory/containing/reads>
    ```
 
    See [usage](#usage) for all available pipeline options.
@@ -56,8 +55,8 @@ This project is part of the Google Summer of Code 2024 program. It provides a Ne
 ## Usage
 
 ```
-Usage: 
-    nextflow run main.nf 
+Usage:
+    nextflow run main.nf
 
 Options:
 
@@ -65,7 +64,7 @@ Options:
     default: "./results"
     Output directory (optional)
 
--- read_dir 
+-- read_dir
     Absolute path to a directory containing reads (mandatory)
 
 -- ref
@@ -82,7 +81,7 @@ Options:
 --human
     default: false
     Mapping against human (optional)
- 
+
 --pairedend
     default: true
     Reads are single ended (optional)
@@ -243,4 +242,3 @@ Options:
 ## Support
 
 For further information or help, don't hesitate to get in touch via [pam-informatics@sanger.ac.uk](mailto:pam-informatics@sanger.ac.uk).
-
