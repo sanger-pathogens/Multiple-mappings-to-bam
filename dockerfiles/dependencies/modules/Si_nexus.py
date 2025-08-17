@@ -1,21 +1,28 @@
-from Bio.Nexus import Trees, Nodes
+import copy
+import glob
+import math
+import os
+import string
+import sys
+import time
+from random import *
+
+import Si_SNPs_temp
 from Bio import AlignIO
 from Bio.Align.Generic import Alignment
-from Bio.Seq import Seq
-from Bio.SeqRecord import SeqRecord
-from Bio.SeqFeature import FeatureLocation, SeqFeature
 from Bio.Alphabet import IUPAC, Gapped
-import sys, string, os, glob, copy
-from Si_general import *
-from random import *
-import Si_SNPs_temp
-import math
 from Bio.Graphics import GenomeDiagram
 from Bio.Graphics.GenomeDiagram._Colors import ColorTranslator
-import time
+from Bio.Nexus import Nodes, Trees
+from Bio.Seq import Seq
+from Bio.SeqFeature import FeatureLocation, SeqFeature
+from Bio.SeqRecord import SeqRecord
+from Si_general import *
+
 sys.path.extend(map(os.path.abspath, ['/nfs/users/nfs_s/sh16/lib/python2.7/site-packages/fisher-0.1.4-py2.7-linux-x86_64.egg']))
 #from scipy import stats
 import fisher
+
 RAXML = "raxmlHPC"
 
 

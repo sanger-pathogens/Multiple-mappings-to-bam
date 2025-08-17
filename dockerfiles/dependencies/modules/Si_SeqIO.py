@@ -1,11 +1,15 @@
-from Bio import AlignIO
-from Bio import SeqIO
-from Bio.GenBank import Scanner
+import os
 #from Bio.SeqIO.InsdcIO import *
-import string, os, sys
+import string
+import sys
 from random import *
+
+from Bio import AlignIO, SeqIO
+from Bio.GenBank import Scanner
+
 sys.path.extend(map(os.path.abspath, ['/nfs/pathogen/sh16_scripts/modules/']))
 from Si_general import *
+
 
 class SimonError(Exception):
 	def __init__(self, value):

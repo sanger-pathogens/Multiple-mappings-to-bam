@@ -1,7 +1,6 @@
 import sys
+
 from Bio.Seq import Seq
-
-
 
 #################################
 # Simple Error Printing Funtion #
