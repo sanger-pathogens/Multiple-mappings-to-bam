@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 # /usr/bin/env python
-from __future__ import absolute_import
-from __future__ import print_function
 import os
 import string
 import sys
@@ -14,7 +12,7 @@ import pysam
 #################################
 
 def DoError(ErrorString):
-    print("!!!Error:", ErrorString, "!!!")
+    print "!!!Error:", ErrorString, "!!!"
     sys.exit()
 
 
@@ -28,7 +26,7 @@ def revcomp(sequence):
     d = {'A': 'T', 'T': 'A', 'C': 'G', 'G': 'C', 'a': 't',
          't': 'a', 'g': 'c', 'c': 'g', "n": "n", "N": "N"}
     for i in rev:
-        if i in d:
+        if d.has_key(i):
             revcomp = revcomp+d[i]
         else:
             revcomp = revcomp+i
@@ -109,33 +107,33 @@ def print_read_to_file(out, samread, format, sammate=False, mateout=False):
     if format in ["sam", "bam"]:
         out.write(read)
     elif format == "fasta":
-        print(">"+samread.qname, file=out)
-        print(samreadseq, file=out)
+        print >>out, ">"+samread.qname
+        print >>out, samreadseq
     elif format == "fastq":
-        print("@"+samread.qname, file=out)
-        print(samreadseq, file=out)
-        print("+", file=out)
-        print(samreadqual, file=out)
+        print >>out, "@"+samread.qname
+        print >>out, samreadseq
+        print >> out, "+"
+        print >> out, samreadqual
     elif format == "pairedfastq" and sammate and mateout:
         if samread.is_read1 and sammate.is_read2:
-            print("@"+samread.qname, file=out)
-            print(samreadseq, file=out)
-            print("+", file=out)
-            print(samreadqual, file=out)
-            print("@"+sammate.qname, file=mateout)
-            print(sammateseq, file=mateout)
-            print("+", file=mateout)
-            print(sammatequal, file=mateout)
+            print >>out, "@"+samread.qname
+            print >>out, samreadseq
+            print >> out, "+"
+            print >> out, samreadqual
+            print >>mateout, "@"+sammate.qname
+            print >>mateout, sammateseq
+            print >> mateout, "+"
+            print >> mateout, sammatequal
 
         elif samread.is_read2 and sammate.is_read1:
-            print("@"+sammate.qname, file=out)
-            print(sammateseq, file=out)
-            print("+", file=out)
-            print(sammatequal, file=out)
-            print("@"+samread.qname, file=mateout)
-            print(samreadseq, file=mateout)
-            print("+", file=mateout)
-            print(samreadqual, file=mateout)
+            print >>out, "@"+sammate.qname
+            print >>out, sammateseq
+            print >> out, "+"
+            print >> out, sammatequal
+            print >>mateout, "@"+samread.qname
+            print >>mateout, samreadseq
+            print >> mateout, "+"
+            print >> mateout, samreadqual
 
     return
 
@@ -155,16 +153,16 @@ if __name__ == "__main__":
     # open the bam/sam file
 
     if options.bam.split(".")[-1] == "bam":
-        print("Reading bam file")
+        print "Reading bam file"
         try:
             samfile = pysam.Samfile(options.bam, "rb")
-        except Exception:
+        except StandardError:
             DoError('Failed to open '+options.bam+'. Is it in bam format?')
     elif options.bam.split(".")[-1] == "sam":
-        print("Reading sam file")
+        print "Reading sam file"
         try:
             samfile = pysam.Samfile(options.bam, "r")
-        except Exception:
+        except StandardError:
             DoError('Failed to open '+options.bam+'. Is it in sam format?')
 
     # get reference names and lengths from the sam file header
@@ -181,7 +179,7 @@ if __name__ == "__main__":
 
     # Create headers for sam/bam output
     if options.fileformat in ["sam", "bam"]:
-        print("Adding sam headers")
+        print "Adding sam headers"
         newrefs = []
         newlengths = []
         if options.outputtype == "contigs":
@@ -212,7 +210,7 @@ if __name__ == "__main__":
     else:
         DoError('Somehow gained a file format')
 
-    print("Converting file")
+    print "Converting file"
     if options.fileformat == "pairedfastq":
         firstofpair = {}
     if options.outputtype == "minusdup":
