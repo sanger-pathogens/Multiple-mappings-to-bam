@@ -6,9 +6,12 @@ include:
 
 # If your project contains python code, delete the sections below which disable black, isort and flake8
 # See also .pre-commit-config.yaml, which will have black, isort and flake8 jobs disabled.
-# black:
-#  rules:
-#    - when: never
+
+# stop blacks running due to python2 code
+
+black:
+  rules:
+    - when: never
 
 # isort:
 #  rules:

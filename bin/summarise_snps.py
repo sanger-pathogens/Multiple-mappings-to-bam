@@ -7,23 +7,28 @@
 # Import modules #
 ##################
 
-import string, re
-import os, sys, getopt, math
+import getopt
+import math
+import os
+import re
+import string
+import sys
+from optparse import OptionGroup, OptionParser
 from random import *
-from Bio import SeqIO
-from Bio.Seq import Seq
-from Bio.Alphabet import IUPAC, Gapped
-from Bio.SeqRecord import SeqRecord
-from Bio import AlignIO
-from Bio.Align import Generic
-from modules.Si_nexus import *
-from modules.Si_SeqIO import *
+
 #from scipy import stats
 import fisher
+from Bio import AlignIO, SeqIO
+from Bio.Align import Generic
+from Bio.Alphabet import IUPAC, Gapped
+from Bio.Seq import Seq
+from Bio.SeqRecord import SeqRecord
+from modules.Si_nexus import *
+from modules.Si_SeqIO import *
+
 #from guppy import hpy
 
 
-from optparse import OptionParser, OptionGroup
 
 
 ##########################

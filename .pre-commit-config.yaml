@@ -26,8 +26,6 @@ repos:
         name: "Black (Python formatter)"
         args:
           - --line-length=120
-        exclude: |
-          ^bin/(bam_filter\.py|bcf_2_pseudosequence\.py|join_dna_files_with_indels\.py|summarise_snps\.py)$
   - repo: https://github.com/pycqa/isort
     rev: 5.13.2
     hooks:

@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 
-from Bio import SeqIO
-from Bio.SeqRecord import SeqRecord
 import os
 import sys
+
+from Bio import SeqIO
+from Bio.SeqRecord import SeqRecord
+
 
 def main():
     if len(sys.argv) != 3:
@@ -15,7 +17,7 @@ def main():
 
     concatenated_seq = ""
     seq_records = list(SeqIO.parse(input_file, "fasta"))
-    
+
     if not seq_records:
         print("Error: No sequences found in input file!")
         sys.exit(1)
@@ -35,8 +37,10 @@ def main():
 
     with open(output_file, "w") as out_handle:
         SeqIO.write(new_record, out_handle, "fasta")
-    
-    print(f"Saved concatenated sequence to {output_file} (ID: '{sequence_id}')")
+
+    print(
+        f"Saved concatenated sequence to {output_file} (ID: '{sequence_id}')")
+
 
 if __name__ == "__main__":
     main()
