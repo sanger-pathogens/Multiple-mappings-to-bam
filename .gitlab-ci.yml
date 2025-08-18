@@ -19,8 +19,7 @@ isort:
 
 flake8:
   rules:
-   - when: never
-
+    - when: never
 
 #     The two sections below prevent this template being deployed to the farm.
 #     DELETE THESE SECTIONS THIS IN YOUR PROJECT
