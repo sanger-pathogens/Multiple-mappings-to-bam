@@ -13,14 +13,14 @@ black:
   rules:
     - when: never
 
-# isort:
-#  rules:
-#    - when: never
+isort:
+  rules:
+    - when: never
 
-# flake8:
-#   rules:
-#    - when: never
-#
+flake8:
+  rules:
+   - when: never
+
 
 #     The two sections below prevent this template being deployed to the farm.
 #     DELETE THESE SECTIONS THIS IN YOUR PROJECT
