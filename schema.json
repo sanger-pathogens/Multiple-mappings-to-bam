@@ -1,14 +1,199 @@
 {
-  "pipeline": "Base schema",
+  "pipeline": "multiple-mappings-to-bam",
   "params": {
-    "Logging options": {
-      "monochrome_logs": {
-        "default": "false",
-        "help_text": "Should logs appear in plain ASCII"
+    "Input/output options": {
+      "read_dir": {
+        "default": null,
+        "help_text": "Absolute path to a directory containing reads (mandatory)"
+      },
+      "ref": {
+        "default": null,
+        "help_text": "Absolute path to a directory containing reference DNA sequence (mandatory)"
+      },
+      "embl": {
+        "default": "",
+        "help_text": "Reference annotation (optional)"
+      },
+      "outdir": {
+        "default": "./results",
+        "help_text": "Output directory (optional)"
+      },
+      "diroutput": {
+        "default": "",
+        "help_text": "Output directory suffix (optional)"
+      },
+      "output": {
+        "default": " ",
+        "help_text": "Output file prefix (optional)"
+      }
+    },
+    "Mapping options": {
+      "program": {
+        "default": "bwa",
+        "help_text": "Mapping program you wish to include. Valid options [bwa, ssaha, smalt] (optional)"
+      },
+      "domapping": {
+        "default": true,
+        "help_text": "Do not remap data (optional)"
+      },
+      "human": {
+        "default": false,
+        "help_text": "Mapping against human (optional)"
+      },
+      "pairedend": {
+        "default": true,
+        "help_text": "Reads are single ended (optional)"
+      },
+      "maxinsertsize": {
+        "default": 1000,
+        "help_text": "Maximum insert size (optional)"
+      },
+      "mininsertsize": {
+        "default": 50,
+        "help_text": "Minimum insert size (optional)"
+      },
+      "ssahaquality": {
+        "default": 30,
+        "help_text": "Minimum ssaha quality score (optional)"
+      },
+      "maprepeats": {
+        "default": false,
+        "help_text": "Randomly map repeats (optional)"
+      },
+      "nomapid": {
+        "default": 0,
+        "help_text": "Minimum identity threshold (optional)"
+      },
+      "GATK": {
+        "default": false,
+        "help_text": "Run GATK indel realignment (optional)"
+      },
+      "markdup": {
+        "default": false,
+        "help_text": "Run Mark duplicates (optional)"
+      },
+      "detectOverlaps": {
+        "default": false,
+        "help_text": "Enable read-pair overlap detection (optional)"
+      },
+      "keep": {
+        "default": false,
+        "help_text": "If old mapping files are present, do not rerun them (optional)"
+      },
+      "filter": {
+        "default": 1,
+        "help_text": "Filter or split bam file (optional)"
+      }
+    },
+    "Variant calling options": {
+      "call": {
+        "default": "c",
+        "help_text": "bcftools caller (optional)"
+      },
+      "prior": {
+        "default": 0.001,
+        "help_text": "Mutation rate (optional)"
+      },
+      "BAQ": {
+        "default": false,
+        "help_text": "Use samtools base alignment quality option (BAQ) (optional)"
+      },
+      "dontuseanomolous": {
+        "default": false,
+        "help_text": "Use anomalous reads in mpileup (optional)"
+      }
+    },
+    "Pseudosequence options": {
+      "pseudosequence": {
+        "default": true,
+        "help_text": "Create pseudosequences (optional)"
+      },
+      "incref": {
+        "default": true,
+        "help_text": "Include reference in pseudosequence alignment (optional)"
+      },
+      "indels": {
+        "default": true,
+        "help_text": "Include small indels in pseudosequence alignment (optional)"
+      },
+      "quality": {
+        "default": 50,
+        "help_text": "Minimum base call quality (optional)"
+      },
+      "mapq": {
+        "default": 20,
+        "help_text": "Minimum mapping quality (optional)"
+      },
+      "depth": {
+        "default": 8,
+        "help_text": "Minimum number of reads matching SNP (optional)"
+      },
+      "stranddepth": {
+        "default": 3,
+        "help_text": "Minimum number of reads matching SNP per strand (optional)"
+      },
+      "ratio": {
+        "default": 0.8,
+        "help_text": "SNP/Mapping quality ratio cutoff (optional)"
+      },
+      "circular": {
+        "default": true,
+        "help_text": "Contigs are circular (optional)"
+      }
+    },
+    "Phylogeny options": {
+      "raxml": {
+        "default": false,
+        "help_text": "Run phylogeny with RAxML (optional)"
+      },
+      "model": {
+        "default": "GTRGAMMA",
+        "help_text": "Model of evolution to use (optional)"
+      },
+      "bootstrap": {
+        "default": 100,
+        "help_text": "Number of bootstrap replicates (optional)"
+      },
+      "tabfile": {
+        "default": false,
+        "help_text": "Create tabfile of snps (optional)"
+      },
+      "alnfile": {
+        "default": false,
+        "help_text": "Create snp alignment file (optional)"
+      }
+    },
+    "Job submission options": {
+      "LSF": {
+        "default": true,
+        "help_text": "Use LSF to parallelise analyses (optional)"
+      },
+      "LSFQ": {
+        "default": "normal",
+        "help_text": "LSF queue to submit to (optional)"
+      },
+      "mem": {
+        "default": 5,
+        "help_text": "Amount of memory required for analysis (Gb) (optional)"
+      },
+      "nodes": {
+        "default": 20,
+        "help_text": "Maximum number of jobs to run on nodes in parallel (optional)"
+      },
+      "docker": {
+        "default": false,
+        "help_text": "Run on docker containers (Default singularity) (optional)"
+      }
+    },
+    "workflow_control": {
+      "force": {
+        "default": false,
+        "help_text": "Force overwrite of output files (optional)"
+      },
+      "dirty": {
+        "default": false,
+        "help_text": "Do not clean up temporary files (optional)"
       }
     }
-  },
-  "overwrite_param": {
-    "none": {}
   }
 }
