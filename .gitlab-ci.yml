@@ -10,14 +10,13 @@ black:
   rules:
     - when: never # Else Black errors on the Python2 code
 
-# isort:
-#  rules:
-#    - when: never
+isort:
+  rules:
+    - when: never
 
-# flake8:
-#   rules:
-#    - when: never
-#
+flake8:
+  rules:
+    - when: never
 
 #     The FARM_NAME variable can be used to set the name of the module on the farm.
 #     The module name will be the same as your git project by default.
