@@ -12,57 +12,61 @@
       },
       "embl": {
         "default": "",
-        "help_text": "Reference annotation (optional)"
+        "help_text": "Reference annotation"
       },
       "outdir": {
         "default": "./results",
-        "help_text": "Output directory (optional)"
+        "help_text": "Output directory"
       },
       "diroutput": {
         "default": "",
-        "help_text": "Output directory suffix (optional)"
+        "help_text": "Output directory suffix"
       },
       "output": {
         "default": " ",
-        "help_text": "Output file prefix (optional)"
+        "help_text": "Output file prefix"
       }
     },
     "Mapping options": {
       "program": {
-        "default": "bwa",
-        "help_text": "Mapping program you wish to include. Valid options [bwa, ssaha, smalt] (optional)"
+        "default": "BWA",
+        "help_text": "Mapping program you wish to include: BWA|SSAHA|SMALT"
       },
       "domapping": {
         "default": true,
-        "help_text": "Do not remap data (optional)"
+        "help_text": "Do not remap data"
       },
       "human": {
         "default": false,
-        "help_text": "Mapping against human (optional)"
+        "help_text": "Optimise SMALT for mapping against human genome"
       },
       "pairedend": {
         "default": true,
-        "help_text": "Reads are single ended (optional)"
+        "help_text": "Set to false for single-end reads"
       },
       "maxinsertsize": {
         "default": 1000,
-        "help_text": "Maximum insert size (optional)"
+        "help_text": "Maximum insert size for paired-end reads (SMALT/SSAHA only)"
       },
       "mininsertsize": {
         "default": 50,
-        "help_text": "Minimum insert size (optional)"
+        "help_text": "Minimum insert size for paired-end reads (SMALT/SSAHA only)"
       },
       "ssahaquality": {
         "default": 30,
-        "help_text": "Minimum ssaha quality score (optional)"
+        "help_text": "Minimum Phred base quality score (SSAHA only)"
+      },
+      "circular": {
+        "default": true,
+        "help_text": "Contigs are circular (SSAHA only)"
       },
       "maprepeats": {
         "default": false,
-        "help_text": "Randomly map repeats (optional)"
+        "help_text": "Map all reads, including repeats (even ambiguous mappings). Default is false to exclude multi-mapping reads. (SMALT only)"
       },
       "nomapid": {
         "default": 0,
-        "help_text": "Minimum identity threshold (optional)"
+        "help_text": "Minimum identity threshold, as a float, for mapping to be reported (SMALT only)"
       },
       "GATK": {
         "default": false,
@@ -70,29 +74,25 @@
       },
       "markdup": {
         "default": false,
-        "help_text": "Run Mark duplicates (optional)"
+        "help_text": "Mark duplicates with Picard (optional)"
       },
       "detectOverlaps": {
         "default": false,
         "help_text": "Enable read-pair overlap detection (optional)"
       },
-      "keep": {
-        "default": false,
-        "help_text": "If old mapping files are present, do not rerun them (optional)"
-      },
       "filter": {
         "default": 1,
-        "help_text": "Filter or split bam file (optional)"
+        "help_text": "Filtering mode for bam file (1=No filter, 2=remove unmapped, 3=properly paired only, 4=split mapped/unmapped, 5=split properly paired/unpaired)"
       }
     },
     "Variant calling options": {
       "call": {
         "default": "c",
-        "help_text": "bcftools caller (optional)"
+        "help_text": "bcftools caller (c=consensus, m=multiallelic)"
       },
       "prior": {
         "default": 0.001,
-        "help_text": "Mutation rate (optional)"
+        "help_text": "Sets the prior probability that a site is non-reference for variant calling, higher values increase sensitivity to rare variants (optional)"
       },
       "BAQ": {
         "default": false,
@@ -136,23 +136,17 @@
         "default": 0.8,
         "help_text": "SNP/Mapping quality ratio cutoff (optional)"
       },
-      "circular": {
-        "default": true,
-        "help_text": "Contigs are circular (optional)"
-      }
-    },
-    "Phylogeny options": {
       "raxml": {
         "default": false,
         "help_text": "Run phylogeny with RAxML (optional)"
       },
       "model": {
         "default": "GTRGAMMA",
-        "help_text": "Model of evolution to use (optional)"
+        "help_text": "Model for RAxML: GTRCAT|GTRMIX|GTRGAMMA (optional)"
       },
       "bootstrap": {
         "default": 100,
-        "help_text": "Number of bootstrap replicates (optional)"
+        "help_text": "Number of bootstrap replicates for RAxML, 0=No bootstrap (optional)"
       },
       "tabfile": {
         "default": false,
@@ -163,7 +157,7 @@
         "help_text": "Create snp alignment file (optional)"
       }
     },
-    "Job submission options": {
+    "Job submission and workflow options": {
       "LSF": {
         "default": true,
         "help_text": "Use LSF to parallelise analyses (optional)"
@@ -180,12 +174,6 @@
         "default": 20,
         "help_text": "Maximum number of jobs to run on nodes in parallel (optional)"
       },
-      "docker": {
-        "default": false,
-        "help_text": "Run on docker containers (Default singularity) (optional)"
-      }
-    },
-    "workflow_control": {
       "force": {
         "default": false,
         "help_text": "Force overwrite of output files (optional)"

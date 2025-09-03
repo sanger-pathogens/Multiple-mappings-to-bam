@@ -15,11 +15,34 @@ This project is part of the Google Summer of Code 2024 program. It provides a Ne
 - Supports multiple mapping programs (BWA, SMALT, SSAHA)
 - Handles paired-end and single-end reads
 - Quality filtering and duplicate marking
-- Generates pseudosequences
+- Optionally generates pseudosequences
 - Supports indel calling and variant detection
 - Configurable parameters for advanced usage
 
-### Getting started
+## Overview
+
+### Mapping
+
+Reads, paired or single-end, can be mapped to a reference by a selection of tools: BWA, SMALT or SSAHA. Choice of program enables various tool-specific options.
+
+If mapping against the human genome with `--program SMALT`, using `--human` optimises kmer size and step size for faster, more memory-efficient mapping.
+
+### Pileup
+
+Optional BAM filtering has 5 modes to choose from (passed to the `--filter` option):
+
+- `1` No filtering (Default)
+- `2` Remove unmapped reads
+- `3` Keep properly paired reads only
+- `4` Split mapped and unmapped into separate bams
+- `5` Split properly paired and unpaired reads into separate bams
+
+### Pseudosequence Generation
+
+Optional workflow that can be deactivated by setting `--pseudosequence false`.
+RAxML phylogeny - can adjust bootstrapping (0 = none, 1-1000 to define bootstrap replicates)
+
+## Getting started
 
 ### Running on the farm (Sanger HPC clusters)
 
@@ -33,8 +56,8 @@ This project is part of the Google Summer of Code 2024 program. It provides a Ne
 
    - Clone this repository using `git clone --recurse-submodules`  
      OR
-   - Use ready-made module: `module load Multiple-mappings-to-bam`  
-     :warning: If using the ready-made module, replace `nextflow run main.nf` with `Multiple-mappings-to-bam` in all subsequent commands.
+   - Use ready-made module: `module load multiple-mappings-to-bam`  
+     :warning: If using the ready-made module, replace `nextflow run main.nf` with `multiple-mappings-to-bam` in all subsequent commands.
 
 3. Start the pipeline
 
@@ -56,7 +79,7 @@ This project is part of the Google Summer of Code 2024 program. It provides a Ne
 
 ```
 Usage:
-    nextflow run main.nf
+    nextflow run main.nf [options]
 
 Options:
 
@@ -204,7 +227,7 @@ Options:
 
 --model
     default: "GTRGAMMA"
-    Model of evolution to use (optional)
+    Model for RAxML: GTRCAT|GTRMIX|GTRGAMMA
 
 --bootstrap
     default: 100
@@ -234,9 +257,6 @@ Options:
     default: false
     Do not clean up temporary files (optional)
 
---docker
-    default: false
-    Run on docker containers (Default singularity) (optional)
 ```
 
 ## Support
