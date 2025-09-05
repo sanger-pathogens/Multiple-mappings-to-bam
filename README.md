@@ -83,9 +83,7 @@ Usage:
 
 Options:
 
--- outdir
-    default: "./results"
-    Output directory (optional)
+Input/output options
 
 -- read_dir
     Absolute path to a directory containing reads (mandatory)
@@ -93,170 +91,178 @@ Options:
 -- ref
     Absolute path to a directory containing reference DNA sequence (mandatory)
 
+-- embl
+    default: ""
+    Reference annotation
+
+-- outdir
+    default: "./results"
+    Output directory
+
+-- diroutput
+    default: ""
+    Output directory suffix
+
+-- output
+    default: " "
+    Output file prefix
+
+Mapping options
+
+
 -- program
-    default: bwa
-    Mapping program you wish to include. Valid options [bwa, ssaha, smalt] (optional)
+    default: BWA
+    Mapping program you wish to include: BWA|SSAHA|SMALT
 
---domapping
-    default: true
-    Do not remap data (optional)
+-- domapping
+    default: true
+    Do not remap data
 
---human
-    default: false
-    Mapping against human (optional)
+-- human
+    default: false
+    Optimise SMALT for mapping against human genome
 
---pairedend
-    default: true
-    Reads are single ended (optional)
+-- pairedend
+    default: true
+    Set to false for single-end reads
 
---maxinsertsize
-    default: 1000
-    Maximum insert size (optional)
+-- maxinsertsize
+    default: 1000
+    Maximum insert size for paired-end reads (SMALT/SSAHA only)
 
---mininsertsize
-    default: 50
-    Minimum insert size (optional)
+-- mininsertsize
+    default: 50
+    Minimum insert size for paired-end reads (SMALT/SSAHA only)
 
---ssahaquality
-    default: 30
-    Minimum ssaha quality score (optional)
+-- ssahaquality
+    default: 30
+    Minimum Phred base quality score (SSAHA only)
 
---maprepeats
-    default: false
-    Randomly map repeats (optional)
+-- circular
+    default: true
+    Contigs are circular (SSAHA only)
 
---nomapid
-    default: 0
-    Minimum identity threshold (optional)
+-- maprepeats
+    default: false
+    Map all reads, including repeats (even ambiguous mappings). Default is false to exclude multi-mapping reads. (SMALT only)
 
---GATK
-    default: false
-    Run GATK indel realignment (optional)
+-- nomapid
+    default: 0
+    Minimum identity threshold, as a float, for mapping to be reported (SMALT only)
 
---markdup
-    default: false
-    Run Mark duplicates (optional)
+-- GATK
+    default: false
+    Run GATK indel realignment (optional)
 
---detectOverlaps
-    default: false
-    Enable read-pair overlap detection (optional)
+-- markdup
+    default: false
+    Mark duplicates with Picard (optional)
 
---pseudosequence
-    default: true
-    Create pseudosequences (optional)
+-- detectOverlaps
+    default: false
+    Enable read-pair overlap detection (optional)
 
---incref
-    default: true
-    Include reference in pseudosequence alignment (optional)
+-- filter
+    default: 1
+    Filtering mode for bam file (1=No filter, 2=remove unmapped, 3=properly paired only, 4=split mapped/unmapped, 5=split properly paired/unpaired)
 
---indels
-    default: true
-    Include small indels in pseudosequence alignment (optional)
+Variant calling options:
 
---quality
-    default: 50
-    Minimum base call quality (optional)
+-- call
+    default: c
+    bcftools caller (c=consensus, m=multiallelic)
 
---mapq
-    default: 20
-    Minimum mapping quality (optional)
+-- prior
+    default: 0.001
+    Sets the prior probability that a site is non-reference for variant calling, higher values increase sensitivity to rare variants (optional)
 
---depth
-    default: 8
-    Minimum number of reads matching SNP (optional)
+-- BAQ
+    default: false
+    Use samtools base alignment quality option (BAQ) (optional)
 
---stranddepth
-    default: 3
-    Minimum number of reads matching SNP per strand (optional)
+-- dontuseanomolous
+    default: false
+    Use anomalous reads in mpileup (optional)
 
---dontuseanomolous
-    default: false
-    Use anomolous reads in mpileup (optional)
+Pseudosequence options:
 
---BAQ
-    default: false
-    Use samtools base alignment quality option (BAQ) (optional)
+-- pseudosequence
+    default: true
+    Create pseudosequences (optional)
 
---circular
-    default: true
-    Contigs are circular (optional)
+-- incref
+    default: true
+    Include reference in pseudosequence alignment (optional)
 
---ratio
-    default: 0.8
-    SNP/Mapping quality ratio cutoff (optional)
+-- indels
+    default: true
+    Include small indels in pseudosequence alignment (optional)
 
---prior
-    default: 0.001
-    Mutation rate (optional)
+-- quality
+    default: 50
+    Minimum base call quality (optional)
 
---call
-    default: "c"
-    bcftools caller (optional)
+-- mapq
+    default: 20
+    Minimum mapping quality (optional)
 
---embl
-    default: ""
-    Reference annotation (optional)
+-- depth
+    default: 8
+    Minimum number of reads matching SNP (optional)
 
---output
-    default: " "
-    Output file prefix (optional)
+-- stranddepth
+    default: 3
+    Minimum number of reads matching SNP per strand (optional)
 
---diroutput
-    default: ""
-    Output directory suffix (optional)
+-- ratio
+    default: 0.8
+    SNP/Mapping quality ratio cutoff (optional)
 
---force
-    default: false
-    Force overwrite of output files (optional)
+-- raxml
+    default: false
+    Run phylogeny with RAxML (optional)
 
---filter
-    default: 1
-    Filter or split bam file (optional)
+-- model
+    default: GTRGAMMA
+    Model for RAxML: GTRCAT|GTRMIX|GTRGAMMA (optional)
 
---tabfile
-    default: false
-    Create tabfile of snps (optional)
+-- bootstrap
+    default: 100
+    Number of bootstrap replicates for RAxML, 0=No bootstrap (optional)
 
---alnfile
-    default: false
-    Create snp alignment file (optional)
+-- tabfile
+    default: false
+    Create tabfile of snps (optional)
 
---raxml
-    default: false
-    Run phylogeny with RAxML (optional)
+-- alnfile
+    default: false
+    Create snp alignment file (optional)
 
---model
-    default: "GTRGAMMA"
-    Model for RAxML: GTRCAT|GTRMIX|GTRGAMMA
+Job submission and workflow options
 
---bootstrap
-    default: 100
-    Number of bootstrap replicates (optional)
+-- LSF
+    default: true
+    Use LSF to parallelise analyses (optional)
 
---keep
-    default: false
-    If old mapping files are present, do not rerun them (optional)
+-- LSFQ
+    default: "normal"
+    LSF queue to submit to (optional)
 
---LSF
-    default: true
-    Use LSF to parallelise analyses (optional)
+-- mem
+    default: 5
+    Amount of memory required for analysis (Gb) (optional)
 
---LSFQ
-    default: "normal"
-    LSF queue to submit to (optional)
+-- nodes
+    default: 20
+    Maximum number of jobs to run on nodes in parallel (optional)
 
---mem
-    default: 5
-    Amount of memory required for analysis (Gb) (optional)
+-- force
+    default: false
+    Force overwrite of output files (optional)
 
---nodes
-    default: 20
-    Maximum number of jobs to run on nodes in parallel (optional)
-
---dirty
-    default: false
-    Do not clean up temporary files (optional)
-
+-- dirty
+    default: false
+    Do not clean up temporary files (optional)
 ```
 
 ## Support
