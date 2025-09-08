@@ -45,8 +45,6 @@ include { PSEUDOSEQUENCE_GENERATION } from './sub-workflows/PSEUDOSEQUENCE_GENER
 
 workflow {
 
-
-    workflow {
     if (params.help) {
         printHelp()
         exit 0
