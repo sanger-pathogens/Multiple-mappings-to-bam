@@ -1,14 +1,187 @@
 {
-  "pipeline": "Base schema",
+  "pipeline": "multiple-mappings-to-bam",
   "params": {
-    "Logging options": {
-      "monochrome_logs": {
-        "default": "false",
-        "help_text": "Should logs appear in plain ASCII"
+    "Input/output options": {
+      "read_dir": {
+        "default": null,
+        "help_text": "Absolute path to a directory containing reads (mandatory)"
+      },
+      "ref": {
+        "default": null,
+        "help_text": "Absolute path to a directory containing reference DNA sequence (mandatory)"
+      },
+      "embl": {
+        "default": "",
+        "help_text": "Reference annotation"
+      },
+      "outdir": {
+        "default": "./results",
+        "help_text": "Output directory"
+      },
+      "diroutput": {
+        "default": "",
+        "help_text": "Output directory suffix"
+      },
+      "output": {
+        "default": " ",
+        "help_text": "Output file prefix"
+      }
+    },
+    "Mapping options": {
+      "program": {
+        "default": "BWA",
+        "help_text": "Mapping program you wish to include: BWA|SSAHA|SMALT"
+      },
+      "domapping": {
+        "default": true,
+        "help_text": "Do not remap data"
+      },
+      "human": {
+        "default": false,
+        "help_text": "Optimise SMALT for mapping against human genome"
+      },
+      "pairedend": {
+        "default": true,
+        "help_text": "Set to false for single-end reads"
+      },
+      "maxinsertsize": {
+        "default": 1000,
+        "help_text": "Maximum insert size for paired-end reads (SMALT/SSAHA only)"
+      },
+      "mininsertsize": {
+        "default": 50,
+        "help_text": "Minimum insert size for paired-end reads (SMALT/SSAHA only)"
+      },
+      "ssahaquality": {
+        "default": 30,
+        "help_text": "Minimum Phred base quality score (SSAHA only)"
+      },
+      "circular": {
+        "default": true,
+        "help_text": "Contigs are circular (SSAHA only)"
+      },
+      "maprepeats": {
+        "default": false,
+        "help_text": "Map all reads, including repeats (even ambiguous mappings). Default is false to exclude multi-mapping reads. (SMALT only)"
+      },
+      "nomapid": {
+        "default": 0,
+        "help_text": "Minimum identity threshold, as a float, for mapping to be reported (SMALT only)"
+      },
+      "GATK": {
+        "default": false,
+        "help_text": "Run GATK indel realignment (optional)"
+      },
+      "markdup": {
+        "default": false,
+        "help_text": "Mark duplicates with Picard (optional)"
+      },
+      "detectOverlaps": {
+        "default": false,
+        "help_text": "Enable read-pair overlap detection (optional)"
+      },
+      "filter": {
+        "default": 1,
+        "help_text": "Filtering mode for bam file (1=No filter, 2=remove unmapped, 3=properly paired only, 4=split mapped/unmapped, 5=split properly paired/unpaired)"
+      }
+    },
+    "Variant calling options": {
+      "call": {
+        "default": "c",
+        "help_text": "bcftools caller (c=consensus, m=multiallelic)"
+      },
+      "prior": {
+        "default": 0.001,
+        "help_text": "Sets the prior probability that a site is non-reference for variant calling, higher values increase sensitivity to rare variants (optional)"
+      },
+      "BAQ": {
+        "default": false,
+        "help_text": "Use samtools base alignment quality option (BAQ) (optional)"
+      },
+      "dontuseanomolous": {
+        "default": false,
+        "help_text": "Use anomalous reads in mpileup (optional)"
+      }
+    },
+    "Pseudosequence options": {
+      "pseudosequence": {
+        "default": true,
+        "help_text": "Create pseudosequences (optional)"
+      },
+      "incref": {
+        "default": true,
+        "help_text": "Include reference in pseudosequence alignment (optional)"
+      },
+      "indels": {
+        "default": true,
+        "help_text": "Include small indels in pseudosequence alignment (optional)"
+      },
+      "quality": {
+        "default": 50,
+        "help_text": "Minimum base call quality (optional)"
+      },
+      "mapq": {
+        "default": 20,
+        "help_text": "Minimum mapping quality (optional)"
+      },
+      "depth": {
+        "default": 8,
+        "help_text": "Minimum number of reads matching SNP (optional)"
+      },
+      "stranddepth": {
+        "default": 3,
+        "help_text": "Minimum number of reads matching SNP per strand (optional)"
+      },
+      "ratio": {
+        "default": 0.8,
+        "help_text": "SNP/Mapping quality ratio cutoff (optional)"
+      },
+      "raxml": {
+        "default": false,
+        "help_text": "Run phylogeny with RAxML (optional)"
+      },
+      "model": {
+        "default": "GTRGAMMA",
+        "help_text": "Model for RAxML: GTRCAT|GTRMIX|GTRGAMMA (optional)"
+      },
+      "bootstrap": {
+        "default": 100,
+        "help_text": "Number of bootstrap replicates for RAxML, 0=No bootstrap (optional)"
+      },
+      "tabfile": {
+        "default": false,
+        "help_text": "Create tabfile of snps (optional)"
+      },
+      "alnfile": {
+        "default": false,
+        "help_text": "Create snp alignment file (optional)"
+      }
+    },
+    "Job submission and workflow options": {
+      "LSF": {
+        "default": true,
+        "help_text": "Use LSF to parallelise analyses (optional)"
+      },
+      "LSFQ": {
+        "default": "normal",
+        "help_text": "LSF queue to submit to (optional)"
+      },
+      "mem": {
+        "default": 5,
+        "help_text": "Amount of memory required for analysis (Gb) (optional)"
+      },
+      "nodes": {
+        "default": 20,
+        "help_text": "Maximum number of jobs to run on nodes in parallel (optional)"
+      },
+      "force": {
+        "default": false,
+        "help_text": "Force overwrite of output files (optional)"
+      },
+      "dirty": {
+        "default": false,
+        "help_text": "Do not clean up temporary files (optional)"
       }
     }
-  },
-  "overwrite_param": {
-    "none": {}
   }
 }
