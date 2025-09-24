@@ -73,7 +73,7 @@
         "help_text": "Run GATK indel realignment (optional)"
       },
       "markdup": {
-        "default": false,
+        "default": true,
         "help_text": "Mark duplicates with Picard (optional)"
       },
       "detectOverlaps": {

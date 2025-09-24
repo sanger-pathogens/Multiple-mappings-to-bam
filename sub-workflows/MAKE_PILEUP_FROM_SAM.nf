@@ -21,7 +21,7 @@ workflow MAKE_PILEUP_FROM_SAM {
 
     main:
 
-    if (!params.markdup) {
+    if (params.markdup) {
         SAMTOOLS_SORT1(mapped_sam_ch)
         | MARK_DUPLICATES
 
