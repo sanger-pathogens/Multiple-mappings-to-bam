@@ -136,7 +136,7 @@ process SAMTOOLS_PILEUP {
     script:
     def dontuseanomolous = params.dontuseanomolous ? '' : ' -A '
     def BAQ = (params.BAQ == false) ? '' : ' -B '
-    def overlaps = params.detectOverlaps ? params.detectOverlaps : '-x'
+    def overlaps = params.detectOverlaps ? '' : '-x'
 
     def samtools_opts = "-t DP,DP4 -C 50 -L 1000 -d 1000 -m ${params.depth} ${dontuseanomolous} ${BAQ} ${overlaps} -ugf ${ref} ${bam}"
     """
