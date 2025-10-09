@@ -46,7 +46,7 @@ workflow MAKE_PILEUP_FROM_SAM {
     | SAMTOOLS_INDEX1
     | set { sam_ref_ch }
 
-    if (!params.GATK) {
+    if (params.GATK) {
         INDEX_REF(params.ref)
         | SEQUENCE_DICT
 
