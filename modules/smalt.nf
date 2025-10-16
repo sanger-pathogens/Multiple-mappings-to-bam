@@ -41,7 +41,7 @@ process RUN_SMALT {
     container 'quay.io/ssd28/gsoc-experimental/run-smalt:0.0.2'
     
     input:
-    tuple val(meta), path(name_1_fastq), path(name_2_fastq),
+    tuple val(meta), path(name_1_fastq), path(name_2_fastq)
     tuple path(ref), path(smalt_indexes)
 
     output:
@@ -99,7 +99,7 @@ process RUN_SMALT {
         fi
 
         if [ "${newsmalt}" = "false" ]; then
-            samtools view -b -S tmp1.sam -t ${ref_fai} > tmp1.bam
+            samtools view -b -S tmp1.sam -t ${smalt_indexes} > tmp1.bam
             rm tmp1.sam
         fi
     else
@@ -109,6 +109,8 @@ process RUN_SMALT {
 }
 
 process SMALT_INDEX {
+    tag "${meta.ID}"
+
     label "cpu_1"
     label "mem_16"
     label "time_1"
@@ -116,7 +118,7 @@ process SMALT_INDEX {
     container 'quay.io/ssd28/gsoc-experimental/run-smalt:0.0.2'
 
     input:
-    path(ref)
+    tuple val(meta), path(ref)
 
     output:
     tuple path(ref), path("${ref}.*")

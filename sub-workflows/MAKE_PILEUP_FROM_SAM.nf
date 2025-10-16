@@ -21,6 +21,9 @@ workflow MAKE_PILEUP_FROM_SAM {
 
     main:
 
+    // Filepath ref is a string, convert to file object
+    ref = file(params.ref)
+
     if (!params.markdup) {
         SAMTOOLS_SORT1(mapped_sam_ch)
         | MARK_DUPLICATES
@@ -47,7 +50,7 @@ workflow MAKE_PILEUP_FROM_SAM {
     | set { sam_ref_ch }
 
     if (!params.GATK) {
-        INDEX_REF(params.ref)
+        INDEX_REF(ref)
         | SEQUENCE_DICT
 
         INDEL_REALIGNMENT(sam_ref_ch, SEQUENCE_DICT.out.ref_ch)
@@ -62,8 +65,12 @@ workflow MAKE_PILEUP_FROM_SAM {
 
     FILTER_BAM(sorted_indel_ch)
 
+    // combine() takes a channel as input, so coaxing ref (UnixPath)
+    // into a channel
+    ref_ch = Channel.value(ref)
+
     SAMTOOLS_INDEX2(FILTER_BAM.out.bam_ch)
-    | combine(ref)
+    | combine(ref_ch)
     | SAMTOOLS_PILEUP
     | BCFTOOLS_CALL
 

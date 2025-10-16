@@ -6,7 +6,7 @@ This project is part of the Google Summer of Code 2024 program. It provides a Ne
 
 ## Features
 
-- Supports multiple mapping programs (e.g., BWA, SMALT, SSAHA)
+- Supports multiple mapping programs -- full support for BWA, support for SMALT and SSAHA still under development
 - Handles paired-end and single-end reads
 - Quality filtering and duplicate marking
 - Generates pseudosequences

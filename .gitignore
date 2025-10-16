@@ -5,3 +5,4 @@ work
 .idea/
 .vscode/
 test_cases/
+*.py[cod]
