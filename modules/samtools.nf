@@ -63,11 +63,11 @@ process SAMTOOLS_SORT {
     tuple val(meta), path(bam)
 
     output:
-    tuple val(meta), path("${meta.ID}.bam")
+    tuple val(meta), path("${meta.ID}_sorted.bam")
 
     script:
     """
-    samtools sort -T ${meta.ID}.tmp ${bam} -o ${meta.ID}.bam
+    samtools sort -T ${meta.ID}.tmp ${bam} -o ${meta.ID}_sorted.bam
     """
 }
 
@@ -128,7 +128,7 @@ process SAMTOOLS_PILEUP {
     container 'quay.io/ssd28/gsoc-experimental/samtools:1.3'
 
     input:
-    tuple val(meta), path(bam), path(bam_bai), path(ref), path(bwa_indexes)
+    tuple val(meta), path(bam), path(bam_bai), path(ref)
 
     output:
     tuple val(meta), path(bam), path("${meta.ID}.mpileup")

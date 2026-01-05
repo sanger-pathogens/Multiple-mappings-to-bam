@@ -41,7 +41,7 @@ process RUN_SMALT {
     container 'quay.io/ssd28/gsoc-experimental/run-smalt:0.0.2'
     
     input:
-    tuple val(meta), path(name_1_fastq), path(name_2_fastq),
+    tuple val(meta), path(name_1_fastq), path(name_2_fastq)
     tuple path(ref), path(smalt_indexes)
 
     output:

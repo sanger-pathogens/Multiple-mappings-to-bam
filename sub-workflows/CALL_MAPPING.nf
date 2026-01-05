@@ -16,6 +16,7 @@ workflow CALL_MAPPING {
 
     switch (params.program.toUpperCase()) {
         case "BWA":
+        
             BWA_INDEX(ref)
             | set { ref_plus_index }
 
@@ -25,13 +26,19 @@ workflow CALL_MAPPING {
             break
 
         case "SMALT":
-            (index_ch, fai) = SMALT_INDEX(ref)
+            SMALT_INDEX(ref)
+            | set { ref_plus_index }
 
-            mapped_ch = RUN_SMALT(reads_and_ref_ch)
+            RUN_SMALT(unzipped_reads, ref_plus_index)
+            | set { mapped_ch }
+
             break
 
         case "SSAHA":
-            mapped_ch = RUN_SSAHA(reads_and_ref_ch)
+            reads_and_ref_ch = unzipped_reads.combine(ref).combine(index_ch)
+
+            RUN_SSAHA(reads_and_ref_ch)
+            | set { mapped_ch }
 
             break
 
@@ -41,5 +48,5 @@ workflow CALL_MAPPING {
 
     emit:
     mapped_ch
-    ref_plus_index
+    ref
 }

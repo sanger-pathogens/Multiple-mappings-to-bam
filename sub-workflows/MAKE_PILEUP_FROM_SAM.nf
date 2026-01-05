@@ -47,7 +47,7 @@ workflow MAKE_PILEUP_FROM_SAM {
     | set { sam_ref_ch }
 
     if (!params.GATK) {
-        INDEX_REF(params.ref)
+        INDEX_REF(ref)
         | SEQUENCE_DICT
 
         INDEL_REALIGNMENT(sam_ref_ch, SEQUENCE_DICT.out.ref_ch)
