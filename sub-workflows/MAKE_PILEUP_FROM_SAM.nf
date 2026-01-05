@@ -21,12 +21,13 @@ workflow MAKE_PILEUP_FROM_SAM {
 
     main:
 
-    if (!params.markdup) {
+    if (params.markdup) {
         SAMTOOLS_SORT1(mapped_sam_ch)
         | MARK_DUPLICATES
 
         MARK_DUPLICATES.out.deduped_ch
         | set { deduped_ch }
+
     } else {
         mapped_sam_ch.set{ deduped_ch }
     }
@@ -46,7 +47,7 @@ workflow MAKE_PILEUP_FROM_SAM {
     | SAMTOOLS_INDEX1
     | set { sam_ref_ch }
 
-    if (!params.GATK) {
+    if (params.GATK) {
         INDEX_REF(ref)
         | SEQUENCE_DICT
 

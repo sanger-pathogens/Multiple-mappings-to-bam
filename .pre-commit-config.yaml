@@ -4,7 +4,7 @@ default_language_version:
 # versions of the modules and options should match those used in CI
 repos:
   - repo: https://github.com/thoughtworks/talisman
-    rev: "v1.32.0"
+    rev: "v1.37.0"
     hooks:
       - id: talisman-commit
         name: "Talisman (secrets detection)"
@@ -38,12 +38,12 @@ repos:
   #       name: "Flake8 (Python linting)"
   #       args:
   #         - --max-line-length=120
-  - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v3.1.0
-    hooks:
-      - id: prettier
-        name: "Prettier (Formatter for Javascript, HTML, CSS, JSON, YAML, Markdown etc.)"
-        args: ["--no-config", "--ignore-path", ".eslintignore", "--write"]
-        additional_dependencies:
-          - prettier@3.1.0
-          - prettier-plugin-svelte@3.2.3
+  #- repo: https://github.com/pre-commit/mirrors-prettier
+  #  rev: v3.1.0
+  #  hooks:
+  #    - id: prettier
+  #      name: "Prettier (Formatter for Javascript, HTML, CSS, JSON, YAML, Markdown etc.)"
+  #      args: ["--no-config", "--ignore-path", ".eslintignore", "--write"]
+  #      additional_dependencies:
+  #        - prettier@3.1.0
+  #        - prettier-plugin-svelte@3.2.3

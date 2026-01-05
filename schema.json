@@ -69,11 +69,11 @@
         "help_text": "Minimum identity threshold, as a float, for mapping to be reported (SMALT only)"
       },
       "GATK": {
-        "default": false,
+        "default": true,
         "help_text": "Run GATK indel realignment (optional)"
       },
       "markdup": {
-        "default": false,
+        "default": true,
         "help_text": "Mark duplicates with Picard (optional)"
       },
       "detectOverlaps": {

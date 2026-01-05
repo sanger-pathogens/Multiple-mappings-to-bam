@@ -151,11 +151,11 @@ Mapping options
     Minimum identity threshold, as a float, for mapping to be reported (SMALT only)
 
 -- GATK
-    default: false
+    default: true
     Run GATK indel realignment (optional)
 
 -- markdup
-    default: false
+    default: true
     Mark duplicates with Picard (optional)
 
 -- detectOverlaps
