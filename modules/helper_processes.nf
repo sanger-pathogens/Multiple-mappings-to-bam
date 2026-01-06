@@ -27,7 +27,7 @@ process UN_BAM {
     label "mem_100M"
     label "time_1"
 
-    container 'quay.io/ssd28/gsoc-experimental/bam_filter:0.0.2'
+    container 'quay.io/ssd28/gsoc-experimental/bam_filter:0.0.3'
     
     publishDir "${params.outdir}", mode: 'copy'
 

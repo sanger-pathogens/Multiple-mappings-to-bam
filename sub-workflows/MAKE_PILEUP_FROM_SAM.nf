@@ -9,6 +9,7 @@ include { INDEX_REF
           SAMTOOLS_PILEUP                               } from '../modules/samtools.nf'
 include { FORMAT_SMALT_HEADER                           } from '../modules/smalt.nf'
 include { FORMAT_BWA_HEADER                             } from '../modules/bwa.nf'
+include { FORMAT_SSAHA_HEADER                           } from '../modules/ssaha.nf'
 include { INDEL_REALIGNMENT                             } from '../modules/gatk_indel_realignment.nf'
 include { FILTER_BAM                                    } from '../modules/filter_bam.nf'
 include { BCFTOOLS_CALL                                 } from '../modules/bcftools.nf'
@@ -45,6 +46,11 @@ workflow MAKE_PILEUP_FROM_SAM {
     } else if (params.program == "BWA") {
 
         FORMAT_BWA_HEADER(SAMTOOLS_SORT_BAM_AND_MAKE_HEADER.out.header_ch)
+        | set { formatted_header_ch }
+
+    } else if (params.program == "SSAHA") {
+
+        FORMAT_SSAHA_HEADER(SAMTOOLS_SORT_BAM_AND_MAKE_HEADER.out.header_ch)
         | set { formatted_header_ch }
 
     }
