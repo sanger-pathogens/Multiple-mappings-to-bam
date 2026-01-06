@@ -12,8 +12,8 @@ RUN sed -i 's|deb.debian.org|archive.debian.org|g' /etc/apt/sources.list && \
         muscle &&
     apt-get clean
 
-RUN pip install --upgrade pip
-RUN pip install --no-cache-dir \
+RUN pip install --upgrade pip && \
+  pip install --no-cache-dir \
     numpy \
     biopython==1.68 \
     pysam==0.12.0.1
