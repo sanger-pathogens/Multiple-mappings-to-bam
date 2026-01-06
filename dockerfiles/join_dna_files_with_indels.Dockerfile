@@ -9,7 +9,8 @@ RUN sed -i 's|deb.debian.org|archive.debian.org|g' /etc/apt/sources.list && \
         libbz2-dev \
         liblzma-dev \
         procps \
-        muscle
+        muscle &&
+    apt-get clean
 
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir \
