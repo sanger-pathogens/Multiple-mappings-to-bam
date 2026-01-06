@@ -1,8 +1,9 @@
 include { UNZIP_GZ
-          UN_BAM                 } from './../modules/helper_processes.nf'
-include { BWA_INDEX; RUN_BWA     } from './../modules/bwa.nf'
-include { SMALT_INDEX; RUN_SMALT } from './../modules/smalt.nf'
-include { RUN_SSAHA              } from './../modules/ssaha.nf'
+          UN_BAM                 } from '../modules/helper_processes.nf'
+include { BWA_INDEX; RUN_BWA     } from '../modules/bwa.nf'
+include { SMALT_INDEX; RUN_SMALT } from '../modules/smalt.nf'
+include { SAMTOOLS_FIX_SMALT     } from '../modules/samtools.nf'
+include { RUN_SSAHA              } from '../modules/ssaha.nf'
 
 workflow CALL_MAPPING {
     take:
@@ -29,6 +30,7 @@ workflow CALL_MAPPING {
             | set { ref_plus_index }
 
             RUN_SMALT(unzipped_reads, ref_plus_index)
+            | SAMTOOLS_FIX_SMALT
             | set { mapped_ch }
 
             break

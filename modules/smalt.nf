@@ -36,13 +36,13 @@ process RUN_SMALT {
     
     input:
     tuple val(meta), path(name_1_fastq), path(name_2_fastq)
-    tuple path(ref), path(ref_sma), path(ref_smi)
+    tuple path(ref), path(ref_sma), path(ref_smi), path(ref_fai)
 
     output:
-    tuple val(meta), path(final_name), emit: mapped_reads
+    tuple val(meta), path(final_name), path(ref_fai), emit: mapped_reads
 
     script:
-    final_name = "${meta.ID}_mapped.bam"
+    final_name = "${meta.ID}_mapped.sam"
 
     allow_multimapping = params.allow_multimapping ? '-r 0' : '-r -1'
 
@@ -52,7 +52,7 @@ process RUN_SMALT {
         ${allow_multimapping} \\
         -i ${params.maxinsertsize} \\
         -j ${params.mininsertsize} \\
-        -f bam \\
+        -f samsoft \\
         -o ${final_name} \\
         ${ref_sma.baseName} \\
         ${name_1_fastq} \\
@@ -71,7 +71,7 @@ process SMALT_INDEX {
     path(ref)
 
     output:
-    tuple path(ref), path("${ref.baseName}_index.sma"), path("${ref.baseName}_index.smi")
+    tuple path(ref), path("${ref.baseName}_index.sma"), path("${ref.baseName}_index.smi"), path("${ref}.fai")
 
     script:
     """
@@ -80,5 +80,6 @@ process SMALT_INDEX {
     else 
         smalt index -k 13 -s 1 ${ref.baseName}_index ${ref}
     fi
+    samtools faidx ${ref}
     """
 }
