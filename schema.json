@@ -60,7 +60,7 @@
         "default": true,
         "help_text": "Contigs are circular (SSAHA only)"
       },
-      "maprepeats": {
+      "allow_multimapping": {
         "default": false,
         "help_text": "Map all reads, including repeats (even ambiguous mappings). Default is false to exclude multi-mapping reads. (SMALT only)"
       },
