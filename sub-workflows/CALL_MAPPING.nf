@@ -1,8 +1,9 @@
 include { UNZIP_GZ
-          UN_BAM                 } from './../modules/helper_processes.nf'
-include { BWA_INDEX; RUN_BWA     } from './../modules/bwa.nf'
-include { SMALT_INDEX; RUN_SMALT } from './../modules/smalt.nf'
-include { RUN_SSAHA              } from './../modules/ssaha.nf'
+          UN_BAM                 } from '../modules/helper_processes.nf'
+include { BWA_INDEX; RUN_BWA     } from '../modules/bwa.nf'
+include { SMALT_INDEX; RUN_SMALT } from '../modules/smalt.nf'
+include { SAMTOOLS_FIX_SMALT     } from '../modules/samtools.nf'
+include { RUN_SSAHA              } from '../modules/ssaha.nf'
 
 workflow CALL_MAPPING {
     take:
@@ -13,9 +14,9 @@ workflow CALL_MAPPING {
     UNZIP_GZ(read_ch)
     | set { unzipped_reads }
 
-
     switch (params.program.toUpperCase()) {
         case "BWA":
+        
             BWA_INDEX(ref)
             | set { ref_plus_index }
 
@@ -25,13 +26,20 @@ workflow CALL_MAPPING {
             break
 
         case "SMALT":
-            (index_ch, fai) = SMALT_INDEX(ref)
+            SMALT_INDEX(ref)
+            | set { ref_plus_index }
 
-            mapped_ch = RUN_SMALT(reads_and_ref_ch)
+            RUN_SMALT(unzipped_reads, ref_plus_index)
+            | SAMTOOLS_FIX_SMALT
+            | set { mapped_ch }
+
             break
 
         case "SSAHA":
-            mapped_ch = RUN_SSAHA(reads_and_ref_ch)
+            reads_and_ref_ch = unzipped_reads.combine(ref).combine(index_ch)
+
+            RUN_SSAHA(reads_and_ref_ch)
+            | set { mapped_ch }
 
             break
 
@@ -41,5 +49,5 @@ workflow CALL_MAPPING {
 
     emit:
     mapped_ch
-    ref_plus_index
+    ref
 }
