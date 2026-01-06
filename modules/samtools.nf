@@ -123,6 +123,8 @@ process SAMTOOLS_FIX_SMALT {
     label "mem_1"
     label "time_1"
 
+    publishDir "${params.outdir}", mode: 'copy', overwrite: true
+
     container 'quay.io/ssd28/gsoc-experimental/samtools:1.3'
 
     input:

@@ -30,8 +30,6 @@ process RUN_SMALT {
     label "mem_16"
     label "time_1"
 
-    publishDir "${params.outdir}", mode: 'copy', overwrite: true
-
     container 'quay.io/ssd28/gsoc-experimental/run-smalt:0.0.2'
     
     input:
