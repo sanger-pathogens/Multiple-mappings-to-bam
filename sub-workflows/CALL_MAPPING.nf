@@ -13,7 +13,6 @@ workflow CALL_MAPPING {
     UNZIP_GZ(read_ch)
     | set { unzipped_reads }
 
-
     switch (params.program.toUpperCase()) {
         case "BWA":
         

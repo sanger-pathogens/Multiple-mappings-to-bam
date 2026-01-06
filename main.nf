@@ -26,9 +26,6 @@ def printHelp() {
 ========================================================================================
 */
 
-//FUNCTIONS
-include { log_commandline           } from './modules/helper_functions.nf'
-
 //MODULES
 include { CONCAT_REFERENCE          } from './modules/concat_reference.nf'
 
@@ -49,8 +46,6 @@ workflow {
         printHelp()
         exit 0
     }
-
-    log_commandline()
 
     if (!params.read_dir) {
         exit 1, 'Error: Please provide a read directory using --read_dir'
