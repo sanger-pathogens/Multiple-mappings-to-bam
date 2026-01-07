@@ -36,7 +36,7 @@ process RUN_SSAHA {
     tuple path(ref), path(ref_fai)
 
     output:
-    tuple val(meta),  path("${final_name}"), path(ref_fai), emit: mapped_reads
+    tuple val(meta),  path(final_name), path(ref_fai), emit: mapped_reads
 
     script:
     final_name = "${meta.ID}_mapped.sam"
