@@ -16,15 +16,9 @@ process FORMAT_SMALT_HEADER {
     tuple val(meta), path(header)
 
     script:
-    newsmalt = "true"
     """
     now=\$(date +'%Y-%m-%dT%H:%M:%S')
-    echo "@RG\tID:${meta.ID}\tCN:Sanger\tDT:"\$now"\tPG:SMALT\tPL:ILLUMINA\tSM:${meta.ID}" >> ${tmphead_sam}
-    if [ ${params.domapping} ] && [ ${newsmalt} = "false" ]
-    then
-        smaltversion=\$( smalt version | grep Version | awk '{print \$2}' )
-        echo "@PG\tID:SMALT\tPN:SMALT\tCL:${cmdline}\tVN:\$smaltversion" >> ${tmphead_sam}
-    fi
+    echo "@RG\tID:${meta.ID}\tCN:Sanger\tDT:"\$now"\tPG:SMALT\tPL:ILLUMINA\tSM:${meta.ID}" >> ${header}
     """
 }
 
@@ -36,75 +30,31 @@ process RUN_SMALT {
     label "mem_16"
     label "time_1"
 
-    publishDir "${params.outdir}", mode: 'copy', overwrite: true
-
     container 'quay.io/ssd28/gsoc-experimental/run-smalt:0.0.2'
     
     input:
-    tuple val(meta), path(name_1_fastq), path(name_2_fastq),
-    tuple path(ref), path(smalt_indexes)
+    tuple val(meta), path(name_1_fastq), path(name_2_fastq)
+    tuple path(ref), path(ref_sma), path(ref_smi), path(ref_fai)
 
     output:
-    tuple val(meta), path(name_1_fastq), path(name_2_fastq), path("tmp1.bam"), env(cmdline)
-
+    tuple val(meta), path(final_name), path(ref_fai), emit: mapped_reads
 
     script:
-    newsmalt = true
-    domapping = meta.domapping
-    pairedend = meta.pairedend
-    fastqdir = meta.fastqdir
-    bam = meta.bam
+    final_name = "${meta.ID}_mapped.sam"
+
+    allow_multimapping = params.allow_multimapping ? '-r 0' : '-r -1'
+
     """
-    smaltoutput="bam"
-    smaltoutputsuffix="bam"
-    rbit=""
-    cmdline=""
-
-    if [ "${domapping}" = "true" ]; then
-
-        if [ "${newsmalt}" = "true" ]; then
-            smaltoutput="bam"
-            smaltoutputsuffix="bam"
-        else
-            smaltoutput="samsoft"
-            smaltoutputsuffix="sam"
-        fi
-
-        if [ "${pairedend}" = "true" ]; then
-            if [ "${params.maprepeats}" = "true" ]; then
-                smalt map -y ${params.nomapid} -x -r 0 -i ${params.maxinsertsize} -j ${params.mininsertsize} -f \$smaltoutput -o tmp1.\$smaltoutputsuffix ${meta.ID}_tmp.index ${name_1_fastq} ${name_2_fastq}
-                cmdline="map -y ${params.nomapid} -x -r 0 -i ${params.maxinsertsize} -j ${params.mininsertsize} -f \$smaltoutput -o tmp1.\$smaltoutputsuffix ${meta.ID}_tmp.index ${fastqdir}${meta.ID}_1.fastq ${fastqdir}${meta.ID}_2.fastq"
-            else
-                if [ "${newsmalt}" = "true" ]; then
-                    rbit=" -r -1"
-                else
-                    rbit=""
-                fi
-                smalt map -y ${params.nomapid}\$rbit -x -i ${params.maxinsertsize} -j ${params.mininsertsize} -f \$smaltoutput -o tmp1.\$smaltoutputsuffix ${meta.ID}_tmp.index ${name_1_fastq} ${name_2_fastq}
-                cmdline="map -y ${params.nomapid}\$rbit -x -i ${params.maxinsertsize} -j ${params.mininsertsize} -f \$smaltoutput -o tmp1.\$smaltoutputsuffix ${meta.ID}_tmp.index ${fastqdir}${meta.ID}_1.fastq ${fastqdir}${meta.ID}_2.fastq"
-            fi
-        else
-            if [ "${params.maprepeats}" = "true" ]; then
-                smalt map -y ${params.nomapid} -x -r 0 -f \$smaltoutput -o tmp1.\$smaltoutputsuffix ${meta.ID}_tmp.index ${name_1_fastq}
-                cmdline="map -y ${params.nomapid} -x -r 0 -f \$smaltoutput -o tmp1.\$smaltoutputsuffix ${meta.ID}_tmp.index ${fastqdir}${meta.ID}.fastq"
-            else
-                if [ "${newsmalt}" = "true" ]; then
-                    \$rbit=" -r -1"
-                else
-                    \$rbit=""
-                fi
-                smalt map -y ${params.nomapid}\$rbit -x -f \$smaltoutput -o tmp1.\$smaltoutputsuffix ${meta.ID}_tmp.index ${name_1_fastq}
-                cmdline="map -y ${params.nomapid}\$rbit -x -f \$smaltoutput -o tmp1.\$smaltoutputsuffix ${meta.ID}_tmp.index ${fastqdir}${meta.ID}.fastq"
-            fi
-        fi
-
-        if [ "${newsmalt}" = "false" ]; then
-            samtools view -b -S tmp1.sam -t ${ref_fai} > tmp1.bam
-            rm tmp1.sam
-        fi
-    else
-        cp ${bam} tmp1.bam
-    fi
+    smalt map -y ${params.nomapid} \\
+        -x \\
+        ${allow_multimapping} \\
+        -i ${params.maxinsertsize} \\
+        -j ${params.mininsertsize} \\
+        -f samsoft \\
+        -o ${final_name} \\
+        ${ref_sma.baseName} \\
+        ${name_1_fastq} \\
+        ${name_2_fastq}
     """
 }
 
@@ -119,14 +69,14 @@ process SMALT_INDEX {
     path(ref)
 
     output:
-    tuple path(ref), path("${ref}.*")
+    tuple path(ref), path("${ref.baseName}_index.sma"), path("${ref.baseName}_index.smi"), path("${ref}.fai")
 
     script:
     """
     if [ "${params.human}" == "True" ]; then
-        smalt index -k 20 -s 13 ${meta.ID}_tmp.index ${ref}
+        smalt index -k 20 -s 13 ${ref.baseName}_index ${ref}
     else 
-        smalt index -k 13 -s 1 ${meta.ID}_tmp.index ${ref}
+        smalt index -k 13 -s 1 ${ref.baseName}_index ${ref}
     fi
     samtools faidx ${ref}
     """

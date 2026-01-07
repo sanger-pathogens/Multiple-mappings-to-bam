@@ -63,11 +63,11 @@ process SAMTOOLS_SORT {
     tuple val(meta), path(bam)
 
     output:
-    tuple val(meta), path("${meta.ID}.bam")
+    tuple val(meta), path("${meta.ID}_sorted.bam")
 
     script:
     """
-    samtools sort -T ${meta.ID}.tmp ${bam} -o ${meta.ID}.bam
+    samtools sort -T ${meta.ID}.tmp ${bam} -o ${meta.ID}_sorted.bam
     """
 }
 
@@ -116,6 +116,30 @@ process SAMTOOLS_MERGE {
     """
 }
 
+process SAMTOOLS_FIX_SMALT {
+    tag "${meta.ID}"
+
+    label "cpu_1"
+    label "mem_1"
+    label "time_1"
+
+    publishDir "${params.outdir}", mode: 'copy', overwrite: true
+
+    container 'quay.io/ssd28/gsoc-experimental/samtools:1.3'
+
+    input:
+    tuple val(meta), path(sam), path(ref_fai)
+
+    output:
+    tuple val(meta), path("${meta.ID}.bam")
+
+    script:
+    """
+    samtools view -b -S ${sam} -t ${ref_fai} > ${meta.ID}.bam
+    """
+
+}
+
 process SAMTOOLS_PILEUP {
     tag "${meta.ID}"
 
@@ -128,7 +152,7 @@ process SAMTOOLS_PILEUP {
     container 'quay.io/ssd28/gsoc-experimental/samtools:1.3'
 
     input:
-    tuple val(meta), path(bam), path(bam_bai), path(ref), path(bwa_indexes)
+    tuple val(meta), path(bam), path(bam_bai), path(ref)
 
     output:
     tuple val(meta), path(bam), path("${meta.ID}.mpileup")
@@ -136,7 +160,7 @@ process SAMTOOLS_PILEUP {
     script:
     def dontuseanomolous = params.dontuseanomolous ? '' : ' -A '
     def BAQ = (params.BAQ == false) ? '' : ' -B '
-    def overlaps = params.detectOverlaps ? params.detectOverlaps : '-x'
+    def overlaps = params.detectOverlaps ? '' : '-x'
 
     def samtools_opts = "-t DP,DP4 -C 50 -L 1000 -d 1000 -m ${params.depth} ${dontuseanomolous} ${BAQ} ${overlaps} -ugf ${ref} ${bam}"
     """

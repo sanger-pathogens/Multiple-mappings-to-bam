@@ -26,9 +26,6 @@ def printHelp() {
 ========================================================================================
 */
 
-//FUNCTIONS
-include { log_commandline           } from './modules/helper_functions.nf'
-
 //MODULES
 include { CONCAT_REFERENCE          } from './modules/concat_reference.nf'
 
@@ -50,8 +47,6 @@ workflow {
         exit 0
     }
 
-    log_commandline()
-
     if (!params.read_dir) {
         exit 1, 'Error: Please provide a read directory using --read_dir'
     }
@@ -63,13 +58,15 @@ workflow {
         [meta, reads[0], reads[1]]
     }
     | set { read_ch }
+
+    ref_ch = Channel.value(file(params.ref))
     
-    CALL_MAPPING(read_ch, params.ref)
+    CALL_MAPPING(read_ch, ref_ch)
     | MAKE_PILEUP_FROM_SAM
     | set { called_ch }
 
     if (params.pseudosequence == true) {
-        PSEUDOSEQUENCE_GENERATION(called_ch, params.ref)
+        PSEUDOSEQUENCE_GENERATION(called_ch, ref_ch)
     }
 
 }

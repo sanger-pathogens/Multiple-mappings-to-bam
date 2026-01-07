@@ -5,7 +5,7 @@ process JOIN_DNA_INDELS {
 
     publishDir "${params.outdir}", mode: 'copy', overwrite: true
 
-    container 'quay.io/ssd28/gsoc-experimental/join_dna_files_with_indels:0.0.2'
+    container 'quay.io/ssd28/gsoc-experimental/join_dna_files_with_indels:0.0.3'
 
     input:
     path(mfa_list)

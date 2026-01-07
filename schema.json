@@ -60,7 +60,7 @@
         "default": true,
         "help_text": "Contigs are circular (SSAHA only)"
       },
-      "maprepeats": {
+      "allow_multimapping": {
         "default": false,
         "help_text": "Map all reads, including repeats (even ambiguous mappings). Default is false to exclude multi-mapping reads. (SMALT only)"
       },
@@ -69,11 +69,11 @@
         "help_text": "Minimum identity threshold, as a float, for mapping to be reported (SMALT only)"
       },
       "GATK": {
-        "default": false,
+        "default": true,
         "help_text": "Run GATK indel realignment (optional)"
       },
       "markdup": {
-        "default": false,
+        "default": true,
         "help_text": "Mark duplicates with Picard (optional)"
       },
       "detectOverlaps": {

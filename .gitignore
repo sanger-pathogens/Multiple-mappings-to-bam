@@ -12,3 +12,5 @@ test*
 work/
 .vscode/
 test_cases/
+*.pyc
+__pycache__/
