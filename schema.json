@@ -8,7 +8,7 @@
       },
       "ref": {
         "default": null,
-        "help_text": "Absolute path to a directory containing reference DNA sequence (mandatory)"
+        "help_text": "Absolute path to a reference reference DNA sequence fasta (mandatory)"
       },
       "embl": {
         "default": "",
