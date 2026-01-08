@@ -1,3 +1,27 @@
+process FORMAT_SSAHA_HEADER {
+    tag "${meta.ID}"
+
+    label "cpu_1"
+    label "mem_16"
+    label "time_1"
+
+    container 'quay.io/ssd28/gsoc-experimental/void:0.0.1'
+
+    stageInMode = 'copy'
+
+    input:
+    tuple val(meta), path(header)
+
+    output:
+    tuple val(meta), path(header)
+
+    script:
+    """
+    now=\$(date +'%Y-%m-%dT%H:%M:%S')
+    echo "@RG\tID:${meta.ID}\tCN:Sanger\tDT:"\$now"\tPG:SSAHA\tPL:ILLUMINA\tSM:${meta.ID}" >> ${header}
+    """
+}
+
 process RUN_SSAHA {
     tag "${meta.ID}"
 
@@ -8,35 +32,37 @@ process RUN_SSAHA {
     container 'quay.io/sangerpathogens/ssaha2:v2.5.5_cv3'
 
     input:
-    tuple val(meta), path(name_1_fastq), path(name_2_fastq), path(ref), path(ref_fai)
+    tuple val(meta), path(name_1_fastq), path(name_2_fastq)
+    tuple path(ref), path(ref_fai)
 
     output:
-    tuple val(meta), path(name_1_fastq), path(name_2_fastq), path("tmp1.bam")
+    tuple val(meta),  path(final_name), path(ref_fai), emit: mapped_reads
 
     script:
-    runname = meta.runname
-    pairedend = meta.pairedend
-    cmdline=""
+    final_name = "${meta.ID}_mapped.sam"
+
     """
-    if [ "${pairedend}" = "false" ]; then
-        ssaha2 -score ${params.ssahaquality} -kmer 13 -skip 2 -seeds 2 -score 12 -cmatch 9 -ckmer 6 -diff 0 -output sam_soft -outfile tmp1.sam ${ref} ${name_fastq}
-    else
-        ssaha2 -score ${params.ssahaquality} -kmer 13 -skip 2 -seeds 2 -score 12 -cmatch 9 -ckmer 6 -diff 0 -outfile tmp1.sam -pair ${params.mininsertsize},${params.maxinsertsize} -output sam_soft ${ref} ${name_1_fastq} ${name_2_fastq}
-    fi
+    ssaha2 -score ${params.ssahaquality} -kmer 13 -skip 2 -seeds 2 -score 12 -cmatch 9 -ckmer 6 -diff 0 -outfile ${final_name} -pair ${params.mininsertsize},${params.maxinsertsize} -output sam_soft ${ref} ${name_1_fastq} ${name_2_fastq}
+    """
+}
 
-    samtools view -b -S tmp1.sam -t ${ref_fai} > tmp1.bam
+process FIX_CIRCULAR_BAMS {
+    tag "${meta.ID}"
 
-    if [ "${pairedend}" = "true" ] && [ "${params.circular}" = "true" ]; then
-        fix_circular_bams.py -b tmp1.bam -o tmp
-        rm tmp1.bam
-    else
-        mv tmp1.bam tmp.bam
-    fi
+    label "cpu_1"
+    label "mem_16"
+    label "time_1"
+    
+    container 'quay.io/ssd28/gsoc-experimental/bam_filter:0.0.3'
 
-    samtools view -H tmp.bam > tmp2.sam
-    cat tmp2.sam tmp1.sam > tmp.sam
-    samtools view -b -S tmp.sam -t ${ref_fai} > tmp1.bam
-    rm -f tmp.sam
-    rm tmp2.sam tmp1.sam
+    input:
+    tuple val(meta),  path(bam)
+
+    output:
+    tuple val(meta),  path("${meta.ID}_fixed.bam"), emit: mapped_reads
+
+    script:
+    """
+    fix_circular_bams.py -b ${bam} -o ${meta.ID}_fixed
     """
 }

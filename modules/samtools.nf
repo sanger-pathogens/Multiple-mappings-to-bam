@@ -116,7 +116,7 @@ process SAMTOOLS_MERGE {
     """
 }
 
-process SAMTOOLS_FIX_SMALT {
+process SAMTOOLS_SAM_TO_BAM {
     tag "${meta.ID}"
 
     label "cpu_1"
