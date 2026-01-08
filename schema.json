@@ -8,7 +8,7 @@
       },
       "ref": {
         "default": null,
-        "help_text": "Absolute path to a directory containing reference DNA sequence (mandatory)"
+        "help_text": "Absolute path to a reference reference DNA sequence fasta (mandatory)"
       },
       "embl": {
         "default": "",
@@ -17,14 +17,6 @@
       "outdir": {
         "default": "./results",
         "help_text": "Output directory"
-      },
-      "diroutput": {
-        "default": "",
-        "help_text": "Output directory suffix"
-      },
-      "output": {
-        "default": " ",
-        "help_text": "Output file prefix"
       }
     },
     "Mapping options": {
@@ -39,10 +31,6 @@
       "human": {
         "default": false,
         "help_text": "Optimise SMALT for mapping against human genome"
-      },
-      "pairedend": {
-        "default": true,
-        "help_text": "Set to false for single-end reads"
       },
       "maxinsertsize": {
         "default": 1000,
@@ -140,10 +128,6 @@
         "default": false,
         "help_text": "Run phylogeny with RAxML (optional)"
       },
-      "model": {
-        "default": "GTRGAMMA",
-        "help_text": "Model for RAxML: GTRCAT|GTRMIX|GTRGAMMA (optional)"
-      },
       "bootstrap": {
         "default": 100,
         "help_text": "Number of bootstrap replicates for RAxML, 0=No bootstrap (optional)"
@@ -155,32 +139,6 @@
       "alnfile": {
         "default": false,
         "help_text": "Create snp alignment file (optional)"
-      }
-    },
-    "Job submission and workflow options": {
-      "LSF": {
-        "default": true,
-        "help_text": "Use LSF to parallelise analyses (optional)"
-      },
-      "LSFQ": {
-        "default": "normal",
-        "help_text": "LSF queue to submit to (optional)"
-      },
-      "mem": {
-        "default": 5,
-        "help_text": "Amount of memory required for analysis (Gb) (optional)"
-      },
-      "nodes": {
-        "default": 20,
-        "help_text": "Maximum number of jobs to run on nodes in parallel (optional)"
-      },
-      "force": {
-        "default": false,
-        "help_text": "Force overwrite of output files (optional)"
-      },
-      "dirty": {
-        "default": false,
-        "help_text": "Do not clean up temporary files (optional)"
       }
     }
   }

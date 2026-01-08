@@ -30,9 +30,9 @@ def printHelp() {
 include { CONCAT_REFERENCE          } from './modules/concat_reference.nf'
 
 //SUBWORKFLOWS
-include { CALL_MAPPING              } from './sub-workflows/CALL_MAPPING.nf'
-include { MAKE_PILEUP_FROM_SAM      } from './sub-workflows/MAKE_PILEUP_FROM_SAM.nf'
-include { PSEUDOSEQUENCE_GENERATION } from './sub-workflows/PSEUDOSEQUENCE_GENERATION.nf'
+include { CALL_MAPPING              } from './sub-workflows/call_mapping.nf'
+include { MAKE_PILEUP_FROM_SAM      } from './sub-workflows/make_pileup_from_sam.nf'
+include { PSEUDOSEQUENCE_GENERATION } from './sub-workflows/pseudosequence_generation.nf'
 
 /*
 ========================================================================================
