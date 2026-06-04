@@ -98,14 +98,15 @@ Results are written to `--outdir` (default: `./results`):
 ```
 results/
   <sample_ID>_<program>/
-    <sample_ID>.bam              # Sorted, filtered BAM
-    <sample_ID>_*.bam            # Additional split BAMs (filter modes 4 or 5 only)
-    <sample_ID>.bcf              # BCF (all sites)
-    <sample_ID>_variant.bcf      # BCF (variant sites only)
+    <sample_ID>.bcf              # BCF with all sites
+    <sample_ID>_variant.bcf      # BCF with variant sites only
+    <sample_ID>.ploidy           # Ploidy file used for variant calling
     <sample_ID>.mpileup          # Samtools mpileup output
-  <sample_ID>.mfa                # Per-sample pseudosequence FASTA (when --pseudosequence true)
-  snp_alignment.out              # Multi-sample SNP summary
-  snp_alignment_summary.out
+    <sample_ID>_metrics.txt      # Picard duplicate-marking metrics (when --markdup true)
+    <sample_ID>.mfa              # Per-sample pseudosequence FASTA (when --pseudosequence true)
+  <ref>.aln                      # Multi-sample indel-joined pseudosequence alignment (when --pseudosequence true)
+  <ref>.aln.out                  # Multi-sample SNP summary (when --pseudosequence true)
+  <ref>.aln_summary.out          # SNP summary statistics (when --pseudosequence true)
 ```
 
 ### Parameters
