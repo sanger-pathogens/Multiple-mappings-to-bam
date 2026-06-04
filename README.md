@@ -231,7 +231,9 @@ See `modules/` for pinned container versions.
 - **Reference index not found**: the pipeline builds BWA/SMALT/SSAHA indexes automatically. Ensure the reference directory is writable.
 - **GATK indel realignment fails**: GATK 3.7 requires a sequence dictionary alongside the reference. This is generated automatically by the pipeline; ensure the reference directory is writable.
 - **Resuming a failed run**: add `-resume` to your command to restart from cached intermediate results.
-- For further help, check `.nextflow.log` and the per-process logs in the `work/` directory.
+- For further help, check `.nextflow.log` and the per-process `.command.log` logs in the `work/` directory.
+
+Sanger users may find [this page](https://ssg-confluence.internal.sanger.ac.uk/spaces/PaMI/pages/181078206/General+pipeline+info#Generalpipelineinfo-Troubleshootingafailedpipelinerunandsendingabugreport) useful for troubleshooting Nextflow pipeline runs.
 
 ## Issues and Contributions
 
