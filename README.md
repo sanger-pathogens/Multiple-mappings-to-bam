@@ -43,7 +43,7 @@ The pipeline performs the following steps:
 
    :warning: If no profile is specified the pipeline will run with the Sanger HPC-specific configuration.
 
-3. Once the run has finished, clean up intermediate files:
+3. Once the run has finished successfully and you have inspected the output, clean up intermediate files. The `work/` directory and `.nextflow.log` are useful for troubleshooting — do not delete them until you are satisfied the outputs are correct:
 
    ```bash
    rm -rf work .nextflow*
