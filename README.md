@@ -1,4 +1,4 @@
-# Multiple Mappings to BAM
+# multiple-mappings-to-bam
 
 [![Nextflow](https://img.shields.io/badge/nextflow%20DSL2-%E2%89%A521.04.0-23aa62.svg?labelColor=000000)](https://www.nextflow.io/)
 [![run with docker](https://img.shields.io/badge/run%20with-docker-0db7ed?labelColor=000000&logo=docker)](https://www.docker.com/)
@@ -6,265 +6,235 @@
 
 [[_TOC_]]
 
-## Introduction
+## Pipeline overview
 
-This project is part of the Google Summer of Code 2024 program. It provides a Nextflow-based pipeline for processing DNA sequences and generating BAM files. The pipeline supports multiple mapping tools and various configurations to suit different research needs.
+**multiple-mappings-to-bam** is a Nextflow DSL2 pipeline for mapping short-read paired-end sequencing data to a reference genome, calling variants, and optionally generating pseudosequences for phylogenetic analysis. It supports three mapping tools (BWA, SMALT, SSAHA2) and produces per-sample filtered BAMs and BCF variant calls.
 
-## Features
+The pipeline performs the following steps:
 
-- Supports multiple mapping programs (BWA, SMALT, SSAHA)
-- Handles paired-end and single-end reads
-- Quality filtering and duplicate marking
-- Optionally generates pseudosequences
-- Supports indel calling and variant detection
-- Configurable parameters for advanced usage
-
-## Overview
-
-### Mapping
-
-Reads, paired or single-end, can be mapped to a reference by a selection of tools: BWA, SMALT or SSAHA. Choice of program enables various tool-specific options.
-
-If mapping against the human genome with `--program SMALT`, using `--human` optimises kmer size and step size for faster, more memory-efficient mapping.
-
-### Pileup
-
-Optional BAM filtering has 5 modes to choose from (passed to the `--filter` option):
-
-- `1` No filtering (Default)
-- `2` Remove unmapped reads
-- `3` Keep properly paired reads only
-- `4` Split mapped and unmapped into separate bams
-- `5` Split properly paired and unpaired reads into separate bams
-
-### Pseudosequence Generation
-
-Optional workflow that can be deactivated by setting `--pseudosequence false`.
-RAxML phylogeny - can adjust bootstrapping (0 = none, 1-1000 to define bootstrap replicates)
-
-## Getting started
-
-### Running on the farm (Sanger HPC clusters)
-
-1. Load nextflow and singularity modules:
-
-   ```bash
-   module load nextflow ISG/singularity
-   ```
-
-2. Either:
-
-   - Clone this repository using `git clone --recurse-submodules`  
-     OR
-   - Use ready-made module: `module load multiple-mappings-to-bam`  
-     :warning: If using the ready-made module, replace `nextflow run main.nf` with `multiple-mappings-to-bam` in all subsequent commands.
-
-3. Start the pipeline
-
-   Example:
-
-   ```bash
-   nextflow run main.nf --manifest ./test_data/inputs/test_manifest.csv --outdir my_output
-   ```
-
-   It is good practice to submit a dedicated job for the nextflow master process (use the `oversubscribed` queue):
-
-   ```bash
-   bsub -o output.o -e error.e -q oversubscribed -R "select[mem>4000] rusage[mem=4000]" -M4000 nextflow run main.nf --ref absolute/path/to/ref/file --read_dir <path/to/directory/containing/reads>
-   ```
-
-   See [usage](#usage) for all available pipeline options.
+1. **Input** — paired FASTQ files are discovered from a read directory (see [Input](#input)).
+2. **Mapping** — reads are aligned to the reference using BWA (default), SMALT, or SSAHA2.
+3. **BAM processing** — the alignment is sorted; duplicates are optionally marked with Picard; GATK indel realignment is optionally applied; the BAM is filtered according to the selected filter mode.
+4. **Variant calling** — Samtools mpileup generates per-position coverage and bcftools calls variants into a BCF.
+5. **Pseudosequence generation** (optional, default: enabled) — a per-sample pseudosequence FASTA is derived from the BCF; indels are joined across samples; a multi-sample SNP summary is produced.
 
 ## Usage
 
-```
-Usage:
-    nextflow run main.nf [options]
+### Quickstart
 
-Options:
+#### From source code
 
-Input/output options
+1. Clone this repository with its submodules:
 
--- read_dir
-    Absolute path to a directory containing reads (mandatory)
+   ```bash
+   git clone --recurse-submodules https://gitlab.internal.sanger.ac.uk/sanger-pathogens/pipelines/multiple-mappings-to-bam.git
+   cd multiple-mappings-to-bam
+   ```
 
--- ref
-    Absolute path to a directory containing reference DNA sequence (mandatory)
+2. To run with `singularity`, use the `-profile singularity` option:
 
--- embl
-    default: ""
-    Reference annotation
+   ```bash
+   nextflow run main.nf \
+       -profile singularity \
+       --read_dir /path/to/reads/ \
+       --ref /path/to/reference.fasta \
+       --outdir my_output
+   ```
 
--- outdir
-    default: "./results"
-    Output directory
+   :warning: If no profile is specified the pipeline will run with the Sanger HPC-specific configuration.
 
--- diroutput
-    default: ""
-    Output directory suffix
+3. Once the run has finished, clean up intermediate files:
 
--- output
-    default: " "
-    Output file prefix
+   ```bash
+   rm -rf work .nextflow*
+   ```
 
-Mapping options
+#### Using on the Sanger farm
 
+First load the latest pipeline module:
 
--- program
-    default: BWA
-    Mapping program you wish to include: BWA|SSAHA|SMALT
-
--- domapping
-    default: true
-    Do not remap data
-
--- human
-    default: false
-    Optimise SMALT for mapping against human genome
-
--- pairedend
-    default: true
-    Set to false for single-end reads
-
--- maxinsertsize
-    default: 1000
-    Maximum insert size for paired-end reads (SMALT/SSAHA only)
-
--- mininsertsize
-    default: 50
-    Minimum insert size for paired-end reads (SMALT/SSAHA only)
-
--- ssahaquality
-    default: 30
-    Minimum Phred base quality score (SSAHA only)
-
--- circular
-    default: true
-    Contigs are circular (SSAHA only)
-
--- maprepeats
-    default: false
-    Map all reads, including repeats (even ambiguous mappings). Default is false to exclude multi-mapping reads. (SMALT only)
-
--- nomapid
-    default: 0
-    Minimum identity threshold, as a float, for mapping to be reported (SMALT only)
-
--- GATK
-    default: true
-    Run GATK indel realignment (optional)
-
--- markdup
-    default: true
-    Mark duplicates with Picard (optional)
-
--- detectOverlaps
-    default: false
-    Enable read-pair overlap detection (optional)
-
--- filter
-    default: 1
-    Filtering mode for bam file (1=No filter, 2=remove unmapped, 3=properly paired only, 4=split mapped/unmapped, 5=split properly paired/unpaired)
-
-Variant calling options:
-
--- call
-    default: c
-    bcftools caller (c=consensus, m=multiallelic)
-
--- prior
-    default: 0.001
-    Sets the prior probability that a site is non-reference for variant calling, higher values increase sensitivity to rare variants (optional)
-
--- BAQ
-    default: false
-    Use samtools base alignment quality option (BAQ) (optional)
-
--- dontuseanomolous
-    default: false
-    Use anomalous reads in mpileup (optional)
-
-Pseudosequence options:
-
--- pseudosequence
-    default: true
-    Create pseudosequences (optional)
-
--- incref
-    default: true
-    Include reference in pseudosequence alignment (optional)
-
--- indels
-    default: true
-    Include small indels in pseudosequence alignment (optional)
-
--- quality
-    default: 50
-    Minimum base call quality (optional)
-
--- mapq
-    default: 20
-    Minimum mapping quality (optional)
-
--- depth
-    default: 8
-    Minimum number of reads matching SNP (optional)
-
--- stranddepth
-    default: 3
-    Minimum number of reads matching SNP per strand (optional)
-
--- ratio
-    default: 0.8
-    SNP/Mapping quality ratio cutoff (optional)
-
--- raxml
-    default: false
-    Run phylogeny with RAxML (optional)
-
--- model
-    default: GTRGAMMA
-    Model for RAxML: GTRCAT|GTRMIX|GTRGAMMA (optional)
-
--- bootstrap
-    default: 100
-    Number of bootstrap replicates for RAxML, 0=No bootstrap (optional)
-
--- tabfile
-    default: false
-    Create tabfile of snps (optional)
-
--- alnfile
-    default: false
-    Create snp alignment file (optional)
-
-Job submission and workflow options
-
--- LSF
-    default: true
-    Use LSF to parallelise analyses (optional)
-
--- LSFQ
-    default: "normal"
-    LSF queue to submit to (optional)
-
--- mem
-    default: 5
-    Amount of memory required for analysis (Gb) (optional)
-
--- nodes
-    default: 20
-    Maximum number of jobs to run on nodes in parallel (optional)
-
--- force
-    default: false
-    Force overwrite of output files (optional)
-
--- dirty
-    default: false
-    Do not clean up temporary files (optional)
+```bash
+module load multiple-mappings-to-bam
 ```
 
-## Support
+Then run on the command line with `multiple-mappings-to-bam <options>`. For instance, to see a help message:
 
-For further information or help, don't hesitate to get in touch via [pam-informatics@sanger.ac.uk](mailto:pam-informatics@sanger.ac.uk).
+```bash
+multiple-mappings-to-bam --help
+```
+
+Submit to LSF:
+
+```bash
+bsub -o output.o -e error.e -q oversubscribed -R "select[mem>4000] rusage[mem=4000]" -M4000 \
+    multiple-mappings-to-bam \
+        --read_dir /path/to/reads/ \
+        --ref /path/to/reference.fasta \
+        --outdir my_output
+```
+
+### Input
+
+#### Read directory (`--read_dir`)
+
+A path to a directory containing paired-end FASTQ files. Files must follow the naming convention `<sample_ID>_1.fastq.gz` / `<sample_ID>_2.fastq.gz`; the sample ID is derived from the filename prefix.
+
+```
+reads/
+  sampleA_1.fastq.gz
+  sampleA_2.fastq.gz
+  sampleB_1.fastq.gz
+  sampleB_2.fastq.gz
+```
+
+#### Reference (`--ref`)
+
+Path to a reference FASTA file. Indexes are built automatically if not already present alongside the reference.
+
+### Output
+
+Results are written to `--outdir` (default: `./results`):
+
+```
+results/
+  <sample_ID>_<program>/
+    <sample_ID>.bam              # Sorted, filtered BAM
+    <sample_ID>_*.bam            # Additional split BAMs (filter modes 4 or 5 only)
+    <sample_ID>.bcf              # BCF (all sites)
+    <sample_ID>_variant.bcf      # BCF (variant sites only)
+    <sample_ID>.mpileup          # Samtools mpileup output
+  <sample_ID>.mfa                # Per-sample pseudosequence FASTA (when --pseudosequence true)
+  snp_alignment.out              # Multi-sample SNP summary
+  snp_alignment_summary.out
+```
+
+### Parameters
+
+**Input/output options**
+
+| Option       | Type   | Default     | Description                                                              |
+| ------------ | ------ | ----------- | ------------------------------------------------------------------------ |
+| `--read_dir` | `path` | (required)  | Path to directory containing paired `*_1.fastq.gz`/`*_2.fastq.gz` files. |
+| `--ref`      | `path` | (required)  | Path to the reference FASTA file.                                        |
+| `--embl`     | `path` | `""`        | Path to reference annotation file (EMBL format).                         |
+| `--outdir`   | `path` | `./results` | Directory where results are written.                                     |
+
+---
+
+**Mapping options**
+
+| Option                 | Type      | Default | Description                                                                                                                                 |
+| ---------------------- | --------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--program`            | `string`  | `BWA`   | Mapping program. Options: `BWA`, `SMALT`, `SSAHA`.                                                                                          |
+| `--domapping`          | `boolean` | `true`  | Perform read mapping. Set `false` to skip remapping.                                                                                        |
+| `--human`              | `boolean` | `false` | Optimise SMALT k-mer size and step for mapping against the human genome (SMALT only).                                                       |
+| `--maxinsertsize`      | `integer` | `1000`  | Maximum insert size for paired-end reads (SMALT/SSAHA only).                                                                                |
+| `--mininsertsize`      | `integer` | `50`    | Minimum insert size for paired-end reads (SMALT/SSAHA only).                                                                                |
+| `--ssahaquality`       | `integer` | `30`    | Minimum Phred base quality score (SSAHA only).                                                                                              |
+| `--circular`           | `boolean` | `true`  | Treat contigs as circular (SSAHA only).                                                                                                     |
+| `--allow_multimapping` | `boolean` | `false` | Map all reads including multi-mapping reads. Default excludes ambiguous mappings (SMALT only).                                              |
+| `--nomapid`            | `float`   | `0`     | Minimum identity threshold for a mapping to be reported (SMALT only).                                                                       |
+| `--GATK`               | `boolean` | `true`  | Run GATK indel realignment.                                                                                                                 |
+| `--markdup`            | `boolean` | `true`  | Mark duplicate reads with Picard.                                                                                                           |
+| `--detectOverlaps`     | `boolean` | `false` | Enable read-pair overlap detection.                                                                                                         |
+| `--filter`             | `integer` | `1`     | BAM filtering mode: `1`=none, `2`=remove unmapped, `3`=properly paired only, `4`=split mapped/unmapped, `5`=split properly paired/unpaired. |
+
+---
+
+**Variant calling options**
+
+| Option               | Type      | Default | Description                                                                                          |
+| -------------------- | --------- | ------- | ---------------------------------------------------------------------------------------------------- |
+| `--call`             | `string`  | `c`     | bcftools caller: `c`=consensus, `m`=multiallelic.                                                    |
+| `--prior`            | `float`   | `0.001` | Prior probability that a site is non-reference. Higher values increase sensitivity to rare variants. |
+| `--BAQ`              | `boolean` | `false` | Apply samtools base alignment quality (BAQ) recalibration.                                           |
+| `--dontuseanomolous` | `boolean` | `false` | Exclude anomalous read pairs from mpileup.                                                           |
+
+---
+
+**Pseudosequence options**
+
+| Option             | Type      | Default | Description                                                             |
+| ------------------ | --------- | ------- | ----------------------------------------------------------------------- |
+| `--pseudosequence` | `boolean` | `true`  | Generate pseudosequences from variant calls.                            |
+| `--incref`         | `boolean` | `true`  | Include the reference sequence in the pseudosequence alignment.         |
+| `--indels`         | `boolean` | `true`  | Include small indels in the pseudosequence alignment.                   |
+| `--quality`        | `integer` | `50`    | Minimum base call quality for pseudosequence generation.                |
+| `--mapq`           | `integer` | `20`    | Minimum mapping quality for pseudosequence generation.                  |
+| `--depth`          | `integer` | `8`     | Minimum number of reads required to call a SNP.                         |
+| `--stranddepth`    | `integer` | `3`     | Minimum number of reads per strand required to call a SNP.              |
+| `--ratio`          | `float`   | `0.8`   | Minimum SNP/mapping quality ratio cutoff.                               |
+| `--raxml`          | `boolean` | `false` | Run RAxML phylogeny on the pseudosequence alignment.                    |
+| `--bootstrap`      | `integer` | `100`   | Number of RAxML bootstrap replicates. Set `0` to disable bootstrapping. |
+| `--tabfile`        | `boolean` | `false` | Output a tab-delimited file of SNPs.                                    |
+| `--alnfile`        | `boolean` | `false` | Output a SNP alignment file.                                            |
+
+---
+
+**Logging options**
+
+| Option              | Type      | Default | Description                                            |
+| ------------------- | --------- | ------- | ------------------------------------------------------ |
+| `--monochrome_logs` | `boolean` | `false` | Output logs in plain ASCII (disable coloured logging). |
+
+### Advanced usage
+
+#### Choosing a mapping program
+
+BWA is the default and recommended mapper for most use cases. Use SMALT for more control over repeat handling (`--allow_multimapping`) or for optimised human genome mapping (`--human`). Use SSAHA2 for circular contig support (`--circular`).
+
+#### Disabling pseudosequence generation
+
+To run mapping and variant calling only, without generating pseudosequences:
+
+```bash
+multiple-mappings-to-bam \
+    --read_dir /path/to/reads/ \
+    --ref /path/to/reference.fasta \
+    --pseudosequence false \
+    --outdir my_output
+```
+
+#### BAM filtering modes
+
+The `--filter` option controls how the output BAM is filtered:
+
+| Mode | Behaviour                                                   |
+| ---- | ----------------------------------------------------------- |
+| `1`  | No filtering (default)                                      |
+| `2`  | Remove unmapped reads                                       |
+| `3`  | Keep properly paired reads only                             |
+| `4`  | Split mapped and unmapped reads into separate BAMs          |
+| `5`  | Split properly paired and unpaired reads into separate BAMs |
+
+### Dependencies
+
+All dependencies are containerised. No external databases are required.
+
+## Software versions
+
+| Software | Version      | Image                                              |
+| -------- | ------------ | -------------------------------------------------- |
+| BWA      | 0.7.17-r1188 | `quay.io/ssd28/gsoc-experimental/run-bwa:0.0.2`    |
+| SMALT    | 0.7.6        | `quay.io/ssd28/gsoc-experimental/run-smalt:0.0.2`  |
+| SSAHA2   | 2.5.5        | `quay.io/sangerpathogens/ssaha2:v2.5.5_cv3`        |
+| Samtools | 1.3          | `quay.io/ssd28/gsoc-experimental/samtools:1.3`     |
+| Picard   | 1.126        | `quay.io/ssd28/gsoc-experimental/picard:1.126`     |
+| GATK     | 3.7.0        | `quay.io/ssd28/gsoc-experimental/gatk:3.7.0`       |
+| bcftools | 1.11         | `quay.io/ssd28/gsoc-experimental/bcftools:1.11-c1` |
+
+See `modules/` for pinned container versions.
+
+## Troubleshooting
+
+- **No reads found**: ensure FASTQ files in `--read_dir` follow the `<sample_ID>_1.fastq.gz` / `<sample_ID>_2.fastq.gz` naming convention.
+- **Reference index not found**: the pipeline builds BWA/SMALT/SSAHA indexes automatically. Ensure the reference directory is writable.
+- **GATK indel realignment fails**: GATK 3.7 requires a sequence dictionary alongside the reference. This is generated automatically by the pipeline; ensure the reference directory is writable.
+- **Resuming a failed run**: add `-resume` to your command to restart from cached intermediate results.
+- For further help, check `.nextflow.log` and the per-process logs in the `work/` directory.
+
+## Issues and Contributions
+
+If you find an issue with this pipeline, or would like to suggest an improvement, please log an issue or open a pull request on this repository.
+
+If you are at Sanger and need internal support, you can raise an issue on the PAM Freshservice portal: https://sanger.freshservice.com/support/catalog/items/426
