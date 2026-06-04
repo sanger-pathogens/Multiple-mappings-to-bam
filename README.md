@@ -236,6 +236,10 @@ See `modules/` for pinned container versions.
 
 Sanger users may find [this page](https://ssg-confluence.internal.sanger.ac.uk/spaces/PaMI/pages/181078206/General+pipeline+info#Generalpipelineinfo-Troubleshootingafailedpipelinerunandsendingabugreport) useful for troubleshooting Nextflow pipeline runs.
 
+## Credits
+
+This pipeline was developed as part of the [Google Summer of Code 2024 program](https://summerofcode.withgoogle.com/archive/2024/projects/6g03n2ZD).
+
 ## Issues and Contributions
 
 **GitHub users:** if you find an issue with this pipeline, or would like to suggest an improvement, please log an issue or open a pull request on this repository.
