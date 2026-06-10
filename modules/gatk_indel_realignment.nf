@@ -5,7 +5,7 @@ process INDEL_REALIGNMENT {
     label "mem_10"
     label "time_12"
 
-    container 'quay.io/ssd28/gsoc-experimental/gatk:3.7.0 '
+    container 'quay.io/ssd28/gsoc-experimental/gatk:3.7.0'
 
     input:
     tuple val(meta), path(bam), path(bam_bai)
