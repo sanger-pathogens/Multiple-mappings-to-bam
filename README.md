@@ -8,7 +8,7 @@
 
 ## Pipeline overview
 
-**multiple-mappings-to-bam** is a Nextflow DSL2 pipeline for mapping short-read paired-end sequencing data to a reference genome, calling variants, and optionally generating pseudosequences for phylogenetic analysis. It supports three mapping tools (BWA, SMALT, SSAHA2) and produces per-sample filtered BAMs and BCF variant calls.
+**multiple-mappings-to-bam** is a Nextflow DSL2 pipeline for mapping short-read paired-end sequencing data to a reference genome, calling variants, and optionally generating pseudosequences for phylogenetic analysis. It supports three mapping tools (BWA, SMALT, SSAHA2) and produces per-sample filtered BAM alignments and BCF variant calls.
 
 The pipeline performs the following steps:
 
@@ -16,7 +16,7 @@ The pipeline performs the following steps:
 2. **Mapping** — reads are aligned to the reference using BWA (default), SMALT, or SSAHA2.
 3. **BAM processing** — the alignment is sorted; duplicates are optionally marked with Picard; GATK indel realignment is optionally applied; the BAM is filtered according to the selected filter mode.
 4. **Variant calling** — Samtools mpileup generates per-position coverage and bcftools calls variants into a BCF.
-5. **Pseudosequence generation** (optional, default: enabled) — a per-sample pseudosequence FASTA is derived from the BCF; indels are joined across samples; a multi-sample SNP summary is produced.
+5. **Pseudosequence generation** (optional, default: enabled) — a per-sample pseudosequence FASTA is derived from the BCF i.e. a consensus sequence is derived from the reference sequence where called variants or reference alleles are placed at their respective position and unknown bases `N` are used when no allele could be confidently called; indels are joined across samples; a multi-sample SNP summary is produced.
 
 ## Usage
 
@@ -27,7 +27,7 @@ The pipeline performs the following steps:
 1. Clone this repository with its submodules:
 
    ```bash
-   git clone --recurse-submodules <repo-url>
+   git clone --recurse-submodules https://github.com/sanger-pathogens/Multiple-mappings-to-bam.git
    cd multiple-mappings-to-bam
    ```
 
@@ -51,7 +51,9 @@ The pipeline performs the following steps:
 
    Alternatively, use `nextflow clean` for more fine-grained control over which runs and intermediate files are removed.
 
-#### Using on the Sanger farm
+#### Using on the Sanger 'farm' HPC
+
+This pipeline is configured by default to run on the Sanger HPC under the `standard` profile (no need to specify it with `-profile`) so it can submit its tasks to the LSF scheduler to run as jobs on the HPC, and also to use singularity containers with adequate filesystem mountings and benefit from centralised singularity image caching.
 
 First load the latest pipeline module:
 
@@ -65,7 +67,7 @@ Then run on the command line with `multiple-mappings-to-bam <options>`. For inst
 multiple-mappings-to-bam --help
 ```
 
-Submit to LSF:
+Submit to HPC job scheduler (LSF):
 
 ```bash
 bsub -o output.o -e error.e -q oversubscribed -R "select[mem>4000] rusage[mem=4000]" -M4000 \
