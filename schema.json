@@ -92,10 +92,6 @@
         "default": true,
         "help_text": "Create pseudosequences (optional)"
       },
-      "incref": {
-        "default": true,
-        "help_text": "Include reference in pseudosequence alignment (optional)"
-      },
       "indels": {
         "default": true,
         "help_text": "Include small indels in pseudosequence alignment (optional)"

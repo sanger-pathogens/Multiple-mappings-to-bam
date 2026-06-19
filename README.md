@@ -161,7 +161,6 @@ results/
 | Option             | Type      | Default | Description                                                             |
 | ------------------ | --------- | ------- | ----------------------------------------------------------------------- |
 | `--pseudosequence` | `boolean` | `true`  | Generate pseudosequences from variant calls.                            |
-| `--incref`         | `boolean` | `true`  | Include the reference sequence in the pseudosequence alignment.         |
 | `--indels`         | `boolean` | `true`  | Include small indels in the pseudosequence alignment.                   |
 | `--quality`        | `integer` | `50`    | Minimum base call quality for pseudosequence generation.                |
 | `--mapq`           | `integer` | `20`    | Minimum mapping quality for pseudosequence generation.                  |
