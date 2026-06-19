@@ -210,11 +210,11 @@ The `--filter` option controls how the output BAM is filtered:
 | `4`  | Split mapped and unmapped reads into separate BAMs          |
 | `5`  | Split properly paired and unpaired reads into separate BAMs |
 
-### Dependencies
+## Dependencies
 
 All dependencies are containerised. No external databases are required.
 
-## Software versions
+### Software versions
 
 | Software | Version      | Image                                              |
 | -------- | ------------ | -------------------------------------------------- |
