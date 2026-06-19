@@ -1,5 +1,4 @@
-include { UNZIP_GZ;
-          UN_BAM                                        } from '../modules/helper_processes.nf'
+include { UNZIP_GZ }                                     } from '../modules/helper_processes.nf'
 include { BWA_INDEX; RUN_BWA                            } from '../modules/bwa.nf'
 include { SMALT_INDEX; 
           RUN_SMALT                                     } from '../modules/smalt.nf'

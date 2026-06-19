@@ -131,7 +131,6 @@ results/
 | Option                 | Type      | Default | Description                                                                                                                                 |
 | ---------------------- | --------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
 | `--program`            | `string`  | `BWA`   | Mapping program. Options: `BWA`, `SMALT`, `SSAHA`.                                                                                          |
-| `--domapping`          | `boolean` | `true`  | Perform read mapping. Set `false` to skip remapping.                                                                                        |
 | `--human`              | `boolean` | `false` | Optimise SMALT k-mer size and step for mapping against the human genome (SMALT only).                                                       |
 | `--maxinsertsize`      | `integer` | `1000`  | Maximum insert size for paired-end reads (SMALT/SSAHA only).                                                                                |
 | `--mininsertsize`      | `integer` | `50`    | Minimum insert size for paired-end reads (SMALT/SSAHA only).                                                                                |
