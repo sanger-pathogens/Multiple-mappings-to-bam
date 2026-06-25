@@ -24,10 +24,6 @@
         "default": "BWA",
         "help_text": "Mapping program you wish to include: BWA|SSAHA|SMALT"
       },
-      "domapping": {
-        "default": true,
-        "help_text": "Do not remap data"
-      },
       "human": {
         "default": false,
         "help_text": "Optimise SMALT for mapping against human genome"
@@ -95,14 +91,6 @@
       "pseudosequence": {
         "default": true,
         "help_text": "Create pseudosequences (optional)"
-      },
-      "incref": {
-        "default": true,
-        "help_text": "Include reference in pseudosequence alignment (optional)"
-      },
-      "indels": {
-        "default": true,
-        "help_text": "Include small indels in pseudosequence alignment (optional)"
       },
       "quality": {
         "default": 50,
