@@ -161,6 +161,7 @@ results/
 | Option             | Type      | Default | Description                                                             |
 | ------------------ | --------- | ------- | ----------------------------------------------------------------------- |
 | `--pseudosequence` | `boolean` | `true`  | Generate pseudosequences from variant calls.                            |
+| `--indels`         | `boolean` | `true`  | Include small indels in the pseudosequence alignment.                   |
 | `--quality`        | `integer` | `50`    | Minimum base call quality for pseudosequence generation.                |
 | `--mapq`           | `integer` | `20`    | Minimum mapping quality for pseudosequence generation.                  |
 | `--depth`          | `integer` | `8`     | Minimum number of reads required to call a SNP.                         |
