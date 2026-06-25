@@ -92,10 +92,6 @@
         "default": true,
         "help_text": "Create pseudosequences (optional)"
       },
-      "indels": {
-        "default": true,
-        "help_text": "Include small indels in pseudosequence alignment (optional)"
-      },
       "quality": {
         "default": 50,
         "help_text": "Minimum base call quality (optional)"
