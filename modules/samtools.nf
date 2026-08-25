@@ -123,7 +123,7 @@ process SAMTOOLS_SAM_TO_BAM {
     label "mem_1"
     label "time_1"
 
-    publishDir "${params.outdir}", mode: 'copy', overwrite: true
+    publishDir "${params.outdir}/${meta.ID}_${params.program}/raw_bams", mode: 'copy', overwrite: true, enabled: params.publish_raw_bam
 
     container 'quay.io/ssd28/gsoc-experimental/samtools:1.3'
 

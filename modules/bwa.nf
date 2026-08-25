@@ -32,6 +32,8 @@ process RUN_BWA {
 
     container 'quay.io/ssd28/gsoc-experimental/run-bwa:0.0.2'
 
+    publishDir "${params.outdir}/${meta.ID}_${params.program}/raw_bams", mode: 'copy', overwrite: true, saveAs: { filename -> "${meta.ID}.bam"}, enabled: params.publish_raw_bam
+
     input:
     tuple val(meta), path(fastq1), path(fastq2)
     tuple path(ref), path(bwa_index_files)
