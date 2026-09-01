@@ -19,7 +19,7 @@ process FILTER_BAM {
     script:
     if ( params.filter == 1 )
         """
-        cp ${tmp_bam} ${meta.ID}.bam
+        ln -s ${tmp_bam} ${meta.ID}.bam
         """
     else if( params.filter == 2 )
         """
