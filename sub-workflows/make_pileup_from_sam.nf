@@ -7,10 +7,8 @@ include { INDEX_REF
           SAMTOOLS_INDEX as SAMTOOLS_FILTERED_INDEX; 
           SAMTOOLS_MERGE;
           SAMTOOLS_PILEUP                               } from '../modules/samtools.nf'
-include { FORMAT_SMALT_HEADER                           } from '../modules/smalt.nf'
-include { FORMAT_BWA_HEADER                             } from '../modules/bwa.nf'
-include { FORMAT_SSAHA_HEADER                           } from '../modules/ssaha.nf'
-include { INDEL_REALIGNMENT                             } from '../modules/gatk_indel_realignment.nf'
+include { INDEL_REALIGNMENT;
+          ADD_READGROUP                                 } from '../modules/gatk_indel_realignment.nf'
 include { FILTER_BAM                                    } from '../modules/filter_bam.nf'
 include { BCFTOOLS_CALL                                 } from '../modules/bcftools.nf'
 
@@ -38,22 +36,17 @@ workflow MAKE_PILEUP_FROM_SAM {
 
     SAMTOOLS_SORT_BAM_AND_MAKE_HEADER(deduped_ch)
 
-    if (params.program == "SMALT") {
+    Map<String, String> program_label = [
+        "BWA": "BWA MEM",
+        "SSAHA": "SSAHA",
+        "SMALT": "SMALT"
+    ]
 
-        FORMAT_SMALT_HEADER(SAMTOOLS_SORT_BAM_AND_MAKE_HEADER.out.header_ch)
-        | set { formatted_header_ch }
-
-    } else if (params.program == "BWA") {
-
-        FORMAT_BWA_HEADER(SAMTOOLS_SORT_BAM_AND_MAKE_HEADER.out.header_ch)
-        | set { formatted_header_ch }
-
-    } else if (params.program == "SSAHA") {
-
-        FORMAT_SSAHA_HEADER(SAMTOOLS_SORT_BAM_AND_MAKE_HEADER.out.header_ch)
-        | set { formatted_header_ch }
-
-    }
+    ADD_READGROUP(
+        SAMTOOLS_SORT_BAM_AND_MAKE_HEADER.out.header_ch,
+        Channel.value(program_label[params.program])
+    )
+    | set { formatted_header_ch }
     
     SAMTOOLS_SORT_BAM_AND_MAKE_HEADER.out.bam_ch.join(formatted_header_ch)
     | SAMTOOLS_MERGE
