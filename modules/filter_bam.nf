@@ -10,7 +10,7 @@ process FILTER_BAM {
     publishDir "${params.outdir}/${meta.ID}_${params.program}/filtered_bams", mode: 'copy', overwrite: true, pattern: "${meta.ID}*.bam"
 
     input:
-    tuple val(meta), path(tmp_bam)
+    tuple val(meta), path(tmp_bam, stageAs: "input.bam")
 
     output:
     tuple val(meta), path("${meta.ID}.bam"), emit: bam_ch
