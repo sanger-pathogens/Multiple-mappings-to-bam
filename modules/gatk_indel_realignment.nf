@@ -1,31 +1,3 @@
-// GATK requires a readgroup (@RG) tag for indel realignment, so we add one to the BAM header if it doesn't already have one
-process ADD_READGROUP {
-    tag "${meta.ID}"
-
-    label "cpu_1"
-    label "mem_100M"
-    label "time_30m"
-
-    container 'quay.io/ssd28/gsoc-experimental/void:0.0.1'
-
-    stageInMode 'copy'
-
-    input:
-    tuple val(meta), path(header)
-    val(program)
-
-    output:
-    tuple val(meta), path(header), emit: header_ch
-
-    script:
-    """
-    if ! grep -q "^@RG" "${header}"; then
-        now=\$(date +'%Y-%m-%dT%H:%M:%S')
-        echo '@RG\tID:${meta.ID}\tCN:Sanger\tDT:'\$now'\tPG:${program}\tPL:ILLUMINA\tSM:${meta.ID}' >> ${header}
-    fi
-    """
-}
-
 process INDEL_REALIGNMENT {
     tag "${meta.ID}"
     
